@@ -47,6 +47,12 @@ lecture-kit/
 - Mobile responsive
 - Minimal dependencies
 
+## Sharing & Navigation Rules
+
+- **Course pages are the entry point for students.** Each course's `index.html` is shared directly — students should never see or navigate to the lecture-kit main page (`/`).
+- **No links to lecture-kit root** from any page inside `courses/`. No breadcrumb, footer, or title referencing "lecture-kit".
+- Weekly pages (`week-XX.html`) link back to their own course index only.
+
 ## Content Language
 
 Primary content is in **Korean (한국어)**. UI labels may be bilingual.
