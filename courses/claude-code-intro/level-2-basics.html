@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>레벨 2 — 기초 — Claude Code 입문</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- Section Nav (right side dots)           -->
+    <!-- ════════════════════════════════════════ -->
+    <nav class="section-nav no-print" id="sectionNav">
+      <a href="#claude-md" data-section="1"><span class="nav-label">01 — CLAUDE.md</span></a>
+      <a href="#permission-modes" data-section="2"><span class="nav-label">02 — 권한 모드</span></a>
+      <a href="#git-integration" data-section="3"><span class="nav-label">03 — Git 연동</span></a>
+      <a href="#slash-commands" data-section="4"><span class="nav-label">04 — 슬래시 커맨드</span></a>
+      <a href="#context-management" data-section="5"><span class="nav-label">05 — 컨텍스트 관리</span></a>
+      <a href="#memory-system" data-section="6"><span class="nav-label">06 — 메모리 시스템</span></a>
+      <a href="#multi-file" data-section="7"><span class="nav-label">07 — 멀티파일 작업</span></a>
+    </nav>
+
+    <div class="lecture-page">
+      <!-- ════════════════════════════════════════ -->
+      <!-- Hero Header                             -->
+      <!-- ════════════════════════════════════════ -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">CLAUDE.md</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-green) 15%, transparent); color: var(--color-accent-green);">Git</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">Commands</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent); color: var(--color-accent-purple);">Memory</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3" style="letter-spacing: -0.03em;">
+          레벨 2 — 기초
+        </h1>
+        <p style="color: var(--color-text-muted);" class="text-base leading-relaxed max-w-2xl">
+          CLAUDE.md로 프로젝트별 AI 행동을 커스터마이즈하고, Git 연동 코드 리뷰, 슬래시 커맨드와 메모리 시스템을 활용하여 실제 프로젝트를 관리한다.
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-green), var(--color-accent-orange), transparent);"></div>
+      </header>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Learning Objectives                     -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="module-card mb-8">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          학습 목표
+        </div>
+        <div class="module-card-body">
+          <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> CLAUDE.md로 프로젝트별 AI 행동을 커스터마이즈한다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> Git 연동을 통한 AI 기반 코드 리뷰를 수행한다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> 슬래시 커맨드와 메모리 시스템을 활용한다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> 멀티파일 작업으로 실제 프로젝트를 관리한다</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Table of Contents                       -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="toc mb-16">
+        <div class="toc-header">목차</div>
+        <div class="toc-body">
+          <a href="#claude-md" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-blue);"></span>
+            <span class="toc-num">01</span>
+            CLAUDE.md 설정 — 프로젝트 맞춤 설정
+          </a>
+          <a href="#permission-modes" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-green);"></span>
+            <span class="toc-num">02</span>
+            권한 모드 — 도구 실행 제어
+          </a>
+          <a href="#git-integration" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-purple);"></span>
+            <span class="toc-num">03</span>
+            Git 연동 — 커밋, 리뷰, PR
+          </a>
+          <a href="#slash-commands" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-orange);"></span>
+            <span class="toc-num">04</span>
+            슬래시 커맨드 — 빠른 실행 단축키
+          </a>
+          <a href="#context-management" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-red);"></span>
+            <span class="toc-num">05</span>
+            컨텍스트 관리 — 토큰 절약
+          </a>
+          <a href="#memory-system" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-yellow);"></span>
+            <span class="toc-num">06</span>
+            메모리 시스템 — 세션 간 기억 유지
+          </a>
+          <a href="#multi-file" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-text-dim);"></span>
+            <span class="toc-num">07</span>
+            멀티파일 작업 — 실전 프로젝트
+          </a>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 1 — CLAUDE.md                                             -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="claude-md">
+        <span class="part-number">01</span>
+        <h2 class="part-title">CLAUDE.md 설정</h2>
+        <p class="part-subtitle">Project Instructions 완전 가이드</p>
+      </div>
+
+      <!-- 개요 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          CLAUDE.md란?
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            CLAUDE.md는 Claude Code가 프로젝트별로 <strong>자동으로 읽는 설정 파일</strong>이다.
+            매 세션마다 반복되는 프로젝트 규칙, 컨벤션, 제약사항을 한 번만 작성하면 Claude가 지속적으로 준수한다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 파일 위치와 우선순위 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-green);"></span>
+          파일 위치와 우선순위
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+            CLAUDE.md는 여러 위치에 배치 가능하며, 더 구체적인 범위일수록 우선순위가 높다.
+          </p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">위치</th>
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">용도</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">공유 범위</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">~/.claude/CLAUDE.md</code></td>
+                  <td class="py-2 pr-4">개인 코딩 스타일</td>
+                  <td class="py-2">나만 (모든 프로젝트)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">./CLAUDE.md</code></td>
+                  <td class="py-2 pr-4">팀 프로젝트 규칙</td>
+                  <td class="py-2">팀 (소스 컨트롤)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">.claude/rules/*.md</code></td>
+                  <td class="py-2 pr-4">모듈화된 주제별 규칙</td>
+                  <td class="py-2">팀 (소스 컨트롤)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">./CLAUDE.local.md</code></td>
+                  <td class="py-2 pr-4">개인 프로젝트별 설정</td>
+                  <td class="py-2">나만 (현재 프로젝트)</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">{subdir}/CLAUDE.md</code></td>
+                  <td class="py-2 pr-4">특정 모듈 전용</td>
+                  <td class="py-2">해당 디렉토리만</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-sm mt-4" style="color: var(--color-text-dim);">
+            Claude Code는 작업 디렉토리에서 루트까지 상위 디렉토리를 재귀적으로 탐색하여 모든 CLAUDE.md 파일을 수집한다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 기본 구조 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+          기본 구조
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+            효과적인 CLAUDE.md는 4개 주요 영역으로 구성된다:
+          </p>
+          <div class="code-block">
+            <div class="code-label">CLAUDE.md 기본 템플릿</div>
+            <pre><code># {프로젝트명}
+
+## 프로젝트 개요
+[1-3문장으로 프로젝트 설명]
+
+## 기술 스택
+[사용 기술, 버전, 중요 라이브러리]
+
+## 코드 컨벤션
+[언어 규칙, 포맷, 네이밍 규칙]
+
+## 주의사항 / 절대 하지 말 것
+[잘못하면 문제 발생하는 사항들]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 실전 예시 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          실전 예시 — Next.js + TypeScript
+        </div>
+        <div class="module-card-body">
+          <div class="code-block">
+            <div class="code-label">CLAUDE.md</div>
+            <pre><code># E-Commerce Platform
+
+## 프로젝트 개요
+Next.js 14 (App Router) 기반 B2C 이커머스 플랫폼.
+결제는 Stripe, 인증은 NextAuth.js, DB는 PostgreSQL + Prisma.
+
+## 기술 스택
+- Next.js 14.2, React 18, TypeScript 5.3
+- Tailwind CSS 3.4 (CSS Modules 금지)
+- Prisma ORM, PostgreSQL 15
+- Vitest, ESLint + Prettier
+- pnpm (npm/yarn 금지)
+
+## 코드 컨벤션
+- 컴포넌트: PascalCase, named export
+- 훅: `use` 접두사, `hooks/` 디렉토리
+- `type` 키워드 사용 (interface 지양)
+
+## 절대 하지 말 것
+- `any` 타입 사용 금지
+- `console.log` 프로덕션 코드에 남기기 금지
+- DB 쿼리 직접 작성 금지 — Prisma 필수
+- `process.env` 직접 접근 금지 — `lib/env.ts` 통해서만</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- @ 임포트 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-red);"></span>
+          @ 임포트 구문
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+            CLAUDE.md에서 다른 파일을 <code class="code-inline">@</code> 접두사로 참조하면 해당 내용도 컨텍스트에 포함된다:
+          </p>
+          <div class="code-block">
+            <div class="code-label">CLAUDE.md</div>
+            <pre><code># My Project
+
+@README.md 를 참고해서 프로젝트 개요를 파악해.
+@package.json 에서 사용 가능한 npm 스크립트 확인.
+
+## 추가 지침
+- git 워크플로우 @docs/git-instructions.md</code></pre>
+          </div>
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">형식</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">의미</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">@filename</code></td>
+                  <td class="py-2">현재 CLAUDE.md 기준 상대 경로</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">@path/to/file</code></td>
+                  <td class="py-2">현재 CLAUDE.md 기준 상대 경로</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">@~/path</code></td>
+                  <td class="py-2">홈 디렉토리 기준</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- .claude/rules/ -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-yellow);"></span>
+          .claude/rules/ — 모듈화된 규칙
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+            대규모 프로젝트는 규칙을 여러 파일로 분리할 수 있다. <code class="code-inline">.claude/rules/</code> 내 모든 <code class="code-inline">.md</code> 파일은 자동으로 로드된다.
+          </p>
+          <div class="code-block">
+            <div class="code-label">디렉토리 구조</div>
+            <pre><code>your-project/
+├── .claude/
+│   ├── CLAUDE.md
+│   └── rules/
+│       ├── code-style.md
+│       ├── testing.md
+│       ├── security.md
+│       ├── frontend/
+│       │   ├── react.md
+│       │   └── styles.md
+│       └── backend/
+│           ├── api.md
+│           └── database.md</code></pre>
+          </div>
+          <p class="text-sm mt-4 mb-3" style="color: var(--color-text-muted);">
+            YAML frontmatter로 특정 파일에만 적용되는 <strong>조건부 규칙</strong>도 만들 수 있다:
+          </p>
+          <div class="code-block">
+            <div class="code-label">.claude/rules/api.md</div>
+            <pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API 개발 규칙
+- 모든 API 엔드포인트에 입력 검증 포함
+- 표준 에러 응답 형식 사용
+- OpenAPI 문서화 주석 포함</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 작성 팁 -->
+      <div class="callout mb-8" style="border-left-color: var(--color-accent-blue);">
+        <div class="callout-title" style="color: var(--color-accent-blue);">CLAUDE.md 작성 팁 5가지</div>
+        <ol class="text-sm space-y-2" style="color: var(--color-text-muted); padding-left: 1.2rem;">
+          <li><strong>명령형으로 작성</strong> — "TypeScript를 사용하는 프로젝트입니다" (X) &rarr; "TypeScript만 사용해. JavaScript 파일 생성 금지" (O)</li>
+          <li><strong>금지사항 명시</strong> — 금지사항을 명확히 하면 실수가 감소한다</li>
+          <li><strong>구체적으로 작성</strong> — "좋은 코드를 써달라"가 아니라 "함수 하나당 30줄 초과 시 분리"</li>
+          <li><strong>파일 길이 관리</strong> — 공식 권장: CLAUDE.md 파일당 200줄 이하</li>
+          <li><strong>팀이 함께 관리</strong> — CLAUDE.md는 코드 리뷰 대상. PR로 수정하고 함께 검토</li>
+        </ol>
+      </div>
+
+      <!-- 빠른 시작 -->
+      <div class="callout mb-16" style="border-left-color: var(--color-accent-green);">
+        <div class="callout-title" style="color: var(--color-accent-green);">빠른 시작</div>
+        <p class="text-sm" style="color: var(--color-text-muted);">
+          터미널에서 <code class="code-inline">/init</code> 커맨드를 실행하면 프로젝트를 분석해 CLAUDE.md를 자동 생성할 수 있다.
+        </p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 2 — 권한 모드                                              -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="permission-modes">
+        <span class="part-number">02</span>
+        <h2 class="part-title">권한 모드</h2>
+        <p class="part-subtitle">도구 실행 제어와 승인 시스템</p>
+      </div>
+
+      <!-- 6가지 모드 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-green);"></span>
+          6가지 권한 모드
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">모드</th>
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">설명</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">사용 사례</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">default</code></td>
+                  <td class="py-2 pr-4">첫 도구 사용 시 승인 요청</td>
+                  <td class="py-2">일반 개발</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">acceptEdits</code></td>
+                  <td class="py-2 pr-4">파일 수정 자동 승인</td>
+                  <td class="py-2">신뢰할 수 있는 로컬 개발</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">plan</code></td>
+                  <td class="py-2 pr-4">분석만, 수정/실행 불가</td>
+                  <td class="py-2">코드 탐색</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">auto</code></td>
+                  <td class="py-2 pr-4">분류기가 자동 승인/차단</td>
+                  <td class="py-2">장시간 세션</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">dontAsk</code></td>
+                  <td class="py-2 pr-4">사전 승인된 도구만, 나머지 자동 거부</td>
+                  <td class="py-2">제한적 자동화</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">bypassPermissions</code></td>
+                  <td class="py-2 pr-4">모든 승인 건너뜀</td>
+                  <td class="py-2">격리된 컨테이너/VM 전용</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-sm mt-4" style="color: var(--color-text-dim);">
+            세션 중 <code class="code-inline">Shift+Tab</code> 또는 <code class="code-inline">Alt+M</code>으로 실시간 전환 가능
+          </p>
+        </div>
+      </div>
+
+      <!-- 승인 옵션 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          승인 옵션 이해하기
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+            default 모드에서 Claude가 승인을 요청할 때 선택할 수 있는 응답:
+          </p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">y</code> (Yes)</td>
+                  <td class="py-2">이번 한 번 허용</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">n</code> (No)</td>
+                  <td class="py-2">거부 — Claude가 대안을 시도</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">a</code> (Always)</td>
+                  <td class="py-2">이 세션에서 이 유형을 자동 승인</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">d</code> (Don't)</td>
+                  <td class="py-2">이 세션에서 이 유형을 항상 거부</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 권한 규칙 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+          권한 규칙 관리
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+            <code class="code-inline">/permissions</code> 커맨드로 현재 규칙을 확인하고 관리할 수 있다.
+            평가 순서: <strong>deny &rarr; ask &rarr; allow</strong> (deny가 항상 우선)
+          </p>
+          <div class="code-block">
+            <div class="code-label">settings.json</div>
+            <pre><code>{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Bash(npm run *)",
+      "Edit(/src/**/*.ts)"
+    ],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(git push *)"
+    ]
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 모드 선택 가이드 -->
+      <div class="callout mb-16" style="border-left-color: var(--color-accent-green);">
+        <div class="callout-title" style="color: var(--color-accent-green);">모드 선택 가이드</div>
+        <div class="code-block" style="margin-top: 0.5rem;">
+          <pre><code>무엇을 하고 있나요?
+├─ 새 코드베이스 탐색/이해
+│  → Plan 모드 (읽기 전용)
+├─ 빠른 로컬 개발
+│  → acceptEdits 또는 default 모드
+├─ 장시간 리팩토링, 승인 피로 줄이기
+│  → Auto 모드 (분류기가 판단)
+├─ 팀 프로젝트, 중요 코드
+│  → Default 모드 + settings.json 규칙
+├─ CI/CD, 자동화 스크립트
+│  → Headless 모드 + allowedTools 지정
+└─ 격리된 Docker/VM 테스트
+   → bypassPermissions (주의!)</code></pre>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 3 — Git 연동                                               -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="git-integration">
+        <span class="part-number">03</span>
+        <h2 class="part-title">Git 연동</h2>
+        <p class="part-subtitle">AI 기반 커밋, 리뷰, PR 워크플로우</p>
+      </div>
+
+      <!-- Git이 읽는 것들 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+          Claude Code가 Git에서 읽는 것들
+        </div>
+        <div class="module-card-body">
+          <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> 현재 브랜치 이름</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> 최근 커밋 히스토리</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> Staged / Unstaged 변경사항</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> 파일 구조 및 수정 시간</li>
+          </ul>
+          <p class="text-sm mt-3" style="color: var(--color-text-dim);">
+            이 컨텍스트 덕분에 최소한의 프롬프팅으로 코드 변경사항을 이해할 수 있다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 커밋 메시지 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          커밋 메시지 자동 생성
+        </div>
+        <div class="module-card-body">
+          <div class="code-block">
+            <div class="code-label">터미널</div>
+            <pre><code>git add src/auth/login.ts tests/auth.test.ts
+claude> 스테이징된 변경사항 보고 커밋 메시지 써줘</code></pre>
+          </div>
+          <p class="text-sm mt-3" style="color: var(--color-text-muted);">
+            CLAUDE.md에 Conventional Commits 가이드라인을 추가하면 <code class="code-inline">type(scope): description</code> 형식을 강제할 수 있다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 코드 리뷰 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-green);"></span>
+          AI 코드 리뷰
+        </div>
+        <div class="module-card-body">
+          <div class="code-block">
+            <div class="code-label">터미널</div>
+            <pre><code>claude> main 브랜치와 비교해서 현재 변경사항 코드 리뷰해줘</code></pre>
+          </div>
+          <p class="text-sm mt-3" style="color: var(--color-text-muted);">
+            보안 취약점, 성능 문제, 엣지 케이스, 테스트 커버리지 갭에 집중하여 리뷰한다.
+          </p>
+        </div>
+      </div>
+
+      <!-- PR 설명 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          PR 설명 자동 작성
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            Claude가 변경사항을 요약하여 PR description을 자동 생성한다.
+            테스트 요구사항, 중요 참고사항도 포함된다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 충돌 해결 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-red);"></span>
+          충돌 해결
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            Claude Code는 merge conflict 마커를 분석하고, 양쪽의 의도를 파악하여 해결안을 제안한다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 실전 워크플로우 -->
+      <div class="callout mb-16" style="border-left-color: var(--color-accent-purple);">
+        <div class="callout-title" style="color: var(--color-accent-purple);">실전 워크플로우</div>
+        <div class="code-block" style="margin-top: 0.5rem;">
+          <pre><code># 1. 최신 코드 가져오기
+git pull origin main
+
+# 2. 피처 브랜치 생성
+git checkout -b feat/user-auth
+
+# 3. Claude와 함께 기능 구현
+claude> JWT 인증 로직을 구현해줘
+
+# 4. 변경사항 리뷰
+claude> 지금까지 변경사항 코드 리뷰해줘
+
+# 5. 커밋 메시지 생성
+git add .
+claude> 커밋 메시지 써줘
+
+# 6. PR 설명 생성
+claude> PR description 작성해줘</code></pre>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 4 — 슬래시 커맨드                                          -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="slash-commands">
+        <span class="part-number">04</span>
+        <h2 class="part-title">슬래시 커맨드</h2>
+        <p class="part-subtitle">빠른 실행 단축키와 키보드 컨트롤</p>
+      </div>
+
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          슬래시 커맨드란?
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            슬래시 커맨드(<code class="code-inline">/</code>)는 Claude Code 대화 중에 특정 동작을 빠르게 실행하는 단축키이다.
+            긴 문장을 타이핑하지 않고 <code class="code-inline">/</code>로 시작하는 짧은 명령으로 자주 하는 작업을 즉시 실행할 수 있다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 세션 관리 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          세션 관리
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">커맨드</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">설명</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/clear</code></td>
+                  <td class="py-2">대화 기록 초기화 (별칭: <code class="code-inline">/reset</code>, <code class="code-inline">/new</code>)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/compact [지시]</code></td>
+                  <td class="py-2">대화 기록을 요약으로 압축</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/rewind</code></td>
+                  <td class="py-2">이전 턴 되돌리기</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/resume</code></td>
+                  <td class="py-2">이전 세션 이어가기</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/fork [이름]</code></td>
+                  <td class="py-2">현재 대화에서 분기하여 새 세션 생성</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">/export</code></td>
+                  <td class="py-2">현재 대화를 파일 또는 클립보드로 내보내기</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 정보 확인 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-green);"></span>
+          정보 확인
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">커맨드</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">설명</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/help</code></td>
+                  <td class="py-2">사용 가능한 모든 커맨드 목록</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/status</code></td>
+                  <td class="py-2">버전, 모델, 계정, 연결 상태</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/cost</code></td>
+                  <td class="py-2">토큰 사용량 통계</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/context</code></td>
+                  <td class="py-2">현재 컨텍스트 사용량 시각화</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">/doctor</code></td>
+                  <td class="py-2">설치 진단 (Node.js, API, 설정 검증)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 코드 작업 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+          코드 작업
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">커맨드</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">설명</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/diff</code></td>
+                  <td class="py-2">인터랙티브 diff 뷰어</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/copy</code></td>
+                  <td class="py-2">마지막 응답 클립보드 복사</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/pr-comments</code></td>
+                  <td class="py-2">GitHub PR 댓글 가져오기</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/init</code></td>
+                  <td class="py-2">프로젝트 분석 후 CLAUDE.md 자동 생성</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">/memory</code></td>
+                  <td class="py-2">CLAUDE.md 편집, 자동 메모리 관리</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 키보드 단축키 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-red);"></span>
+          키보드 단축키
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">단축키</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">설명</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">Ctrl+C</code></td>
+                  <td class="py-2">현재 입력 또는 생성 취소</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">Ctrl+L</code></td>
+                  <td class="py-2">터미널 화면 클리어 (대화 기록은 유지)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">Ctrl+B</code></td>
+                  <td class="py-2">실행 중인 작업을 백그라운드로 전환</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">Ctrl+V</code></td>
+                  <td class="py-2">클립보드에서 이미지 붙여넣기</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">Shift+Tab</code></td>
+                  <td class="py-2">권한 모드 전환</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">Esc + Esc</code></td>
+                  <td class="py-2">체크포인트로 되돌리기</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">Alt+P</code></td>
+                  <td class="py-2">모델 전환 (프롬프트 유지)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 빠른 입력 접두사 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-yellow);"></span>
+          빠른 입력 접두사
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">/</code></td>
+                  <td class="py-2">슬래시 커맨드 또는 스킬 호출</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4"><code class="code-inline">!</code></td>
+                  <td class="py-2">Bash 모드 — Claude 거치지 않고 직접 실행, 결과는 컨텍스트에 추가</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4"><code class="code-inline">@</code></td>
+                  <td class="py-2">파일 경로 자동완성</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 커스텀 슬래시 커맨드 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          커스텀 슬래시 커맨드 만들기
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+            자주 하는 작업을 커스텀 커맨드로 만들어두면 반복 입력을 줄일 수 있다.
+          </p>
+          <div class="code-block">
+            <div class="code-label">.claude/commands/review.md</div>
+            <pre><code>지금까지 변경된 코드를 리뷰해줘.
+다음 항목을 중심으로:
+
+1. 보안 취약점 (OWASP Top 10)
+2. 성능 문제 (N+1 쿼리, 불필요한 반복)
+3. 타입 안전성
+4. 엣지 케이스 처리
+5. 테스트 커버리지
+
+각 항목마다 심각도(높음/중간/낮음)로 분류해서 알려줘.</code></pre>
+          </div>
+          <p class="text-sm mt-3" style="color: var(--color-text-dim);">
+            이제 대화 중에 <code class="code-inline">/review</code>라고 입력하면 위 프롬프트가 자동 실행된다.
+            <code class="code-inline">$ARGUMENTS</code>를 사용하면 실행 시 추가 인자를 전달할 수 있다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 자주 쓰는 활용 -->
+      <div class="callout mb-16" style="border-left-color: var(--color-accent-orange);">
+        <div class="callout-title" style="color: var(--color-accent-orange);">자주 쓰는 커맨드 실전 활용</div>
+        <ul class="text-sm space-y-2" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+          <li><code class="code-inline">/clear</code> — 새 작업 시작 시 이전 대화 노이즈 제거</li>
+          <li><code class="code-inline">/compact</code> — 대화가 길어졌지만 초기화하기는 싫을 때 핵심만 유지</li>
+          <li><code class="code-inline">/cost</code> — 토큰 사용량과 비용 확인</li>
+          <li><code class="code-inline">/init</code> — 새 프로젝트에서 CLAUDE.md 자동 생성</li>
+          <li><code class="code-inline">/resume</code> — 이전 세션을 이어서 작업</li>
+        </ul>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 5 — 컨텍스트 관리                                          -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="context-management">
+        <span class="part-number">05</span>
+        <h2 class="part-title">컨텍스트 관리</h2>
+        <p class="part-subtitle">토큰 절약과 효율적인 세션 운영</p>
+      </div>
+
+      <!-- 컨텍스트 창이란 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-red);"></span>
+          컨텍스트 창이란?
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+            Claude 모델이 한 세션에서 "기억"할 수 있는 텍스트 총량이다:
+          </p>
+          <div class="code-block">
+            <pre><code>┌─────────────────────────────────────────┐
+│     컨텍스트 창 (기본 200K / 확장 1M 토큰)   │
+│                                         │
+│  [대화 히스토리] [코드] [파일 내용] [응답]  │
+│                                         │
+└─────────────────────────────────────────┘</code></pre>
+          </div>
+          <ul class="text-sm space-y-1 mt-3" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li><span style="color: var(--color-accent-blue);">&#9679;</span> 기본: 200,000 토큰 (200K)</li>
+            <li><span style="color: var(--color-accent-green);">&#9679;</span> Opus 4.6 / Sonnet 4.6: 최대 1,000,000 토큰 (1M) 확장 가능</li>
+            <li><span style="color: var(--color-accent-orange);">&#9679;</span> 대략 한국어 약 10만 단어, 코드 파일 약 150개(50줄 기준)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 가득 차면 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          컨텍스트가 가득 차면?
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+            컨텍스트가 70-80%에 도달하면:
+          </p>
+          <ol class="text-sm space-y-2" style="color: var(--color-text-muted); padding-left: 1.2rem;">
+            <li><strong>응답 속도 저하</strong> — 처리할 텍스트가 많아질수록 느려짐</li>
+            <li><strong>초반 내용 망각</strong> — 초기 대화 정확도 하락</li>
+            <li><strong>비용 증가</strong> — 토큰이 많을수록 API 비용 증가</li>
+            <li><strong>자동 압축 발동</strong> — Claude Code가 오래된 도구 출력부터 제거</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 관리 전략 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          컨텍스트 관리 6가지 전략
+        </div>
+        <div class="module-card-body">
+          <div class="space-y-4">
+            <!-- 전략 1 -->
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-blue);">전략 1: /compact로 압축</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                긴 대화를 초기화하지 않고 핵심만 유지한다. 커스텀 지시사항 추가 가능:
+                <code class="code-inline">/compact 코드 샘플에 집중해서 요약해줘</code>
+              </p>
+            </div>
+            <!-- 전략 2 -->
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-green);">전략 2: /clear로 새 시작</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                완전히 다른 작업을 시작할 때 사용. CLAUDE.md 내용은 유지된다.
+              </p>
+            </div>
+            <!-- 전략 3 -->
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-purple);">전략 3: 작업을 작게 분할</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                하나의 긴 세션보다 여러 짧은 세션이 효과적. 커밋 후 <code class="code-inline">/clear</code>.
+              </p>
+            </div>
+            <!-- 전략 4 -->
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-orange);">전략 4: 파일 직접 참조</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                코드를 대화창에 붙여넣지 말고 <code class="code-inline">src/payment/stripe.ts 파일 리뷰해줘</code>처럼 경로를 지정한다.
+              </p>
+            </div>
+            <!-- 전략 5 -->
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-red);">전략 5: CLAUDE.md에 중요 정보 저장</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                세션 간 유지되어야 할 진행 상황, 중요 결정사항을 CLAUDE.md에 기록한다.
+              </p>
+            </div>
+            <!-- 전략 6 -->
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-yellow);">전략 6: 서브에이전트로 컨텍스트 분리</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                서브에이전트는 독립적인 컨텍스트 창을 갖고 요약된 결과만 반환하므로 메인 컨텍스트를 보호한다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 실전 패턴 -->
+      <div class="callout mb-16" style="border-left-color: var(--color-accent-red);">
+        <div class="callout-title" style="color: var(--color-accent-red);">실전 패턴: 장시간 세션 관리</div>
+        <div class="code-block" style="margin-top: 0.5rem;">
+          <pre><code>오전 9시: claude 시작
+> 오늘 할 일: 결제 모듈 완성...
+  2시간 작업 ...
+> /status   (컨텍스트 45% 사용 확인)
+  1시간 더 작업 ...
+> /compact  (컨텍스트 70% → 30%로 압축)
+  마무리 작업 ...
+> 오늘 작업 완료됐어.
+  내일 이어할 수 있게 CLAUDE.md 업데이트해줘.</code></pre>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 6 — 메모리 시스템                                          -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="memory-system">
+        <span class="part-number">06</span>
+        <h2 class="part-title">메모리 시스템</h2>
+        <p class="part-subtitle">세션 간 기억 유지와 6계층 아키텍처</p>
+      </div>
+
+      <!-- 왜 필요한가 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-yellow);"></span>
+          왜 메모리가 필요한가?
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            Claude Code는 세션이 끝나면 대화를 기억하지 못한다.
+            <strong>6계층 메모리 아키텍처</strong>를 통해 세션 간 연속성을 유지한다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 6계층 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          메모리 계층 (우선순위 순)
+        </div>
+        <div class="module-card-body">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">순위</th>
+                  <th class="text-left py-2 pr-4" style="color: var(--color-text-muted);">계층</th>
+                  <th class="text-left py-2" style="color: var(--color-text-muted);">위치 / 설명</th>
+                </tr>
+              </thead>
+              <tbody style="color: var(--color-text-muted);">
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4">1</td>
+                  <td class="py-2 pr-4">관리형 정책</td>
+                  <td class="py-2">Enterprise — 조직 전체 CLAUDE.md</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4">2</td>
+                  <td class="py-2 pr-4">사용자 메모리</td>
+                  <td class="py-2"><code class="code-inline">~/.claude/CLAUDE.md</code> — 개인 전역 설정</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4">3</td>
+                  <td class="py-2 pr-4">프로젝트 메모리</td>
+                  <td class="py-2"><code class="code-inline">./CLAUDE.md</code> — 팀 공유 (git 추적)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4">4</td>
+                  <td class="py-2 pr-4">프로젝트 규칙</td>
+                  <td class="py-2"><code class="code-inline">.claude/rules/</code> — 모듈화된 조건부 규칙</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--color-border);">
+                  <td class="py-2 pr-4">5</td>
+                  <td class="py-2 pr-4">로컬 메모리</td>
+                  <td class="py-2"><code class="code-inline">./CLAUDE.local.md</code> — 개인 프로젝트별 (git 무시)</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4">6</td>
+                  <td class="py-2 pr-4">자동 메모리</td>
+                  <td class="py-2"><code class="code-inline">~/.claude/projects/.../memory/</code> — Claude 자동 학습</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-sm mt-3" style="color: var(--color-text-dim);">
+            더 구체적인 (좁은 범위의) 설정이 광범위한 설정보다 우선적용된다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 자동 메모리 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-green);"></span>
+          자동 메모리 (Auto Memory)
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            Claude가 자율적으로 발견한 패턴, 디버깅 인사이트, 사용자 선호도를 기록한다.
+          </p>
+          <ul class="text-sm space-y-1 mt-3" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li><span style="color: var(--color-accent-green);">&#9679;</span> <code class="code-inline">MEMORY.md</code>의 첫 200줄만 세션 시작 시 자동 로드</li>
+            <li><span style="color: var(--color-accent-blue);">&#9679;</span> 추가 내용은 주제별 파일에 저장, 필요 시 읽음</li>
+            <li><span style="color: var(--color-accent-purple);">&#9679;</span> <code class="code-inline">/memory</code> 커맨드로 토글 및 관리 가능</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 관리 팁 -->
+      <div class="callout mb-16" style="border-left-color: var(--color-accent-yellow);">
+        <div class="callout-title" style="color: var(--color-accent-yellow);">메모리 관리 팁</div>
+        <ul class="text-sm space-y-2" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+          <li><span style="color: var(--color-accent-yellow);">&#9679;</span> <code class="code-inline">/memory</code>로 로드된 메모리 파일 확인 및 편집</li>
+          <li><span style="color: var(--color-accent-yellow);">&#9679;</span> 작업 완료 시마다 CLAUDE.md를 정기적으로 업데이트</li>
+          <li><span style="color: var(--color-accent-yellow);">&#9679;</span> 오래된 항목을 제거하여 혼란 방지</li>
+          <li><span style="color: var(--color-accent-yellow);">&#9679;</span> 세션 종료 전: "CLAUDE.md에 오늘 작업 내용과 중요 결정사항 업데이트해줘"</li>
+        </ul>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- PART 7 — 멀티파일 작업                                          -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="part-header" id="multi-file">
+        <span class="part-number">07</span>
+        <h2 class="part-title">멀티파일 작업</h2>
+        <p class="part-subtitle">실제 프로젝트의 파일 간 의존성 관리</p>
+      </div>
+
+      <!-- Claude의 파일 이해 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+          Claude Code의 파일 이해 프로세스
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+            Claude Code는 요청 시 다음 단계를 자동 수행한다:
+          </p>
+          <ol class="text-sm space-y-1" style="color: var(--color-text-muted); padding-left: 1.2rem;">
+            <li>디렉토리 구조 파악</li>
+            <li>관련 파일 식별</li>
+            <li>import/require 관계 추적</li>
+            <li>변경 계획 수립</li>
+          </ol>
+          <p class="text-sm mt-3" style="color: var(--color-text-dim);">
+            사용자가 모든 관련 파일을 명시할 필요는 없다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 작업 요청 방법 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          효과적인 작업 요청 방법
+        </div>
+        <div class="module-card-body">
+          <div class="space-y-4">
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-blue);">기능 단위 요청</h4>
+              <div class="code-block">
+                <pre><code>사용자 인증 기능을 추가해줘.
+로그인, 회원가입, 로그아웃 포함.
+기존 User 모델 활용해서.</code></pre>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-green);">범위 명시</h4>
+              <div class="code-block">
+                <pre><code>src/auth/ 디렉토리 중심으로 JWT 구현해줘.
+src/users/ 는 건드리지 마.</code></pre>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-accent-purple);">단계별 진행</h4>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                한 번에 너무 많은 파일을 변경하지 않고, "1단계: 타입 정의만 먼저" 식으로 분할한다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 대규모 리팩토링 -->
+      <div class="module-card mb-6">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          대규모 리팩토링 활용
+        </div>
+        <div class="module-card-body">
+          <p class="text-sm" style="color: var(--color-text-muted);">
+            Claude Code는 네이밍 변경, 패턴 일관성 적용, 의존성 교체 등의 대규모 리팩토링에서 강점을 발휘한다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 안전 습관 -->
+      <div class="callout mb-6" style="border-left-color: var(--color-accent-red);">
+        <div class="callout-title" style="color: var(--color-accent-red);">필수 안전 습관</div>
+        <p class="text-sm" style="color: var(--color-text-muted);">
+          <strong>멀티파일 작업 전에는 반드시 git 커밋을 먼저 하세요.</strong>
+          이렇게 하면 <code class="code-inline">git checkout .</code>으로 즉시 복구할 수 있다.
+        </p>
+      </div>
+
+      <!-- 체크리스트 -->
+      <div class="module-card mb-16">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-green);"></span>
+          멀티파일 작업 체크리스트
+        </div>
+        <div class="module-card-body">
+          <ul class="text-sm space-y-2" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9744;</span> Git 커밋 확보</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9744;</span> CLAUDE.md에 금지 파일/디렉토리 명시</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9744;</span> 작업 범위를 작게 분할</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9744;</span> 빌드/테스트 검증</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9744;</span> 단계별 커밋 진행</li>
+          </ul>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Footer                                  -->
+      <!-- ════════════════════════════════════════ -->
+      <footer class="flex items-center justify-between" style="color: var(--color-text-dim); border-top: 1px solid var(--color-border); padding-top: 2rem;">
+        <a href="./" style="color: var(--color-text-dim); text-decoration: none; font-size: 0.75rem;" class="hover:text-[var(--color-text-muted)] transition-colors flex items-center gap-2">
+          <span class="sig-led sig-led-blue" style="width: 4px; height: 4px; box-shadow: none;"></span>
+          <span class="sig-label">&larr; Claude Code 입문</span>
+        </a>
+        <span class="sig-label" style="font-size: 0.65rem;">
+          출처: <a href="https://claude-code-playbook-nu.vercel.app/docs/level-2/intro" style="color: var(--color-accent-blue); text-decoration: none;">Claude Code 플레이북</a>
+        </span>
+      </footer>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>
