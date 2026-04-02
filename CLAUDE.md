@@ -1,0 +1,61 @@
+# CLAUDE.md — lecture-kit
+
+## What This Is
+
+**lecture-kit** is an interactive web-based lecture material platform for media art and creative coding education. It serves as a central hub for managing and delivering lecture content across multiple courses and workshops.
+
+## Architecture
+
+- **Framework**: Static site with Vanilla JS + TailwindCSS
+- **Hosting**: Vercel (static deployment)
+- **Design Language**: Dark theme, modular/technical aesthetic inspired by signal processing panels (see `docs/design-reference.jpg`)
+
+## Project Structure
+
+```
+lecture-kit/
+├── index.html              ← Public landing / course listing
+├── dashboard.html          ← Password-protected admin dashboard
+├── courses/
+│   └── [course-name]/
+│       ├── index.html      ← Course overview
+│       └── week-XX.html    ← Weekly lecture pages
+├── shared/
+│   ├── style.css           ← Global styles (Tailwind + custom)
+│   ├── print.css           ← PDF export styles
+│   └── components.js       ← Shared JS (code copy, toggles, nav)
+├── docs/
+│   └── design-reference.jpg
+├── tailwind.config.js
+├── package.json
+└── vercel.json
+```
+
+## URL Routing
+
+- `/` — Public course listing
+- `/dashboard` — Admin view (simple password gate)
+- `/courses/[name]/` — Individual course pages (shareable)
+- `/courses/[name]/week-XX` — Weekly content pages
+
+## Design Principles
+
+- Dark theme with muted accent colors (inspired by hardware panel aesthetics)
+- Modular grid layout
+- Code blocks with syntax highlighting + copy button
+- PDF-friendly print styles
+- Mobile responsive
+- Minimal dependencies
+
+## Content Language
+
+Primary content is in **Korean (한국어)**. UI labels may be bilingual.
+
+## Commands
+
+```bash
+npm install          # Install dependencies
+npm run dev          # Local dev server (Vite)
+npm run build        # Production build
+npx tailwindcss ...  # Tailwind utilities
+```

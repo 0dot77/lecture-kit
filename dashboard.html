@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — lecture-kit</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div id="app" class="max-w-5xl mx-auto px-6 py-16" style="display: none; position: relative; z-index: 1;">
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="sig-led sig-led-orange sig-led-pulse"></span>
+              <span class="sig-label">Control Panel</span>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight mb-1">Dashboard</h1>
+            <p style="color: var(--color-text-muted);" class="text-sm">강의 관리</p>
+          </div>
+          <a
+            href="/"
+            class="text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            style="
+              background: var(--color-surface);
+              border: 1px solid var(--color-border);
+              color: var(--color-text-muted);
+            "
+          >
+            <span class="sig-led sig-led-blue" style="width: 5px; height: 5px;"></span>
+            공개 페이지
+          </a>
+        </div>
+        <div class="accent-line mt-6" style="background: linear-gradient(90deg, var(--color-accent-orange), var(--color-accent-blue), transparent);"></div>
+      </header>
+
+      <!-- Overview — meter readouts -->
+      <section class="grid grid-cols-3 gap-4 mb-12">
+        <div class="stat-readout">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <span class="sig-led sig-led-blue" style="width: 5px; height: 5px;"></span>
+          </div>
+          <div class="stat-value" style="color: var(--color-accent-blue);">1</div>
+          <div class="stat-label">전체 강의</div>
+        </div>
+        <div class="stat-readout">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <span class="sig-led sig-led-green" style="width: 5px; height: 5px;"></span>
+          </div>
+          <div class="stat-value" style="color: var(--color-accent-green);">1</div>
+          <div class="stat-label">완료된 주차</div>
+        </div>
+        <div class="stat-readout">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <span class="sig-led sig-led-orange" style="width: 5px; height: 5px;"></span>
+          </div>
+          <div class="stat-value" style="color: var(--color-accent-orange);">0</div>
+          <div class="stat-label">작성 중</div>
+        </div>
+      </section>
+
+      <!-- Course List -->
+      <section>
+        <div class="flex items-center gap-3 mb-5">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">강의 목록</h2>
+          <div class="sig-cable sig-cable-blue" style="max-width: 40px;"></div>
+        </div>
+
+        <div class="grid gap-3">
+          <!-- Course entry -->
+          <a href="/courses/2026-digital-media-visual-1/" class="course-panel group">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="sig-led sig-led-purple sig-led-pulse"></span>
+              <h3 class="font-semibold group-hover:text-[var(--color-accent-purple)] transition-colors">
+                디지털미디어비주얼 1
+              </h3>
+              <span class="badge badge-wip" style="margin-left: auto;">진행중</span>
+            </div>
+            <div class="flex items-center gap-4 ml-[1.6rem]">
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                Digital Media Visual 1 — 2026
+              </p>
+            </div>
+            <div class="flex items-center gap-3 mt-4 ml-[1.6rem]">
+              <span class="sig-label">1 weeks</span>
+              <div class="flex-1 h-[3px] rounded-full" style="background: var(--color-border); max-width: 200px;">
+                <div class="h-full rounded-full" style="width: 10%; background: linear-gradient(90deg, var(--color-accent-purple), var(--color-accent-blue));"></div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { initPasswordGate, init } from "/shared/components.js";
+
+      // Change this hash to set your password
+      // Default password: "lecture" → hash: "-1261498887"
+      const authorized = initPasswordGate("-1261498887");
+      if (authorized) {
+        document.getElementById("app").style.display = "block";
+        init();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>디지털미디어비주얼1 — lecture-kit</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <a href="/" style="color: var(--color-text-dim); text-decoration: none;" class="hover:text-[var(--color-text-muted)] transition-colors">lecture-kit</a>
+        <span>/</span>
+        <span style="color: var(--color-text-muted);">디지털미디어비주얼 1</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-purple sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-purple"></span>
+          <span class="sig-led sig-led-blue sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-blue"></span>
+          <span class="sig-led sig-led-green sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">Course — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          디지털미디어비주얼 1
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          Digital Media Visual 1
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-purple), var(--color-accent-blue), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- Week List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">주차별 강의</h2>
+          <div class="sig-cable sig-cable-blue" style="max-width: 40px;"></div>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <a href="./chop-audio-reactive.html" class="course-panel group">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">05</span>
+              <span class="sig-led sig-led-green" style="width: 5px; height: 5px;"></span>
+              <h3 class="font-semibold group-hover:text-[var(--color-accent-blue)] transition-colors">
+                CHOP / Audio Reactive 기초
+              </h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              Feedback TOP, Displace TOP 복습 → CHOP 개념과 Reference → 오디오 리액티브 비주얼
+            </p>
+            <div class="flex items-center gap-2 mt-4 ml-[3.3rem]">
+              <span class="badge badge-top">TOP</span>
+              <span class="badge badge-chop">CHOP</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">Audio</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mt-20 flex items-center gap-3" style="color: var(--color-text-dim);">
+        <a href="/" style="color: var(--color-text-dim); text-decoration: none; font-size: 0.75rem;" class="hover:text-[var(--color-text-muted)] transition-colors flex items-center gap-2">
+          <span class="sig-led sig-led-blue" style="width: 4px; height: 4px; box-shadow: none;"></span>
+          <span class="sig-label">← lecture-kit</span>
+        </a>
+      </footer>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>

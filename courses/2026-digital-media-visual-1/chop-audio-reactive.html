@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHOP & Audio Reactive — 디지털미디어비주얼 1</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- Section Nav (right side dots)           -->
+    <!-- ════════════════════════════════════════ -->
+    <nav class="section-nav no-print" id="sectionNav">
+      <a href="#top-review" data-section="1"><span class="nav-label">Part 1 — TOP 복습</span></a>
+      <a href="#chop-intro" data-section="2"><span class="nav-label">Part 2 — CHOP 개념</span></a>
+      <a href="#chop-ref" data-section="3"><span class="nav-label">Part 3 — CHOP Reference</span></a>
+      <a href="#audio-reactive" data-section="4"><span class="nav-label">Part 4 — 오디오 리액티브</span></a>
+      <a href="#practice" data-section="5"><span class="nav-label">Part 5 — 실습</span></a>
+      <a href="#summary" data-section="6"><span class="nav-label">Part 6 — 정리</span></a>
+    </nav>
+
+    <div class="lecture-page">
+      <!-- ════════════════════════════════════════ -->
+      <!-- Hero Header                             -->
+      <!-- ════════════════════════════════════════ -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="badge badge-top">TOP</span>
+          <span class="badge badge-chop">CHOP</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">Audio Reactive</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3" style="letter-spacing: -0.03em;">
+          CHOP / Audio Reactive 기초
+        </h1>
+        <p style="color: var(--color-text-muted);" class="text-base leading-relaxed max-w-2xl">
+          TOP 복습 위에 "시간에 따라 변하는 숫자"라는 CHOP의 핵심 개념을 이해하고,
+          오디오 입력을 분석하여 소리에 반응하는 비주얼을 직접 만들어본다.
+        </p>
+
+        <!-- Decorative accent line -->
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-purple), var(--color-accent-blue), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Learning Objectives                     -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="module-card mb-8">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          학습 목표
+        </div>
+        <div class="module-card-body">
+          <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> Feedback TOP과 Displace TOP의 원리를 이해하고 활용할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> CHOP이 무엇인지 이해하고, TOP과의 차이를 설명할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> CHOP Reference의 세 가지 방식(Export, Reference, Bind)을 이해한다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> <code style="font-family: var(--font-mono); font-size: 0.8rem;">입력 → 가공 → 출력</code> 이라는 인터랙션의 기본 구조를 체득한다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> Math CHOP을 활용해 값의 범위를 변환할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> 오디오 입력으로 Feedback/Displace를 포함한 영상 파라미터를 실시간 제어할 수 있다</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Table of Contents                       -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="toc mb-16">
+        <div class="toc-header">목차</div>
+        <div class="toc-body">
+          <a href="#top-review" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-purple);"></span>
+            <span class="toc-num">01</span>
+            TOP 복습 — Feedback과 Displacement
+          </a>
+          <a href="#chop-intro" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-green);"></span>
+            <span class="toc-num">02</span>
+            CHOP — 시간에 따라 변하는 숫자
+          </a>
+          <a href="#chop-ref" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-blue);"></span>
+            <span class="toc-num">03</span>
+            CHOP Reference — 값을 파라미터에 연결하는 법
+          </a>
+          <a href="#audio-reactive" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-orange);"></span>
+            <span class="toc-num">04</span>
+            오디오 리액티브 비주얼
+          </a>
+          <a href="#practice" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-red);"></span>
+            <span class="toc-num">05</span>
+            실습 — 오디오 리액티브 비주얼 만들기
+          </a>
+          <a href="#summary" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-text-dim);"></span>
+            <span class="toc-num">06</span>
+            정리와 다음 단계
+          </a>
+        </div>
+      </div>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 1 — TOP 복습                    ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="top-review">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-purple);">
+            <span class="dot" style="background: var(--color-accent-purple);"></span>
+            Part 01
+          </div>
+          <h2 class="part-title">TOP 복습 — Feedback과 Displacement</h2>
+          <p class="part-subtitle">이전 수업에서 배운 TOP의 핵심 개념을 복습하고, 두 가지 강력한 이미지 처리 도구를 추가로 익힌다.</p>
+        </div>
+
+        <!-- 1-1. TOP 기본 복습 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">지난 수업 복습: TOP의 기본 개념</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">핵심 개념</div>
+            TOP(Texture Operator)은 TouchDesigner에서 <strong>2D 이미지/영상</strong>을 다루는 오퍼레이터 패밀리다.
+            모든 TOP은 <strong>이미지를 입력받아 → 처리하고 → 이미지를 출력</strong>한다. 와이어로 연결하면 이미지가 흘러간다.
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              지금까지 배운 TOP
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>TOP</th><th>역할</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Movie File In</td><td>영상/이미지 파일을 불러온다</td></tr>
+                  <tr><td>Noise</td><td>절차적(procedural) 노이즈 패턴을 생성한다</td></tr>
+                  <tr><td>Ramp</td><td>그라데이션(경사) 이미지를 생성한다</td></tr>
+                  <tr><td>Constant</td><td>단색 이미지를 만든다</td></tr>
+                  <tr><td>Transform</td><td>이동, 회전, 스케일을 적용한다</td></tr>
+                  <tr><td>Level</td><td>밝기, 감마, 불투명도를 조절한다</td></tr>
+                  <tr><td>Composite / Over</td><td>여러 이미지를 합성한다</td></tr>
+                  <tr><td>Switch</td><td>여러 입력 중 하나를 선택한다</td></tr>
+                  <tr><td>Null</td><td>네트워크 정리용 — 결과를 깔끔하게 정리한다</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation">TOP 네트워크 읽는 법 —</span><br>
+            <span class="node node-top">소스</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">처리</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">처리</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">출력 / Null</span>
+            <br><br>
+            <span class="annotation">왼쪽에서 오른쪽으로 데이터가 흐른다. Null TOP으로 중간 결과를 정리하는 습관이 중요하다.</span>
+          </div>
+        </div>
+
+        <!-- 1-2. Feedback TOP -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">Feedback TOP — 이미지의 잔상과 누적</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            Feedback TOP은 <strong>네트워크의 하류(downstream)에 있는 TOP의 결과를 다시 상류(upstream)로 가져오는</strong> 특별한 오퍼레이터다. 일반적으로 TouchDesigner는 순환(loop) 연결을 허용하지 않지만, Feedback TOP은 이것을 안전하게 가능하게 한다. 쉽게 말하면: <strong>이전 프레임의 결과물 위에 현재 프레임을 덧쌓는 것</strong>이다.
+          </p>
+
+          <!-- Feedback 원리 다이어그램 -->
+          <div class="node-diagram mb-6">
+            <span class="annotation">Feedback 루프 원리</span><br><br>
+            <span class="node node-top">Feedback TOP</span>
+            <span class="arrow">──→</span>
+            <span class="node node-top">처리 체인</span>
+            <span class="arrow">──→</span>
+            <span class="node node-top">Target TOP</span>
+            <br>
+            <span style="color: var(--color-accent-orange); margin-left: 2rem;">↑ ─────────── 이전 프레임 ─────────── ↲</span>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">시각적 비유</div>
+            TV 화면 앞에 카메라를 놓는 것과 같다. 카메라가 화면을 찍고 → 그 영상이 화면에 나오고 → 다시 카메라가 찍고... 반복될수록 이미지가 축소되고, 회전하고, 색이 변하면서 무한 터널 같은 효과가 나온다.
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              핵심 파라미터
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>파라미터</th><th>설명</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Target TOP</td><td>피드백 루프의 끝점. 이 TOP의 출력이 다음 프레임에 Feedback TOP의 출력이 된다</td></tr>
+                  <tr><td>Reset</td><td>0이면 피드백 활성, 1이면 비활성(입력 이미지를 그대로 통과)</td></tr>
+                  <tr><td>Reset Pulse</td><td>클릭하면 한 프레임 동안 피드백을 리셋한다</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 기본 잔상 만들기 -->
+          <h4 class="text-base font-semibold mb-3 mt-8">기본 사용법: 잔상 만들기</h4>
+
+          <div class="node-diagram mb-4">
+            <span class="node node-top">Movie File In</span><br>
+            <span style="margin-left: 3rem;">↓</span><br>
+            <span class="node node-top">Feedback TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Composite (Over)</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Level</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null</span>
+            <br>
+            <span style="margin-left: 12rem; color: var(--color-text-dim); font-size: 0.72rem;">↑ 원본 영상을 위에 합성&emsp;&emsp;&emsp;opacity 0.95 → 서서히 사라지는 잔상</span>
+          </div>
+
+          <div class="step-list mb-6">
+            <div class="step-item"><span><code>Feedback TOP</code>을 만들고, Target TOP을 하류의 <code>Level TOP</code>으로 지정한다</span></div>
+            <div class="step-item"><span><code>Composite TOP</code>의 첫 번째 입력에 Feedback TOP을, 두 번째 입력에 원본 영상을 연결한다</span></div>
+            <div class="step-item"><span><code>Level TOP</code>의 opacity를 <strong>0.95</strong> 정도로 낮춘다</span></div>
+            <div class="step-item"><span>결과: 이전 프레임이 살짝 투명해지면서 새 프레임이 위에 쌓인다 → <strong>잔상 효과</strong></span></div>
+          </div>
+
+          <!-- Feedback + Transform -->
+          <h4 class="text-base font-semibold mb-3 mt-8">Feedback + Transform: 무한 터널</h4>
+
+          <div class="node-diagram mb-4">
+            <span class="node node-top">Feedback TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Transform</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Composite</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null</span>
+            <br>
+            <span style="margin-left: 9.5rem; color: var(--color-text-dim); font-size: 0.72rem;">scale: 0.98&emsp;&emsp;&emsp;↑ 원본 이미지</span><br>
+            <span style="margin-left: 9.5rem; color: var(--color-text-dim); font-size: 0.72rem;">rotate: 1°</span>
+          </div>
+
+          <div class="callout callout-warning mb-6">
+            <div class="callout-label">주의</div>
+            Feedback 루프 안에서 <strong>Level TOP의 opacity</strong>를 반드시 1보다 낮게 설정해야 한다. 그렇지 않으면 이미지가 계속 쌓여서 화면이 완전히 하얗게(또는 까맣게) 된다.
+          </div>
+
+        </div>
+
+        <!-- 1-3. Displace TOP -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">Displace TOP — 이미지를 왜곡하는 힘</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            Displace TOP은 <strong>하나의 이미지를 다른 이미지로 왜곡(warp)하는</strong> 오퍼레이터다.
+            두 개의 입력을 받는다: <strong>Source Image</strong>(왜곡될 원본)와 <strong>Displace Image</strong>(왜곡의 방향과 세기를 결정).
+          </p>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">원리</div>
+            Displace Image의 <strong>밝기 값</strong>이 Source Image의 픽셀을 이동시킨다.
+            50% 회색(0.5) = 이동 없음(기준점), 밝은 부분 = 한 방향으로 이동, 어두운 부분 = 반대 방향으로 이동.
+            <strong>Red 채널</strong>이 X축, <strong>Green 채널</strong>이 Y축 방향 이동을 결정한다.
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label">시각적 비유</div>
+            물 위에 비친 풍경을 상상해보자 — 물결이 없으면 풍경이 그대로 보이고(Weight = 0),
+            잔잔한 물결이면 살짝 일렁이고(작은 값), 거센 파도면 심하게 뒤틀린다(큰 값).
+            <strong>물결의 패턴</strong>(Displace Image)이 왜곡의 모양을 결정한다.
+          </div>
+
+          <h4 class="text-base font-semibold mb-3">기본 사용법: Noise로 왜곡하기</h4>
+
+          <div class="node-diagram mb-4">
+            <span class="node node-top">Movie File In</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Displace TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null</span>
+            <br>
+            <span style="margin-left: 12rem; color: var(--color-text-dim);">↑</span><br>
+            <span style="margin-left: 9.5rem;" class="node node-top">Noise TOP</span>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 0.5rem;">(Displace Image)</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              Noise TOP 설정에 따른 왜곡 변화
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Noise TOP 파라미터</th><th>효과</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Period 크게</td><td>넓고 부드러운 왜곡 (물 위의 물결)</td></tr>
+                  <tr><td>Period 작게</td><td>좁고 날카로운 왜곡 (유리 깨짐)</td></tr>
+                  <tr><td>Translate 변화</td><td>왜곡 패턴이 움직인다 (흐르는 물)</td></tr>
+                  <tr><td>Amplitude</td><td>밝기 차이 → 왜곡 강도</td></tr>
+                  <tr><td>Type</td><td>Perlin, Simplex 등 — 왜곡의 질감이 달라진다</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label">팁</div>
+            Noise TOP의 Translate 파라미터에 <code style="font-family: var(--font-mono); font-size: 0.8rem;">absTime.seconds * 0.1</code>을 넣으면 시간에 따라 노이즈가 움직인다.
+          </div>
+
+        </div>
+
+        <!-- 1-4. Feedback + Displace 결합 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">Feedback + Displace: 결합의 힘</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            Feedback과 Displace를 결합하면 단순한 잔상이나 왜곡을 넘어서, <strong>살아 움직이는 듯한 유기적 비주얼</strong>을 만들 수 있다.
+            매 프레임마다 이전 결과가 살짝 왜곡되면서 다시 쌓인다 → 시간이 지나면서 이미지가 흘러가고, 녹아내리고, 퍼져나가는 효과.
+          </p>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation">Feedback + Displace 기본 구조</span><br><br>
+            <span class="node node-top">Feedback</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Level</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Displace</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Composite</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null</span>
+            <br>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 7.5rem;">opacity: 0.95</span>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 2.5rem;">↑</span>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 4rem;">↑ 원본 이미지</span>
+            <br>
+            <span style="margin-left: 17rem;" class="node node-top">Noise</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              파라미터 감각
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>설정</th><th>낮은 값</th><th>높은 값</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Level opacity</td><td>잔상이 빨리 사라짐 (0.9)</td><td>잔상이 오래 남음 (0.99)</td></tr>
+                  <tr><td>Displace Weight</td><td>살짝 일렁임 (0.005)</td><td>심하게 뒤틀림 (0.1)</td></tr>
+                  <tr><td>Noise Period</td><td>날카로운 왜곡</td><td>부드러운 왜곡</td></tr>
+                  <tr><td>Noise Speed</td><td>느리게 변화</td><td>빠르게 변화</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">미리보기</div>
+            이 값들을 나중에 <strong>CHOP으로 제어</strong>하면 소리에 반응하는 비주얼이 된다.
+            예: 소리가 크면 Displace Weight가 올라가고, 조용하면 내려간다.
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 2 — CHOP 개념                   ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="chop-intro">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-green);">
+            <span class="dot" style="background: var(--color-accent-green);"></span>
+            Part 02
+          </div>
+          <h2 class="part-title">CHOP — 시간에 따라 변하는 숫자</h2>
+          <p class="part-subtitle">CHOP(Channel Operator)의 핵심 개념과 세 가지 역할(생성, 가공, 출력)을 이해한다.</p>
+        </div>
+
+        <!-- 2-1. CHOP이란 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">CHOP이란 무엇인가</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="module-card">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+                TOP
+              </div>
+              <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+                <p><strong style="color: var(--color-text);">다루는 것:</strong> 2D 이미지 (픽셀)</p>
+                <p><strong style="color: var(--color-text);">시각적 표현:</strong> 이미지 미리보기</p>
+                <p><strong style="color: var(--color-text);">와이어 색상:</strong> <span style="color: var(--color-accent-purple);">보라색</span></p>
+                <p><strong style="color: var(--color-text);">핵심 질문:</strong> "이 이미지를 어떻게 바꿀까?"</p>
+              </div>
+            </div>
+            <div class="module-card">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-green);"></span>
+                CHOP
+              </div>
+              <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+                <p><strong style="color: var(--color-text);">다루는 것:</strong> 숫자의 흐름 (채널)</p>
+                <p><strong style="color: var(--color-text);">시각적 표현:</strong> 그래프 (파형)</p>
+                <p><strong style="color: var(--color-text);">와이어 색상:</strong> <span style="color: var(--color-accent-green);">녹색</span></p>
+                <p><strong style="color: var(--color-text);">핵심 질문:</strong> "이 숫자를 어떻게 만들까?"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">핵심 정의</div>
+            CHOP = <strong>Ch</strong>annel <strong>Op</strong>erator = 시간에 따라 변하는 숫자를 만들고, 가공하고, 전달하는 도구.
+            TOP이 <strong>사진</strong>이라면, CHOP은 <strong>심전도 그래프</strong>다.
+          </div>
+
+          <!-- Channel, Sample, Sample Rate -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Channel (채널)
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                하나의 데이터 흐름. 마우스 x좌표 = 1개 채널, 오디오 L/R = 2개 채널.
+              </p>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-blue);"></span>
+                Sample (샘플)
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                매 순간 기록되는 하나의 값. 그래프의 한 점 = 하나의 샘플.
+              </p>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-orange);"></span>
+                Sample Rate
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                1초에 몇 번 값을 기록하는가. 컨트롤: 60Hz, 오디오: 44100Hz.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label">CHOP Viewer 습관</div>
+            CHOP을 처음 배울 때 가장 중요한 습관: <strong>항상 Viewer를 열어두고 값이 어떻게 움직이는지 관찰한다.</strong>
+            가로축 = 시간, 세로축 = 값, 각 선 = 하나의 채널.
+          </div>
+        </div>
+
+        <!-- 2-2. 세 가지 역할 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">CHOP의 세 가지 역할: 생성, 가공, 출력</h3>
+
+          <div class="node-diagram mb-6">
+            <span class="node node-chop">생성 Generator</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">가공 Filter</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">출력 Output/Export</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-green);"></span>
+              CHOP 오퍼레이터 분류
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>역할</th><th>하는 일</th><th>대표 CHOP</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>생성</td><td>값을 만들어낸다</td><td>LFO, Noise, Constant, Pattern</td></tr>
+                  <tr><td>입력</td><td>외부 데이터를 가져온다</td><td>Mouse In, Keyboard In, Audio Device In</td></tr>
+                  <tr><td>가공</td><td>값을 변환/처리한다</td><td>Math, Filter, Lag, Limit, Logic, Analyze</td></tr>
+                  <tr><td>출력</td><td>가공된 값을 전달한다</td><td>Null (+ Export/Reference)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">인터랙션의 기본 구조</div>
+            모든 인터랙티브 작업은 하나의 구조로 요약된다:<br>
+            <strong style="font-family: var(--font-mono); font-size: 0.85rem;">입력(Input) → 변환(Process) → 출력(Output)</strong><br><br>
+            이 구조를 몸에 익히면 나중에 입력 장치가 바뀌어도(마우스 → 센서 → 카메라 → MIDI) 같은 방식으로 응용할 수 있다.
+          </div>
+        </div>
+
+        <!-- 2-3. 생성 계열 CHOP -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">생성 계열 CHOP — 값을 만든다</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <!-- LFO -->
+            <div class="module-card">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-green);"></span>
+                LFO CHOP
+              </div>
+              <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+                <p class="mb-3">Low Frequency Oscillator = 일정한 주기로 반복되는 값을 만든다.</p>
+                <table class="data-table">
+                  <tbody>
+                    <tr><td>Frequency</td><td>1초에 몇 번 반복 (Hz)</td></tr>
+                    <tr><td>Amplitude</td><td>파형의 크기</td></tr>
+                    <tr><td>Offset</td><td>파형의 중심값 이동</td></tr>
+                    <tr><td>Type</td><td>Sin, Square, Triangle, Ramp</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Noise -->
+            <div class="module-card">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-green);"></span>
+                Noise CHOP
+              </div>
+              <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+                <p class="mb-3">유기적이고 불규칙한 변화. LFO가 "기계적 반복"이라면 Noise는 "자연스러운 흔들림".</p>
+                <table class="data-table">
+                  <tbody>
+                    <tr><td>Period</td><td>노이즈의 주기. 클수록 변화가 느리다</td></tr>
+                    <tr><td>Amplitude</td><td>출력값의 범위</td></tr>
+                    <tr><td>Seed</td><td>같은 설정이라도 다른 패턴</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 파형 ASCII art -->
+          <div class="node-diagram mb-6">
+            <span class="annotation">파형 종류와 느낌</span><br><br>
+            <span style="color: var(--color-accent-blue);">Sin (사인파):</span>&emsp;&emsp;&emsp;～～～～～&emsp;→ 부드럽고 자연스러운. 호흡, 물결<br>
+            <span style="color: var(--color-accent-orange);">Square (사각파):</span>&emsp;▔▁▔▁▔▁&emsp;→ 깜빡임, ON/OFF, 스트로보<br>
+            <span style="color: var(--color-accent-green);">Triangle (삼각파):</span> /\/\/\/\&emsp;→ 일정한 속도로 왕복. 기계적<br>
+            <span style="color: var(--color-accent-purple);">Ramp (톱니파):</span>&emsp;&emsp;/|/|/|/|&emsp;→ 한 방향으로 올라갔다 순간 돌아옴
+          </div>
+        </div>
+
+        <!-- 2-4. 입력 계열 CHOP -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">입력 계열 CHOP — 외부 데이터를 가져온다</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Mouse In
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                <code>tx</code> <code>ty</code> <code>lselect</code> <code>mselect</code> <code>rselect</code><br>
+                별도 장비 없이 바로 실습 가능한 가장 기본적인 입력.
+              </p>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Audio Device In
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                마이크나 시스템 오디오를 가져온다. 오디오 리액티브의 시작점.<br>
+                <span style="font-size: 0.75rem;">Mac: BlackHole 등 가상 드라이버 필요할 수 있음</span>
+              </p>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Audio Spectrum
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                FFT 기반 주파수 대역별 분리. 저음(bass), 중음(mid), 고음(high)을 각각 다른 파라미터에 연결.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">FFT란</div>
+            Fast Fourier Transform — 복잡한 파형을 주파수별 성분으로 분해하는 수학적 방법. 합주를 들으면서 "베이스 기타가 얼마나 크게 나오는가", "심벌즈가 얼마나 크게 나오는가"를 각각 추출하는 것과 같다.
+          </div>
+        </div>
+
+        <!-- 2-5. 가공 계열 CHOP -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">가공 계열 CHOP — 값을 다듬는다</h3>
+
+          <!-- Math CHOP -->
+          <div class="module-card mb-6" style="border-color: var(--color-accent-yellow);">
+            <div class="module-card-header" style="border-color: var(--color-accent-yellow);">
+              <span class="module-dot" style="background: var(--color-accent-yellow);"></span>
+              Math CHOP ⭐ 가장 중요
+            </div>
+            <div class="module-card-body">
+              <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+                <strong>범위 변환, 반전, 오프셋, 배율 조정</strong> — 거의 모든 인터랙션에서 필요하다.
+              </p>
+
+              <div class="callout callout-warning mb-4">
+                <div class="callout-label">핵심 인사이트</div>
+                인터랙션이 안 되는 대부분의 경우는 값을 못 받는 게 아니라, <strong>받은 값을 적절한 범위로 못 바꾸는 것</strong>이다.
+              </div>
+
+              <table class="data-table mb-4">
+                <thead>
+                  <tr><th>입력</th><th>실제 범위</th><th>필요한 범위</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>마우스 X</td><td>0 ~ 1920</td><td>-1 ~ 1 (Transform tx)</td></tr>
+                  <tr><td>오디오 RMS</td><td>0 ~ 0.01</td><td>0 ~ 2 (Level brightness)</td></tr>
+                  <tr><td>센서값</td><td>300 ~ 700</td><td>0 ~ 1 (opacity)</td></tr>
+                </tbody>
+              </table>
+
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                <strong>Range 탭</strong>: From Range(입력값 범위) → To Range(출력값 범위). 이것만 알면 대부분의 범위 변환 문제를 해결할 수 있다.
+              </p>
+            </div>
+          </div>
+
+          <!-- 나머지 가공 CHOP -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Analyze CHOP
+              </div>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);">
+                복잡한 신호를 <strong>하나의 제어값으로 요약</strong>한다.
+              </p>
+              <p class="text-xs" style="color: var(--color-text-dim);">
+                RMS Power(에너지), Maximum(피크), Average(평균). 오디오 리액티브에서 가장 많이 쓰는 건 <strong>RMS Power</strong>.
+              </p>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Lag CHOP
+              </div>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);">
+                거친 값을 <strong>부드럽게</strong> 만든다 (스무딩).
+              </p>
+              <pre class="mt-2" style="font-size: 0.75rem; padding: 0.5rem 0.75rem;"><code>스무딩 전: ╱╲╱╲╱╲╱╲  (들쭉날쭉)
+스무딩 후: ～～～～～  (부드러움)</code></pre>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Logic CHOP
+              </div>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);">
+                임계값(threshold) 기준으로 <strong>ON/OFF</strong>를 만든다.
+              </p>
+              <pre class="mt-2" style="font-size: 0.75rem; padding: 0.5rem 0.75rem;"><code>입력: 0.2 0.5 0.8 0.3 0.9
+임계:     ── 0.6 ──
+출력: 0   0   1   0   1</code></pre>
+            </div>
+            <div class="panel">
+              <div class="panel-header">
+                <span class="indicator" style="background: var(--color-accent-green);"></span>
+                Trigger / Count
+              </div>
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                <strong>Trigger:</strong> 신호가 임계값을 넘는 순간 한 번만 반응(펄스).<br>
+                <strong>Count:</strong> 입력 신호가 올라갈 때마다 카운트 증가 → Switch의 인덱스로 쓰면 컷 전환.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-6. 연속값과 사건 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">연속값과 사건(Event)의 구분</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="module-card" style="border-color: color-mix(in srgb, var(--color-accent-blue) 40%, var(--color-border));">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+                연속값 (Continuous)
+              </div>
+              <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+                <p class="mb-2">매 순간 변하는 값. 부드럽게 변화한다.</p>
+                <p>마우스 위치, 센서 거리, 오디오 레벨</p>
+                <p class="mt-2"><strong style="color: var(--color-text);">→</strong> 밝기, 위치, 크기, 색상 제어에 적합</p>
+              </div>
+            </div>
+            <div class="module-card" style="border-color: color-mix(in srgb, var(--color-accent-orange) 40%, var(--color-border));">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+                사건 (Event / Trigger)
+              </div>
+              <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+                <p class="mb-2">특정 순간에 발생하는 신호. 0 또는 1.</p>
+                <p>키를 눌렀다, 임계값을 넘었다, 장면을 바꾼다</p>
+                <p class="mt-2"><strong style="color: var(--color-text);">→</strong> Switch, 재생 시작, 이펙트 발동에 적합</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">핵심</div>
+            "입력값이 있다"와 "사건이 발생했다"는 다른 문제다. 이 구분이 명확해야 인터랙션 설계가 깔끔해진다.
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 3 — CHOP Reference              ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="chop-ref">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-blue);">
+            <span class="dot" style="background: var(--color-accent-blue);"></span>
+            Part 03
+          </div>
+          <h2 class="part-title">CHOP Reference — 값을 파라미터에 연결하는 법</h2>
+          <p class="part-subtitle">CHOP에서 만든 값을 TOP의 파라미터에 연결하는 세 가지 방법을 배운다.</p>
+        </div>
+
+        <!-- 3가지 방법 카드 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <!-- Export -->
+          <div class="module-card">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-green);"></span>
+              1. Export (드래그)
+            </div>
+            <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+              <p class="mb-2">가장 직관적이고 빠른 방법.</p>
+              <p class="mb-3">CHOP 노드 우측 하단의 <code>+</code>를 드래그해서 파라미터 위에 놓는다.</p>
+              <div class="flex items-center gap-2 mb-2">
+                <span style="width: 12px; height: 12px; background: var(--color-accent-green); border-radius: 3px; display: inline-block;"></span>
+                <span style="font-size: 0.75rem;">녹색 배경 = Export 활성</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--color-text-dim);">수식 불가. 파라미터가 CHOP에 의해 잠긴다.</p>
+            </div>
+          </div>
+          <!-- Reference -->
+          <div class="module-card">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              2. Reference (표현식)
+            </div>
+            <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+              <p class="mb-2">파라미터 필드에 Python 표현식을 직접 입력.</p>
+              <pre style="font-size: 0.75rem; padding: 0.5rem; margin-bottom: 0.5rem;"><code>op('chop이름')['채널이름']</code></pre>
+              <div class="flex items-center gap-2 mb-2">
+                <span style="width: 12px; height: 12px; background: var(--color-accent-blue); border-radius: 3px; display: inline-block;"></span>
+                <span style="font-size: 0.75rem;">파란색 배경 = Reference 활성</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--color-text-dim);">수식 가능! 가장 유연하다.</p>
+            </div>
+          </div>
+          <!-- Bind -->
+          <div class="module-card">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              3. Bind (양방향)
+            </div>
+            <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+              <p class="mb-2">CHOP과 파라미터를 양방향으로 연결.</p>
+              <p class="mb-3">파라미터를 바꾸면 CHOP도 바뀐다.</p>
+              <div class="flex items-center gap-2 mb-2">
+                <span style="width: 12px; height: 12px; background: var(--color-accent-green); border-radius: 3px; display: inline-block;"></span>
+                <span style="font-size: 0.75rem;">녹색 배경 (양방향)</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--color-text-dim);">고급 기능. 이번 수업에서는 소개만.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference 예시 -->
+        <h4 class="text-base font-semibold mb-3">Reference 표현식 예시</h4>
+
+        <div class="module-card mb-6">
+          <div class="module-card-body">
+            <table class="data-table">
+              <thead>
+                <tr><th>표현식</th><th>의미</th></tr>
+              </thead>
+              <tbody>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('lfo1')['chan1']</td><td>lfo1의 chan1 채널 값</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('mouse1')['tx']</td><td>마우스 X 위치</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('analyze1')['chan1']</td><td>오디오 분석값</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('lfo1')['chan1'] * 2</td><td>값을 2배로</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('audio1')['chan1'] * 10 + 1</td><td>10배 하고 1 더하기</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="callout callout-tip mb-6">
+          <div class="callout-label">언제 뭘 쓸까</div>
+          처음 배울 때 → <strong>Export</strong> (드래그)<br>
+          간단한 계산이 필요하면 → <strong>Reference</strong> (표현식)<br>
+          양방향 제어가 필요하면 → <strong>Bind</strong>
+        </div>
+
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 4 — 오디오 리액티브              ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="audio-reactive">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-orange);">
+            <span class="dot" style="background: var(--color-accent-orange);"></span>
+            Part 04
+          </div>
+          <h2 class="part-title">오디오 리액티브 비주얼</h2>
+          <p class="part-subtitle">소리 데이터를 실시간으로 분석하여 영상 파라미터를 제어하는 오디오 리액티브 비주얼의 기초.</p>
+        </div>
+
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">오디오 리액티브란</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            소리가 크면 밝아지고, 베이스가 강하면 화면이 흔들리고, 킥 드럼이 울릴 때마다 장면이 전환되는 — 이런 비주얼이 오디오 리액티브다.
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="panel text-center" style="padding: 1rem;">
+              <div class="text-xs mb-1" style="color: var(--color-accent-orange);">라이브</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">VJing</div>
+            </div>
+            <div class="panel text-center" style="padding: 1rem;">
+              <div class="text-xs mb-1" style="color: var(--color-accent-blue);">뮤직비디오</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">동기화 영상</div>
+            </div>
+            <div class="panel text-center" style="padding: 1rem;">
+              <div class="text-xs mb-1" style="color: var(--color-accent-green);">설치 미술</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">반응하는 작품</div>
+            </div>
+            <div class="panel text-center" style="padding: 1rem;">
+              <div class="text-xs mb-1" style="color: var(--color-accent-purple);">제너레이티브</div>
+              <div class="text-xs" style="color: var(--color-text-muted);">알고리즘 패턴</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오디오 분석 파이프라인 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">오디오 분석의 기초 — 5단계 파이프라인</h3>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation">오디오 리액티브 기본 뼈대</span><br><br>
+            <span class="node node-chop">Audio Device In</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Analyze (RMS)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Math (범위변환)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Lag (스무딩)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Null</span>
+            <span class="arrow">→</span>
+            <span style="color: var(--color-accent-orange);">Export</span>
+          </div>
+
+          <div class="space-y-4 mb-6">
+            <div class="panel flex gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">1</div>
+              <div>
+                <div class="font-semibold text-sm mb-1">오디오 입력받기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><code>Audio Device In CHOP</code> — Device에서 마이크/시스템 오디오 선택. Viewer에서 파형 확인.</p>
+              </div>
+            </div>
+            <div class="panel flex gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">2</div>
+              <div>
+                <div class="font-semibold text-sm mb-1">에너지 추출하기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><code>Analyze CHOP (RMS Power)</code> — 빠르게 진동하는 오디오 파형 → <strong>하나의 숫자</strong>(현재 볼륨)</p>
+              </div>
+            </div>
+            <div class="panel flex gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">3</div>
+              <div>
+                <div class="font-semibold text-sm mb-1">범위 맞추기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><code>Math CHOP (Range)</code> — RMS 출력(0~0.01)을 원하는 범위(0~2)로 변환</p>
+              </div>
+            </div>
+            <div class="panel flex gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">4</div>
+              <div>
+                <div class="font-semibold text-sm mb-1">부드럽게 만들기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><code>Lag CHOP</code> — Lag Up: 0.05, Lag Down: 0.3 → "빠르게 반응하고 천천히 사라지는" 느낌</p>
+              </div>
+            </div>
+            <div class="panel flex gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">5</div>
+              <div>
+                <div class="font-semibold text-sm mb-1">파라미터에 연결하기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><code>Null CHOP → Export</code> — 이제 소리가 크면 밝아지고, 소리가 작으면 어두워진다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 인터랙션의 미감 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">인터랙션의 미감 — "어떻게 반응하는가?"</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">핵심 원칙</div>
+            인터랙티브 작업에서는 기술적으로 "작동하는 것"과 미적으로 "좋은 것"이 다르다.<br><br>
+            <span style="color: var(--color-accent-red);">나쁜 예:</span> 소리 → 즉시 밝기 100% → 거칠고 불쾌하다<br>
+            <span style="color: var(--color-accent-green);">좋은 예:</span> 소리 → 0.1초에 밝기 상승 → 0.5초에 천천히 하강 → 호흡감이 있다
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              Lag CHOP 비대칭 설정
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>설정</th><th>효과</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Up: 0.05, Down: 0.3</td><td>빠르게 반응하고 천천히 사라짐 → <strong>펀치감 + 여운</strong></td></tr>
+                  <tr><td>Up: 0.3, Down: 0.05</td><td>천천히 반응하고 빠르게 사라짐 → <strong>몽환적</strong></td></tr>
+                  <tr><td>Up: 0.1, Down: 0.1</td><td>대칭적 반응 → <strong>중립적</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label">인사이트</div>
+            인터랙션은 "편집과 리듬의 문제"이기도 하다.
+            값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 5 — 실습                        ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="practice">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-red, #d45b5b);">
+            <span class="dot" style="background: var(--color-accent-red);"></span>
+            Part 05
+          </div>
+          <h2 class="part-title">실습 — 오디오 리액티브 비주얼 만들기</h2>
+          <p class="part-subtitle">단계별 실습으로 소리에 반응하는 비주얼을 직접 만든다.</p>
+        </div>
+
+        <!-- 실습 A: Feedback + Displace 체험 -->
+        <div class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="badge badge-practice">실습 A</span>
+            <h3 class="text-lg font-semibold">Feedback + Displace 체험</h3>
+          </div>
+
+          <!-- A-1 -->
+          <details class="mb-4" open>
+            <summary>
+              <span class="badge badge-top" style="margin-right: 0.5rem;">A-1</span>
+              기본 잔상 만들기
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                <strong>목표:</strong> Feedback TOP의 동작 원리를 체감한다
+              </p>
+              <div class="step-list mb-4">
+                <div class="step-item"><span><code>Movie File In TOP</code>으로 영상을 불러온다</span></div>
+                <div class="step-item"><span><code>Feedback TOP</code>을 만든다</span></div>
+                <div class="step-item"><span><code>Composite TOP</code> (Operation: Over)를 만들고: 입력 1에 Feedback, 입력 2에 원본 영상</span></div>
+                <div class="step-item"><span><code>Level TOP</code>을 연결하고 opacity를 <strong>0.95</strong>로 설정</span></div>
+                <div class="step-item"><span><code>Null TOP</code>을 끝에 연결</span></div>
+                <div class="step-item"><span>Feedback TOP의 Target TOP을 <code>Level TOP</code>으로 설정</span></div>
+              </div>
+              <div class="callout callout-tip">
+                <div class="callout-label">확인 포인트</div>
+                opacity를 <strong>0.8 / 0.95 / 0.99</strong>로 바꿔보면서 차이를 느껴본다. Reset Pulse로 초기화해본다.
+              </div>
+            </div>
+          </details>
+
+          <!-- A-2 -->
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-top" style="margin-right: 0.5rem;">A-2</span>
+              Noise Displacement
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                <strong>목표:</strong> Displace TOP으로 이미지를 왜곡하고, 패턴의 변화를 관찰한다
+              </p>
+              <div class="step-list mb-4">
+                <div class="step-item"><span>영상을 <code>Displace TOP</code>의 첫 번째 입력에 연결</span></div>
+                <div class="step-item"><span><code>Noise TOP</code>을 두 번째 입력에 연결</span></div>
+                <div class="step-item"><span>Displace Weight를 <strong>0.02</strong>에서 시작</span></div>
+                <div class="step-item"><span>Noise TOP의 Transform → Translate X에 <code>absTime.seconds * 0.1</code> 입력</span></div>
+              </div>
+              <div class="callout callout-tip">
+                <div class="callout-label">확인 포인트</div>
+                Displace Weight를 <strong>0.01 / 0.05 / 0.2</strong>로 비교. Noise의 Period, Type을 바꿔보면서 질감 차이를 관찰.
+              </div>
+            </div>
+          </details>
+
+          <!-- A-3 -->
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-top" style="margin-right: 0.5rem;">A-3</span>
+              Feedback + Displace 결합
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                <strong>목표:</strong> 두 효과를 결합하여 유기적으로 움직이는 비주얼을 만든다
+              </p>
+              <div class="step-list mb-4">
+                <div class="step-item"><span>실습 A-1의 Feedback 구조를 만든다</span></div>
+                <div class="step-item"><span>Level TOP과 Composite TOP 사이에 <code>Displace TOP</code>을 삽입</span></div>
+                <div class="step-item"><span>Displace의 두 번째 입력에 <code>Noise TOP</code> 연결</span></div>
+                <div class="step-item"><span>Displace Weight: <strong>0.01</strong>, Level opacity: <strong>0.96</strong>으로 시작</span></div>
+                <div class="step-item"><span>여러 파라미터를 바꿔가며 "마음에 드는 움직임"을 찾아본다</span></div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 실습 B: CHOP 기본 -->
+        <div class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="badge badge-practice">실습 B</span>
+            <h3 class="text-lg font-semibold">CHOP 기본과 Reference 연습</h3>
+          </div>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-chop" style="margin-right: 0.5rem;">B-1</span>
+              LFO로 영상 자동 움직이기
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="node node-chop">LFO CHOP</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Math CHOP</span>
+                <span class="arrow">→</span>
+                <span style="color: var(--color-accent-orange);">Export</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Transform TOP (tx)</span>
+              </div>
+              <div class="step-list mb-4">
+                <div class="step-item"><span><code>LFO CHOP</code>을 만든다 (Type: Sin, Frequency: 0.3)</span></div>
+                <div class="step-item"><span><code>Math CHOP</code> Range: From -1~1, To -0.5~0.5</span></div>
+                <div class="step-item"><span>Math CHOP의 <code>+</code>를 드래그해서 Transform TOP의 tx에 Export</span></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-chop" style="margin-right: 0.5rem;">B-2</span>
+              Reference 표현식 연습
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="step-list mb-4">
+                <div class="step-item"><span>Level TOP의 <strong>Opacity</strong> 파라미터를 우클릭 → Expression Mode</span></div>
+                <div class="step-item"><span>다음 표현식을 입력한다:</span></div>
+              </div>
+              <pre class="mb-4"><code>op('math1')['chan1'] * 0.5 + 0.5</code></pre>
+              <div class="callout callout-tip">
+                <div class="callout-label">확인</div>
+                Export(녹색)와 Reference(파란색)의 파라미터 색 차이를 확인한다.
+              </div>
+            </div>
+          </details>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-chop" style="margin-right: 0.5rem;">B-3</span>
+              마우스로 영상 제어 + 스무딩
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="node node-chop">Mouse In</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Select (tx)</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Math</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Lag</span>
+                <span class="arrow">→</span>
+                <span style="color: var(--color-accent-orange);">Export</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Transform (tx)</span>
+              </div>
+              <div class="step-list mb-4">
+                <div class="step-item"><span>Math CHOP Range: From 0~1920, To -1~1</span></div>
+                <div class="step-item"><span><code>Lag CHOP</code> 연결, Lag: <strong>0.2</strong>로 설정</span></div>
+                <div class="step-item"><span>Transform TOP의 tx에 Export</span></div>
+              </div>
+              <div class="callout callout-tip">
+                <div class="callout-label">확인</div>
+                Lag 값을 <strong>0.05 / 0.2 / 1.0</strong>으로 바꿔보면서 차이를 느낀다. Lag가 없을 때 vs 있을 때를 비교.
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 실습 C~F: 오디오 리액티브 -->
+        <div class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="badge badge-practice">실습 C–F</span>
+            <h3 class="text-lg font-semibold">오디오 리액티브 비주얼</h3>
+          </div>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">C</span>
+              소리에 반응하는 밝기
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="node node-chop">Audio Device In</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Analyze (RMS)</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Math</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Lag</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Null</span>
+                <span class="arrow">→</span>
+                <span style="color: var(--color-accent-orange);">Export</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Level (brightness)</span>
+              </div>
+              <div class="step-list mb-4">
+                <div class="step-item"><span>Audio Device In → Device에서 마이크/시스템 오디오 선택</span></div>
+                <div class="step-item"><span>Analyze CHOP: Function을 <strong>RMS Power</strong>로</span></div>
+                <div class="step-item"><span>Math CHOP Range: From 0~0.01, To 0~2</span></div>
+                <div class="step-item"><span>Lag: Up <strong>0.05</strong>, Down <strong>0.3</strong></span></div>
+                <div class="step-item"><span>Null CHOP 이름을 <code>audio_level</code>로 변경</span></div>
+                <div class="step-item"><span>Level TOP의 Brightness에 Export</span></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">D</span>
+              소리에 반응하는 왜곡 (Displace)
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                실습 C의 CHOP 네트워크를 그대로 사용. Displace TOP의 Weight에 Reference 표현식으로 연결한다.
+              </p>
+              <pre class="mb-4"><code>op('audio_level')['chan1'] * 0.05</code></pre>
+              <div class="callout callout-tip">
+                <div class="callout-label">확인</div>
+                <code>* 0.05</code> 부분을 <strong>* 0.1</strong>, <strong>* 0.2</strong>로 바꿔보면서 감도를 조절한다.
+              </div>
+            </div>
+          </details>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">E</span>
+              소리에 반응하는 Feedback
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                Feedback 루프 안의 파라미터에 오디오를 연결한다.
+              </p>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);"><strong>Level TOP Opacity에 Reference:</strong></p>
+              <pre class="mb-3"><code>0.9 + op('audio_level')['chan1'] * 0.08</code></pre>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);"><strong>Displace Weight에 Reference:</strong></p>
+              <pre class="mb-4"><code>op('audio_level')['chan1'] * 0.03</code></pre>
+              <p class="text-xs" style="color: var(--color-text-dim);">
+                소리가 클 때 잔상이 더 오래 남고(opacity↑), 동시에 왜곡이 강해진다(weight↑). 조용하면 거의 원본만 보인다.
+              </p>
+            </div>
+          </details>
+
+          <details class="mb-4">
+            <summary>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">F</span>
+              임계값 기반 장면 전환
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="annotation">연속값 + 사건 복합 구조</span><br><br>
+                <span class="node node-chop">audio_level</span>
+                <span class="arrow">→</span>
+                <span style="color: var(--color-accent-blue);">[연속값]</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Level / Displace</span><br><br>
+                <span class="node node-chop">audio_level</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Logic</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Count</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Switch TOP (index)</span>
+              </div>
+              <div class="step-list">
+                <div class="step-item"><span><code>Logic CHOP</code>: Off When 0.4, On When 0.6</span></div>
+                <div class="step-item"><span><code>Count CHOP</code>: Limit Loop, Min 0, Max 영상 개수-1</span></div>
+                <div class="step-item"><span>Count → Switch TOP의 Index에 Export</span></div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 실습 G: 미니 과제 -->
+        <div class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="badge badge-practice">실습 G</span>
+            <h3 class="text-lg font-semibold">미니 과제 — 나만의 오디오 리액티브 비주얼</h3>
+          </div>
+
+          <div class="module-card mb-6" style="border-color: var(--color-accent-orange);">
+            <div class="module-card-header" style="border-color: var(--color-accent-orange);">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              과제 조건
+            </div>
+            <div class="module-card-body">
+              <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> 오디오 입력 사용 필수</li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> 가공 CHOP <strong>2개 이상</strong> 사용 (Math, Lag, Limit, Logic 등)</li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> TOP 파라미터 <strong>2개 이상</strong> 제어</li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> <strong>연속값 제어 1개</strong>와 <strong>이벤트 제어 1개</strong>를 모두 포함</li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> Feedback TOP 또는 Displace TOP 중 <strong>1개 이상</strong> 활용</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              아이디어 예시
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr><th>아이디어</th><th>연속값</th><th>이벤트</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>오디오 + Feedback 잔상</td><td>소리로 opacity/왜곡</td><td>킥에 반응해 색상 전환</td></tr>
+                  <tr><td>오디오 + Displacement</td><td>소리로 Weight 조절</td><td>큰 소리에 글리치 전환</td></tr>
+                  <tr><td>마우스 + 오디오 복합</td><td>마우스→위치, 오디오→밝기</td><td>키보드로 영상 전환</td></tr>
+                  <tr><td>주파수 분리</td><td>저음→스케일, 고음→색상</td><td>전체 볼륨 임계값→전환</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 6 — 정리                        ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="summary">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-text-muted);">
+            <span class="dot" style="background: var(--color-text-muted);"></span>
+            Part 06
+          </div>
+          <h2 class="part-title">정리와 다음 단계</h2>
+        </div>
+
+        <!-- 핵심 원칙 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">핵심 원칙</h3>
+
+          <div class="space-y-3 mb-6">
+            <div class="panel" style="border-left: 3px solid var(--color-accent-blue);">
+              <div class="font-semibold text-sm mb-1">1. 인터랙션은 "값을 설계하는 것"이다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);">영상을 직접 건드리는 것보다 영상을 움직이는 값을 설계하는 것이 인터랙션이다.</p>
+            </div>
+            <div class="panel" style="border-left: 3px solid var(--color-accent-green);">
+              <div class="font-semibold text-sm mb-1">2. 좋은 인터랙션은 가공 방식에서 나온다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);">마우스를 받는 것은 쉽다. 그 값을 적당한 속도, 범위, 감도, 리듬으로 가공하는 것이 어렵고 중요하다.</p>
+            </div>
+            <div class="panel" style="border-left: 3px solid var(--color-accent-orange);">
+              <div class="font-semibold text-sm mb-1">3. 센서 데이터는 대부분 더럽고 불안정하다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);">"센서가 이상하다"라고 할 때 사실은 데이터 가공 문제인 경우가 많다.</p>
+            </div>
+            <div class="panel" style="border-left: 3px solid var(--color-accent-purple);">
+              <div class="font-semibold text-sm mb-1">4. 인터랙션은 서사와 편집의 문제이기도 하다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);">값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오퍼레이터 치트시트 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">최소 필수 오퍼레이터</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="module-card">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+                TOP
+              </div>
+              <div class="module-card-body">
+                <table class="data-table">
+                  <tbody>
+                    <tr><td>Movie File In</td><td>영상 불러오기</td></tr>
+                    <tr><td>Transform</td><td>이동, 회전, 스케일</td></tr>
+                    <tr><td>Level</td><td>밝기, 불투명도</td></tr>
+                    <tr><td>Composite</td><td>합성</td></tr>
+                    <tr><td>Switch</td><td>입력 선택</td></tr>
+                    <tr><td style="color: var(--color-accent-purple);">Feedback</td><td>이전 프레임 피드백</td></tr>
+                    <tr><td style="color: var(--color-accent-purple);">Displace</td><td>이미지 왜곡</td></tr>
+                    <tr><td>Noise</td><td>절차적 노이즈</td></tr>
+                    <tr><td>Null</td><td>네트워크 정리</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="module-card">
+              <div class="module-card-header">
+                <span class="module-dot" style="background: var(--color-accent-green);"></span>
+                CHOP
+              </div>
+              <div class="module-card-body">
+                <table class="data-table">
+                  <tbody>
+                    <tr><td>Mouse In</td><td>마우스 입력</td></tr>
+                    <tr><td style="color: var(--color-accent-green);">Audio Device In</td><td>오디오 입력</td></tr>
+                    <tr><td>LFO / Noise</td><td>값 생성</td></tr>
+                    <tr><td style="color: var(--color-accent-yellow);">Math ⭐</td><td>범위 변환</td></tr>
+                    <tr><td style="color: var(--color-accent-green);">Analyze</td><td>신호 요약 (RMS)</td></tr>
+                    <tr><td>Filter / Lag</td><td>스무딩</td></tr>
+                    <tr><td>Limit</td><td>범위 제한</td></tr>
+                    <tr><td>Logic / Trigger</td><td>사건 생성</td></tr>
+                    <tr><td>Null</td><td>네트워크 정리</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 핵심 파이프라인 -->
+        <div class="mb-10">
+          <div class="module-card" style="border-color: var(--color-accent-orange);">
+            <div class="module-card-header" style="border-color: var(--color-accent-orange);">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              오디오 리액티브 파이프라인 (암기)
+            </div>
+            <div class="module-card-body">
+              <div class="node-diagram">
+                <span class="node node-chop">Audio Device In</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Analyze</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Math</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Lag</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Null</span>
+                <span class="arrow">→</span>
+                <span style="color: var(--color-accent-orange); font-weight: 600;">Export / Reference</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 디버깅 순서 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">디버깅 순서</h3>
+
+          <div class="step-list mb-6">
+            <div class="step-item"><span><strong>"값이 들어오고 있는가?"</strong> — CHOP Viewer에서 입력 확인</span></div>
+            <div class="step-item"><span><strong>"범위가 맞는가?"</strong> — Math CHOP의 From/To Range 확인</span></div>
+            <div class="step-item"><span><strong>"값이 너무 튀는가?"</strong> — Filter/Lag/Limit 추가</span></div>
+            <div class="step-item"><span><strong>"연결이 되어 있는가?"</strong> — Export/Reference 상태 확인</span></div>
+          </div>
+        </div>
+
+        <!-- 키워드 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4">핵심 키워드</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="badge badge-chop">channel</span>
+            <span class="badge badge-chop">sample</span>
+            <span class="badge badge-chop">sample rate</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-yellow) 15%, transparent); color: var(--color-accent-yellow);">range</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-yellow) 15%, transparent); color: var(--color-accent-yellow);">mapping</span>
+            <span class="badge badge-chop">smoothing</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">threshold</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">trigger</span>
+            <span class="badge badge-chop">export</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">reference</span>
+            <span class="badge badge-top">feedback</span>
+            <span class="badge badge-top">displacement</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">RMS</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">FFT</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-red) 15%, transparent); color: var(--color-accent-red);">audio reactive</span>
+            <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">continuous vs event</span>
+          </div>
+        </div>
+
+        <!-- 다음 수업 예고 -->
+        <div class="module-card" style="border-color: var(--color-border-light);">
+          <div class="module-card-header" style="border-color: var(--color-border-light);">
+            <span class="module-dot" style="background: var(--color-text-dim);"></span>
+            다음 수업 예고
+          </div>
+          <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
+            <ul class="space-y-1" style="list-style: none; padding: 0;">
+              <li>&#8226; Audio Spectrum CHOP을 활용한 주파수 대역별 분리와 정밀 매핑</li>
+              <li>&#8226; SOP(3D)와 CHOP의 결합 — 소리에 반응하는 3D 지오메트리</li>
+              <li>&#8226; MIDI / OSC 입력 — 외부 컨트롤러와의 연동</li>
+              <li>&#8226; 여러 입력을 결합한 복합 인터랙션 설계</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Accent line footer -->
+      <div class="accent-line mt-16 mb-8" style="background: linear-gradient(90deg, transparent, var(--color-accent-green), var(--color-accent-blue), var(--color-accent-purple), transparent);"></div>
+
+      <!-- Footer -->
+      <footer class="text-center text-xs" style="color: var(--color-text-dim);">
+        <p>디지털미디어비주얼 1 — CHOP / Audio Reactive 기초</p>
+        <button id="export-pdf" class="mt-3 px-4 py-2 rounded-lg no-print" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-border-light)'" onmouseout="this.style.borderColor='var(--color-border)'">
+          PDF로 내보내기
+        </button>
+      </footer>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+
+      // Section nav active state
+      const sections = document.querySelectorAll("section[id]");
+      const navLinks = document.querySelectorAll(".section-nav a");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              navLinks.forEach((link) => link.classList.remove("active"));
+              const activeLink = document.querySelector(
+                `.section-nav a[href="#${entry.target.id}"]`
+              );
+              if (activeLink) activeLink.classList.add("active");
+            }
+          });
+        },
+        { rootMargin: "-20% 0px -60% 0px" }
+      );
+
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+</html>

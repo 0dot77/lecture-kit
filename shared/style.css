@@ -1,0 +1,832 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #1c1c20;
+  --color-bg-deep: #141417;
+  --color-surface: #222226;
+  --color-surface-alt: #28282d;
+  --color-surface-hover: #2e2e33;
+  --color-border: #333338;
+  --color-border-light: #3e3e44;
+  --color-text: #dcdce0;
+  --color-text-muted: #78787f;
+  --color-text-dim: #555560;
+  --color-accent-blue: #5ba0d9;
+  --color-accent-orange: #d98c52;
+  --color-accent-green: #5cb87a;
+  --color-accent-purple: #9e80d4;
+  --color-accent-red: #d45b5b;
+  --color-accent-yellow: #d4b85b;
+
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+}
+
+/* ─── Base ─── */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
+}
+
+/* ─── Lecture page layout ─── */
+.lecture-page {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+/* ─── Section navigation (sticky sidebar dots) ─── */
+.section-nav {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 50;
+}
+
+.section-nav a {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all 0.3s;
+  position: relative;
+}
+
+.section-nav a.active {
+  background: var(--color-accent-blue);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
+}
+
+.section-nav a:hover {
+  background: var(--color-text-muted);
+  transform: scale(1.4);
+}
+
+.section-nav a .nav-label {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.section-nav a:hover .nav-label {
+  opacity: 1;
+}
+
+/* ─── Part header (big section divider) ─── */
+.part-header {
+  position: relative;
+  padding: 3rem 0 2rem;
+  margin: 4rem 0 2rem;
+}
+
+.part-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-border-light) 20%,
+    var(--color-border-light) 80%,
+    transparent
+  );
+}
+
+.part-number {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.part-number .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.part-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.part-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+/* ─── Panel / Card ─── */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.25s;
+}
+
+.panel:hover {
+  border-color: var(--color-border-light);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.panel-header .indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── Module card (hardware-inspired) ─── */
+.module-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.module-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.module-card-header .module-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.module-card-body {
+  padding: 1.25rem;
+}
+
+/* ─── Node diagram (signal flow) ─── */
+.node-diagram {
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 2;
+  color: var(--color-text-muted);
+}
+
+.node-diagram .node {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.node-diagram .node-top {
+  background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-purple) 30%, transparent);
+  color: var(--color-accent-purple);
+}
+
+.node-diagram .node-chop {
+  background: color-mix(in srgb, var(--color-accent-green) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-green) 30%, transparent);
+  color: var(--color-accent-green);
+}
+
+.node-diagram .arrow {
+  color: var(--color-text-dim);
+  margin: 0 0.25rem;
+}
+
+.node-diagram .annotation {
+  font-size: 0.7rem;
+  color: var(--color-text-dim);
+  font-style: italic;
+}
+
+/* ─── Code blocks ─── */
+pre {
+  position: relative;
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+pre code {
+  color: var(--color-text-muted);
+}
+
+pre .copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-dim);
+  padding: 0.25rem 0.625rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+}
+
+pre:hover .copy-btn {
+  opacity: 1;
+}
+
+pre .copy-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-light);
+}
+
+/* Code syntax colors */
+.code-keyword { color: var(--color-accent-purple); }
+.code-string { color: var(--color-accent-green); }
+.code-comment { color: var(--color-text-dim); font-style: italic; }
+.code-number { color: var(--color-accent-orange); }
+.code-func { color: var(--color-accent-blue); }
+
+/* ─── Tables ─── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table thead th {
+  text-align: left;
+  padding: 0.625rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table tbody td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  color: var(--color-text-muted);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--color-surface-hover) 50%, transparent);
+}
+
+.data-table td:first-child {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* ─── Callout / Tip ─── */
+.callout {
+  position: relative;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border: 1px solid;
+}
+
+.callout-concept {
+  background: color-mix(in srgb, var(--color-accent-blue) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
+  color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--color-text));
+}
+
+.callout-tip {
+  background: color-mix(in srgb, var(--color-accent-green) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-green) 20%, transparent);
+  color: color-mix(in srgb, var(--color-accent-green) 80%, var(--color-text));
+}
+
+.callout-warning {
+  background: color-mix(in srgb, var(--color-accent-orange) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-orange) 20%, transparent);
+  color: color-mix(in srgb, var(--color-accent-orange) 80%, var(--color-text));
+}
+
+.callout-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.375rem;
+}
+
+/* ─── Toggle / Accordion ─── */
+details {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+details summary {
+  padding: 0.875rem 1.25rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+details summary:hover {
+  background: var(--color-surface-hover);
+}
+
+details summary::marker {
+  content: "";
+}
+
+details summary .chevron {
+  transition: transform 0.2s;
+  color: var(--color-text-dim);
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+
+details[open] summary .chevron {
+  transform: rotate(90deg);
+}
+
+details .details-body {
+  padding: 1.25rem;
+  border-top: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 50%, var(--color-bg));
+}
+
+/* ─── Practice step indicator ─── */
+.step-list {
+  counter-reset: step;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step-item {
+  counter-increment: step;
+  display: flex;
+  gap: 0.875rem;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+.step-item::before {
+  content: counter(step);
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-dim);
+  margin-top: 0.15rem;
+}
+
+/* ─── Dot grid decoration ─── */
+.dot-grid {
+  display: inline-grid;
+  gap: 4px;
+  opacity: 0.3;
+}
+
+.dot-grid span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--color-text-dim);
+}
+
+/* ─── Accent line connector ─── */
+.accent-line {
+  height: 2px;
+  border-radius: 1px;
+  margin: 2rem 0;
+}
+
+/* ─── Signal Panel Frame ─── */
+.page-frame {
+  position: fixed;
+  inset: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-frame::before,
+.page-frame::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+}
+
+.page-frame::before { top: 8px; left: 8px; }
+.page-frame::after { top: 8px; right: 8px; }
+
+.page-screw-bl,
+.page-screw-br {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page-screw-bl { bottom: 18px; left: 18px; }
+.page-screw-br { bottom: 18px; right: 18px; }
+
+/* Grid background overlay */
+.grid-bg-page {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-text) 2%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-text) 2%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Signal Panel Decorations ─── */
+.sig-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.sig-led-blue { background: var(--color-accent-blue); box-shadow: 0 0 6px var(--color-accent-blue); }
+.sig-led-green { background: var(--color-accent-green); box-shadow: 0 0 6px var(--color-accent-green); }
+.sig-led-orange { background: var(--color-accent-orange); box-shadow: 0 0 6px var(--color-accent-orange); }
+.sig-led-purple { background: var(--color-accent-purple); box-shadow: 0 0 6px var(--color-accent-purple); }
+
+@keyframes led-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.sig-led-pulse { animation: led-blink 2.5s ease-in-out infinite; }
+
+.sig-knob {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, var(--color-surface-hover), var(--color-bg-deep));
+  border: 1.5px solid var(--color-border-light);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sig-knob::after {
+  content: "";
+  width: 2px;
+  height: 35%;
+  background: var(--color-text);
+  border-radius: 1px;
+  transform: rotate(-45deg);
+}
+
+.sig-cable {
+  height: 3px;
+  border-radius: 2px;
+  flex: 1;
+  min-width: 20px;
+  max-width: 80px;
+}
+
+.sig-cable-orange { background: linear-gradient(90deg, var(--color-accent-orange), color-mix(in srgb, var(--color-accent-orange) 25%, transparent)); }
+.sig-cable-blue   { background: linear-gradient(90deg, var(--color-accent-blue),   color-mix(in srgb, var(--color-accent-blue)   25%, transparent)); }
+.sig-cable-green  { background: linear-gradient(90deg, var(--color-accent-green),  color-mix(in srgb, var(--color-accent-green)  25%, transparent)); }
+.sig-cable-purple { background: linear-gradient(90deg, var(--color-accent-purple), color-mix(in srgb, var(--color-accent-purple) 25%, transparent)); }
+
+.sig-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+/* ─── Course card (signal panel style) ─── */
+.course-panel {
+  display: block;
+  text-decoration: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.75rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-panel:hover {
+  border-color: var(--color-border-light);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.course-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    var(--color-accent-purple),
+    var(--color-accent-blue),
+    var(--color-accent-green),
+    transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.course-panel:hover::before {
+  opacity: 1;
+}
+
+/* ─── Stat readout (meter style) ─── */
+.stat-readout {
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  position: relative;
+}
+
+.stat-readout .stat-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-readout .stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+  margin-top: 0.5rem;
+}
+
+/* ─── Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.badge-top {
+  background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent);
+  color: var(--color-accent-purple);
+}
+
+.badge-chop {
+  background: color-mix(in srgb, var(--color-accent-green) 15%, transparent);
+  color: var(--color-accent-green);
+}
+
+.badge-practice {
+  background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent);
+  color: var(--color-accent-orange);
+}
+
+.badge-done {
+  background: color-mix(in srgb, var(--color-accent-green) 15%, transparent);
+  color: var(--color-accent-green);
+}
+
+.badge-wip {
+  background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent);
+  color: var(--color-accent-orange);
+}
+
+.badge-todo {
+  background: color-mix(in srgb, var(--color-border) 40%, transparent);
+  color: var(--color-text-muted);
+}
+
+/* ─── TOC (Table of Contents) ─── */
+.toc {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.toc-header {
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+.toc-body {
+  padding: 0.75rem 0;
+}
+
+.toc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.toc-item:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.toc-item .toc-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.toc-item .toc-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-dim);
+  width: 2rem;
+  flex-shrink: 0;
+}
+
+/* ─── Waveform visual decoration ─── */
+.waveform-decoration {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+}
+
+.waveform-decoration span {
+  width: 2px;
+  border-radius: 1px;
+  animation: waveform 1.5s ease-in-out infinite;
+}
+
+@keyframes waveform {
+  0%, 100% { height: 4px; opacity: 0.3; }
+  50% { height: 16px; opacity: 0.7; }
+}
+
+/* ─── Presentation Mode ─── */
+
+/* Enter button (floating) */
+.pres-enter-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 40;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.pres-enter-btn:hover {
+  border-color: var(--color-accent-blue);
+  color: var(--color-accent-blue);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .lecture-page {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .section-nav {
+    display: none;
+  }
+
+  .part-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* ─── Print styles ─── */
+@media print {
+  body {
+    background: white;
+    color: #1a1a1a;
+  }
+  .no-print,
+  .section-nav {
+    display: none !important;
+  }
+  .panel,
+  .module-card {
+    border: 1px solid #ddd;
+    break-inside: avoid;
+  }
+  pre,
+  .node-diagram {
+    background: #f5f5f5;
+    border-color: #ddd;
+  }
+  .callout {
+    break-inside: avoid;
+  }
+  .part-header {
+    break-before: page;
+  }
+}

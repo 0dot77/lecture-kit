@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lecture-kit</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame with corner screws -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Header -->
+      <header class="mb-16">
+        <!-- Signal decoration -->
+        <div class="flex items-center gap-3 mb-8">
+          <span class="sig-led sig-led-blue sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-blue"></span>
+          <span class="sig-led sig-led-green sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-green"></span>
+          <span class="sig-led sig-led-orange sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-3">Signal Routing — Active Courses</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3" style="letter-spacing: -0.03em;">
+          lecture-kit
+        </h1>
+        <p style="color: var(--color-text-muted);" class="text-base">
+          강의 자료 모음
+        </p>
+
+        <!-- Accent cable line -->
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-purple), var(--color-accent-blue), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- Course Grid -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">Courses</h2>
+          <div class="sig-cable sig-cable-purple" style="max-width: 40px;"></div>
+          <span class="sig-label" style="margin-left: auto;">01 active</span>
+        </div>
+
+        <div class="grid gap-4" id="courses">
+          <!-- Course: 디지털미디어비주얼 1 -->
+          <a href="/courses/2026-digital-media-visual-1/" class="course-panel group">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <span class="sig-led sig-led-purple sig-led-pulse"></span>
+                <h3 class="text-xl font-semibold group-hover:text-[var(--color-accent-purple)] transition-colors">
+                  디지털미디어비주얼 1
+                </h3>
+              </div>
+              <span class="badge badge-wip">진행중</span>
+            </div>
+            <p style="color: var(--color-text-muted);" class="text-sm ml-[1.6rem]">
+              Digital Media Visual 1 — 2026
+            </p>
+
+            <!-- Signal flow decoration -->
+            <div class="flex items-center gap-2 mt-5 ml-[1.6rem]">
+              <span class="sig-label">modules</span>
+              <span class="sig-cable sig-cable-purple" style="max-width: 24px;"></span>
+              <span class="sig-cable sig-cable-blue" style="max-width: 32px;"></span>
+              <span class="sig-cable sig-cable-green" style="max-width: 28px;"></span>
+              <span class="sig-cable sig-cable-orange" style="max-width: 20px;"></span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Footer decoration -->
+      <footer class="mt-20 flex items-center gap-3" style="color: var(--color-text-dim);">
+        <span class="sig-led sig-led-green" style="width: 5px; height: 5px; box-shadow: none; opacity: 0.4;"></span>
+        <span class="sig-label">lecture-kit v1.0</span>
+        <div class="sig-cable sig-cable-green" style="max-width: 60px; opacity: 0.3;"></div>
+      </footer>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>

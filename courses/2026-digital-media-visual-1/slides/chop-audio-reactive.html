@@ -1,0 +1,2817 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHOP / Audio Reactive 기초 — 디지털미디어비주얼 1</title>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&f[]=satoshi@400;500;700&f[]=jet-brains-mono@400;500&display=swap">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — SIGNAL PANEL THEME
+           Inspired by hardware signal conditioning panels
+           =========================================== */
+        :root {
+            --bg-primary: #2c2c2c;
+            --bg-secondary: #363636;
+            --bg-panel: #333333;
+            --bg-inset: #292929;
+            --border-panel: #4a4a4a;
+            --border-screw: #555555;
+            --text-primary: #e8e0d4;
+            --text-secondary: #9a9285;
+            --text-dim: #6b6560;
+            --accent-orange: #d4843e;
+            --accent-blue: #4a9ece;
+            --accent-green: #4caf6e;
+            --accent-purple: #8b6cc4;
+            --accent-cyan: #5bbfbf;
+            --cream: #e8e0d4;
+            --cream-dim: rgba(232, 224, 212, 0.08);
+            --cream-border: rgba(232, 224, 212, 0.15);
+
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 5vw, 4rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            --body-size: clamp(0.8rem, 1.4vw, 1.1rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --label-size: clamp(0.6rem, 0.9vw, 0.75rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.25rem, 1vw, 0.75rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE / VIEWPORT FITTING
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            padding-bottom: clamp(2rem, 4vw, 3.5rem);
+        }
+
+        /* ===========================================
+           PANEL FRAME — hardware panel border with screws
+           =========================================== */
+        .panel-frame {
+            position: absolute;
+            inset: clamp(8px, 1.2vw, 16px);
+            border: 1px solid var(--border-panel);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Corner screws */
+        .panel-frame::before,
+        .panel-frame::after {
+            content: '';
+            position: absolute;
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-screw);
+        }
+        .panel-frame::before { top: clamp(6px, 1vw, 12px); left: clamp(6px, 1vw, 12px); }
+        .panel-frame::after { top: clamp(6px, 1vw, 12px); right: clamp(6px, 1vw, 12px); }
+
+        .screw-bl, .screw-br {
+            position: absolute;
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-screw);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .screw-bl { bottom: clamp(14px, 2.2vw, 28px); left: clamp(14px, 2.2vw, 28px); }
+        .screw-br { bottom: clamp(14px, 2.2vw, 28px); right: clamp(14px, 2.2vw, 28px); }
+
+        /* ===========================================
+           GRID BACKGROUND PATTERN
+           =========================================== */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(232, 224, 212, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(232, 224, 212, 0.02) 1px, transparent 1px);
+            background-size: clamp(30px, 4vw, 50px) clamp(30px, 4vw, 50px);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--cream);
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            color: var(--cream);
+            margin-bottom: var(--content-gap);
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            color: var(--cream);
+            margin-bottom: var(--element-gap);
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .label {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+        }
+
+        .accent-orange { color: var(--accent-orange); }
+        .accent-blue { color: var(--accent-blue); }
+        .accent-green { color: var(--accent-green); }
+        .accent-purple { color: var(--accent-purple); }
+        .accent-cyan { color: var(--accent-cyan); }
+
+        /* ===========================================
+           CODE BLOCKS
+           =========================================== */
+        code, .code-inline {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+            background: var(--bg-inset);
+            padding: 0.15em 0.4em;
+            border-radius: 3px;
+            color: var(--accent-cyan);
+        }
+
+        .code-block {
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1vw, 0.85rem);
+            line-height: 1.6;
+            color: var(--text-primary);
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        .code-block .comment { color: var(--text-dim); }
+        .code-block .keyword { color: var(--accent-orange); }
+        .code-block .string { color: var(--accent-green); }
+        .code-block .op-name { color: var(--accent-cyan); }
+
+        /* ===========================================
+           TABLES
+           =========================================== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--body-size);
+        }
+
+        .data-table th {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-align: left;
+            padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid var(--cream-border);
+        }
+
+        .data-table td {
+            padding: clamp(0.35rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid rgba(232, 224, 212, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .data-table td:first-child {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        /* ===========================================
+           CARDS / PANELS
+           =========================================== */
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+        }
+
+        .info-card h3 {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            margin-bottom: clamp(0.3rem, 0.5vw, 0.5rem);
+        }
+
+        .info-card p, .info-card li {
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+        }
+
+        /* ===========================================
+           FLOW DIAGRAMS (text-based)
+           =========================================== */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.3rem, 0.8vw, 0.75rem);
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem) 0;
+        }
+
+        .flow-node {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 4px;
+            padding: clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.5rem, 1vw, 0.8rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 1vw, 0.8rem);
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .flow-node.highlight {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .flow-node.green {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .flow-node.blue {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .flow-arrow {
+            color: var(--text-dim);
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
+        }
+
+        /* ===========================================
+           GRID LAYOUTS
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.75rem, 2vw, 2rem);
+            align-items: start;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.5rem, 1.5vw, 1.5rem);
+        }
+
+        .four-col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        @media (max-width: 768px) {
+            .two-col, .three-col, .four-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===========================================
+           DECORATIVE ELEMENTS
+           =========================================== */
+        .knob {
+            width: clamp(24px, 3vw, 40px);
+            height: clamp(24px, 3vw, 40px);
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, var(--bg-secondary) 0%, var(--bg-inset) 100%);
+            border: 2px solid var(--cream-border);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .knob::after {
+            content: '';
+            width: 2px;
+            height: 40%;
+            background: var(--cream);
+            border-radius: 1px;
+            transform: rotate(-45deg);
+        }
+
+        .led {
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .led-orange { background: var(--accent-orange); box-shadow: 0 0 6px var(--accent-orange); }
+        .led-green { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+        .led-blue { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
+
+        .cable-line {
+            height: 3px;
+            border-radius: 2px;
+            flex: 1;
+            min-width: 30px;
+        }
+
+        .cable-orange { background: linear-gradient(90deg, var(--accent-orange), rgba(212, 132, 62, 0.3)); }
+        .cable-blue { background: linear-gradient(90deg, var(--accent-blue), rgba(74, 158, 206, 0.3)); }
+        .cable-green { background: linear-gradient(90deg, var(--accent-green), rgba(76, 175, 110, 0.3)); }
+
+        /* Dot matrix pattern */
+        .dot-matrix {
+            display: grid;
+            gap: clamp(3px, 0.4vw, 5px);
+            opacity: 0.15;
+        }
+
+        .dot-matrix .dot {
+            width: clamp(3px, 0.4vw, 5px);
+            height: clamp(3px, 0.4vw, 5px);
+            border-radius: 50%;
+            background: var(--cream);
+        }
+
+        /* ===========================================
+           SPECIAL SLIDE TYPES
+           =========================================== */
+
+        /* Title slide */
+        .title-slide .slide-content {
+            justify-content: flex-end;
+            padding-bottom: clamp(3rem, 8vw, 6rem);
+        }
+
+        .title-slide .course-label {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .title-slide h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .title-slide .subtitle {
+            font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* Section divider */
+        .section-slide {
+            background: var(--bg-inset);
+        }
+
+        .section-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .section-slide .part-number {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--accent-orange);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .section-slide h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            text-align: center;
+        }
+
+        .section-slide .section-desc {
+            max-width: 500px;
+            text-align: center;
+            margin-top: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        /* Practice slide */
+        .practice-slide {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .practice-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-green);
+            margin-bottom: var(--content-gap);
+        }
+
+        /* Quote / highlight */
+        .highlight-box {
+            background: rgba(212, 132, 62, 0.08);
+            border-left: 3px solid var(--accent-orange);
+            padding: clamp(0.6rem, 1.2vw, 1rem) clamp(0.8rem, 1.5vw, 1.25rem);
+            border-radius: 0 6px 6px 0;
+            margin: var(--element-gap) 0;
+        }
+
+        .highlight-box p {
+            color: var(--text-primary);
+            font-size: clamp(0.75rem, 1.2vw, 1rem);
+        }
+
+        /* ===========================================
+           VIDEO SLIDE
+           =========================================== */
+        .video-slide .vid-container {
+            width: min(90%, 900px);
+            aspect-ratio: 16/9;
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+        .video-slide .vid-container iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .video-slide .vid-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: opacity 0.3s;
+            z-index: 2;
+        }
+        .video-slide .vid-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .video-slide .play-btn {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--accent-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .video-slide .play-btn::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 0 12px 20px;
+            border-color: transparent transparent transparent var(--accent-orange);
+            margin-left: 4px;
+        }
+        .video-slide .vid-overlay:hover .play-btn {
+            background: var(--accent-orange);
+            transform: scale(1.1);
+        }
+        .video-slide .vid-overlay:hover .play-btn::after {
+            border-color: transparent transparent transparent var(--bg-primary);
+        }
+        .video-slide .vid-play-label {
+            margin-top: 12px;
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-orange);
+        }
+        .video-slide .vid-meta {
+            text-align: center;
+            margin-top: var(--content-gap);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .video-slide .vid-meta p {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+        }
+        .video-slide .vid-meta a {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            color: var(--accent-blue);
+            text-decoration: none;
+            border: 1px solid rgba(74, 158, 206, 0.3);
+            padding: 0.2em 0.6em;
+            border-radius: 3px;
+            margin-top: 0.5em;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .video-slide .vid-meta a:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .reveal:nth-child(6) { transition-delay: 0.40s; }
+
+        @keyframes pulse-led {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .led-pulse { animation: pulse-led 2s ease-in-out infinite; }
+
+        @keyframes signal-flow {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent-orange);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        /* ===========================================
+           SLIDE NUMBER
+           =========================================== */
+        .slide-number {
+            position: fixed;
+            bottom: clamp(12px, 2vw, 20px);
+            right: clamp(16px, 2.5vw, 28px);
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            color: var(--text-dim);
+            z-index: 100;
+        }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(12px, 2vw, 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.7vw, 0.65rem);
+            color: var(--text-dim);
+            opacity: 0.5;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        /* ===========================================
+           SPEAKER NOTES
+           =========================================== */
+        .speaker-note {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: clamp(0.5rem, 1vw, 1rem) var(--slide-padding);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            z-index: 50;
+            max-height: 25vh;
+            overflow-y: auto;
+        }
+
+        body.show-notes .speaker-note { display: block; }
+
+        /* ===========================================
+           OVERVIEW MODE
+           =========================================== */
+        .overview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .overview-overlay.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; align-content: start; }
+
+        .overview-thumb {
+            aspect-ratio: 16/9;
+            border: 1px solid var(--cream-border);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: var(--bg-secondary);
+            transition: border-color 0.2s;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .overview-thumb:hover { border-color: var(--accent-orange); }
+        .overview-thumb.current { border-color: var(--accent-orange); background: rgba(212, 132, 62, 0.1); }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1.1rem, 3vw, 1.75rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .keyboard-hint, .panel-frame, .screw-bl, .screw-br { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .two-col, .three-col, .four-col { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           UTILITY
+           =========================================== */
+        .gap-sm { gap: var(--element-gap); }
+        .gap-md { gap: var(--content-gap); }
+        .mt-sm { margin-top: var(--element-gap); }
+        .mt-md { margin-top: var(--content-gap); }
+        .mb-sm { margin-bottom: var(--element-gap); }
+        .text-center { text-align: center; }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-row { display: flex; align-items: center; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-start { align-items: start; }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Slide number -->
+    <div class="slide-number" id="slideNumber">01 / 59</div>
+
+    <!-- Keyboard hint -->
+    <div class="keyboard-hint" id="keyboardHint">&larr; &rarr; navigate &middot; N notes &middot; O overview &middot; F fullscreen</div>
+
+    <!-- Overview overlay -->
+    <div class="overview-overlay" id="overviewOverlay"></div>
+
+
+    <!-- ============================================
+         SLIDE 01: TITLE
+         ============================================ -->
+    <section class="slide title-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="course-label reveal">Digital Media Visual 1</div>
+            <h1 class="reveal">CHOP &amp; Audio<br>Reactive</h1>
+            <p class="subtitle reveal">TouchDesigner CHOP 기초와 오디오 리액티브 비주얼</p>
+            <div style="display:flex;align-items:center;gap:clamp(0.5rem,1vw,1rem);margin-top:clamp(1rem,2vw,2rem);" class="reveal">
+                <span class="led led-orange led-pulse"></span>
+                <span class="led led-green led-pulse" style="animation-delay:0.5s;"></span>
+                <span class="led led-blue led-pulse" style="animation-delay:1s;"></span>
+                <span class="cable-line cable-orange" style="max-width:80px;"></span>
+                <span class="cable-line cable-blue" style="max-width:60px;"></span>
+            </div>
+            <div class="reveal" style="margin-top:clamp(0.5rem,1vw,1rem);font-size:var(--small-size);color:var(--text-dim);">한예종 디지털미디어비주얼 1 &middot; 3시간</div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 02: 수업 개요
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Overview</div>
+            <h2 class="reveal">수업 개요</h2>
+            <div class="flex-col gap-sm" style="flex:1;">
+                <p class="reveal">이전 수업에서 배운 <strong>TOP의 핵심 개념</strong>을 복습하고, <strong>Feedback TOP</strong>과 <strong>Displace TOP</strong>이라는 두 가지 강력한 이미지 처리 도구를 복습한다.</p>
+                <p class="reveal">그 위에 <span class="accent-orange">"시간에 따라 변하는 숫자"</span>라는 <strong>CHOP의 핵심 개념</strong>을 이해하고, <strong>CHOP Reference</strong>를 통해 값을 영상 파라미터에 연결하는 방법을 배운다.</p>
+                <p class="reveal">최종적으로 <strong>오디오 입력을 분석</strong>하여 Feedback과 Displacement 효과가 소리에 반응하는 비주얼을 직접 만들어본다.</p>
+                <div class="reveal" style="margin-top:var(--content-gap);">
+                    <table class="data-table">
+                        <thead><tr><th>Part</th><th>내용</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">Part 1</td><td>TOP 복습 &#8212; Feedback TOP, Displace TOP</td></tr>
+                            <tr><td class="accent-cyan">Part 2</td><td>CHOP &#8212; 시간에 따라 변하는 숫자</td></tr>
+                            <tr><td class="accent-cyan">Part 3</td><td>CHOP Reference &#8212; 값을 파라미터에 연결하는 법</td></tr>
+                            <tr><td class="accent-cyan">Part 4</td><td>오디오 리액티브 비주얼</td></tr>
+                            <tr><td class="accent-cyan">Part 5</td><td>실습 &#8212; 나만의 오디오 리액티브 비주얼</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 03: 학습 목표
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Objectives</div>
+            <h2 class="reveal">학습 목표</h2>
+            <div class="flex-col gap-sm" style="flex:1;">
+                <div class="info-card reveal">
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.4em;">
+                        <li><strong>Feedback TOP</strong>과 <strong>Displace TOP</strong>의 원리를 이해하고 활용할 수 있다</li>
+                        <li><strong>CHOP</strong>이 무엇인지 이해하고, TOP과의 차이를 설명할 수 있다</li>
+                        <li><strong>CHOP Reference</strong>의 세 가지 방식(Export, Reference, Bind)을 이해하고 사용할 수 있다</li>
+                        <li><code>입력 &rarr; 가공 &rarr; 출력</code> 인터랙션의 기본 구조를 체득한다</li>
+                        <li><strong>Math CHOP</strong>을 활용해 값의 범위를 변환할 수 있다</li>
+                        <li>오디오 입력을 분석하여 영상 파라미터를 <strong>실시간으로 제어</strong>할 수 있다</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 04: SECTION &#8212; TOP 복습
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 1</div>
+            <h2 class="reveal">TOP 복습<br><span class="accent-orange">Feedback &amp; Displacement</span></h2>
+            <p class="section-desc reveal">이전 프레임의 잔상, 이미지의 왜곡</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 05: 지금까지 배운 TOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Review</div>
+            <h2 class="reveal">지금까지 배운 TOP</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="reveal">
+                    <table class="data-table">
+                        <thead><tr><th>TOP</th><th>역할</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">Movie File In</td><td>영상/이미지 파일을 불러온다</td></tr>
+                            <tr><td class="accent-cyan">Noise</td><td>절차적(procedural) 노이즈 패턴을 생성한다</td></tr>
+                            <tr><td class="accent-cyan">Ramp</td><td>그라데이션(경사) 이미지를 생성한다</td></tr>
+                            <tr><td class="accent-cyan">Constant</td><td>단색 이미지를 만든다</td></tr>
+                            <tr><td class="accent-cyan">Transform</td><td>이동, 회전, 스케일을 적용한다</td></tr>
+                            <tr><td class="accent-cyan">Level</td><td>밝기, 감마, 불투명도를 조절한다</td></tr>
+                            <tr><td class="accent-cyan">Composite / Over</td><td>여러 이미지를 합성한다</td></tr>
+                            <tr><td class="accent-cyan">Switch</td><td>여러 입력 중 하나를 선택한다</td></tr>
+                            <tr><td class="accent-cyan">Null</td><td>네트워크 정리용</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="reveal">
+                    <div class="highlight-box">
+                        <p><strong>TOP의 핵심:</strong> 모든 TOP은 <span class="accent-orange">이미지를 입력</span>받아 &rarr; <span class="accent-green">처리</span>하고 &rarr; <span class="accent-blue">이미지를 출력</span>한다. 와이어로 연결하면 이미지가 흘러간다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 06: Feedback TOP 개념
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Feedback TOP</div>
+            <h2 class="reveal">이미지의 잔상과 누적</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm">
+                    <p class="reveal">Feedback TOP은 <strong>네트워크의 하류(downstream)에 있는 TOP의 결과를 다시 상류(upstream)로 가져오는</strong> 특별한 오퍼레이터다.</p>
+                    <div class="highlight-box reveal">
+                        <p><span class="accent-orange">이전 프레임의 결과물 위에 현재 프레임을 덧쌓는 것</span> &#8212; TV 화면 앞에 카메라를 놓는 것과 같다.</p>
+                    </div>
+                    <div class="reveal">
+                        <table class="data-table">
+                            <thead><tr><th>파라미터</th><th>설명</th></tr></thead>
+                            <tbody>
+                                <tr><td class="accent-cyan">Target TOP</td><td>피드백 루프의 끝점. 이 TOP의 출력이 다음 프레임에 Feedback TOP의 출력이 된다</td></tr>
+                                <tr><td class="accent-cyan">Reset</td><td>0이면 피드백 활성, 1이면 비활성</td></tr>
+                                <tr><td class="accent-cyan">Reset Pulse</td><td>클릭하면 한 프레임 동안 피드백을 리셋</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="flex-col gap-sm reveal">
+                    <div class="code-block" style="font-size:clamp(0.6rem,0.9vw,0.75rem);">
+<span class="op-name">Feedback TOP</span> &#8212;&#8594; [처리 체인] &#8212;&#8594; <span class="op-name">Target TOP</span>
+     &uarr;                              |
+     &larr;&#8212;&#8212;&#8212;&#8212; <span class="comment">이전 프레임</span> &#8212;&#8212;&#8212;&#8212;&rdquo;</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 07: Feedback TOP 작동 원리
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Feedback &#8212; 작동 원리</div>
+            <h2 class="reveal">Feedback TOP 동작 단계</h2>
+            <div class="flex-col gap-sm" style="flex:1;">
+                <div class="info-card reveal">
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.4em;">
+                        <li>Feedback TOP은 처음에 <strong>입력 이미지</strong>(Input)를 통과시킨다</li>
+                        <li>활성화되면, <strong>Target TOP</strong>으로 지정된 하류 노드의 출력을 자신의 출력으로 사용한다</li>
+                        <li>결과적으로 이전 프레임의 처리 결과가 다음 프레임의 입력이 된다</li>
+                        <li>매 프레임 반복 &rarr; <span class="accent-orange">잔상, 트레일, 누적 효과</span></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 08: Feedback &#8212; 잔상 만들기
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Feedback &#8212; Example</div>
+            <h2 class="reveal">잔상 만들기</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node">Movie File In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite (Over)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Level (0.95)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Null</span>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계별 설명</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li><code>Feedback TOP</code>을 만들고, Target TOP을 하류의 <code>Level TOP</code>으로 지정</li>
+                        <li><code>Composite TOP</code>의 입력 1: Feedback, 입력 2: 원본 영상</li>
+                        <li><code>Level TOP</code>의 opacity를 <strong>0.95</strong> 정도로 낮춤</li>
+                        <li>결과: 이전 프레임이 살짝 투명해지면서 새 프레임이 위에 쌓인다 &rarr; <span class="accent-orange">잔상 효과</span></li>
+                    </ol>
+                </div>
+                <div class="info-card" style="border-left:3px solid #d44;">
+                    <h3 style="color:#d66;">주의</h3>
+                    <p>Level TOP의 opacity를 반드시 1보다 낮게 설정해야 한다. 그렇지 않으면 이미지가 계속 쌓여서 화면이 하얗게 된다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 09: 실습 A &#8212; Feedback 잔상
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise A</div>
+            <h2 class="reveal">실습: Feedback 잔상 만들기</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node">Movie File In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite (Over)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Level</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Null</span>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li><code>Movie File In TOP</code>으로 영상 불러오기</li>
+                        <li><code>Feedback TOP</code> 만들기</li>
+                        <li><code>Composite TOP</code> &#8212; 입력 1: Feedback, 입력 2: Movie File In</li>
+                        <li><code>Level TOP</code> &#8212; opacity를 <strong>0.95</strong>로 설정</li>
+                        <li>Feedback의 <strong>Target TOP</strong>을 Level TOP으로 설정</li>
+                    </ol>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>영상이 움직일 때 잔상이 남는가</li>
+                        <li>opacity를 <strong>0.8 / 0.95 / 0.99</strong>로 바꿔보면서 차이를 느껴본다</li>
+                        <li>Reset Pulse를 눌러서 초기화해본다</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 10: Displace TOP 개념
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Displace TOP</div>
+            <h2 class="reveal">이미지를 왜곡하는 힘</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm">
+                    <p class="reveal"><strong>하나의 이미지를 다른 이미지로 왜곡(warp)하는</strong> 오퍼레이터. 두 개의 입력:</p>
+                    <div class="reveal">
+                        <table class="data-table">
+                            <thead><tr><th>입력</th><th>역할</th></tr></thead>
+                            <tbody>
+                                <tr><td class="accent-cyan">Source Image (1st)</td><td>왜곡될 원본 이미지</td></tr>
+                                <tr><td class="accent-orange">Displace Image (2nd)</td><td>왜곡의 방향과 세기를 결정하는 이미지</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="highlight-box reveal">
+                        <p><strong>시각적 비유 &#8212; 물 위의 풍경:</strong> 물결의 패턴(Displace Image)이 왜곡의 모양을 결정한다. Displace Image의 <strong>밝기 값</strong>이 Source 픽셀을 이동시킨다.</p>
+                    </div>
+                </div>
+                <div class="flex-col gap-sm reveal">
+                    <div class="flow-diagram">
+                        <span class="flow-node">Movie File In</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-node highlight">Displace</span>
+                        <span class="flow-arrow">&rarr;</span>
+                        <span class="flow-node">Null</span>
+                    </div>
+                    <div style="text-align:center;color:var(--text-dim);font-size:var(--small-size);">&uarr; Noise TOP 연결</div>
+                    <div class="info-card">
+                        <p style="font-size:var(--small-size);">50% 회색 (0.5) &rarr; 이동 없음 (기준점)<br>밝은 부분 &rarr; 한 방향으로 이동<br>어두운 부분 &rarr; 반대 방향으로 이동</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 11: Displace + Noise
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Displace &#8212; Example</div>
+            <h2 class="reveal">Noise로 왜곡하기</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node">Movie File In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Displace</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Null</span>
+            </div>
+            <div style="text-align:center;font-size:var(--small-size);color:var(--text-dim);" class="reveal">&uarr; Noise TOP (Displace Image)</div>
+            <div class="two-col reveal" style="flex:1;">
+                <div>
+                    <table class="data-table">
+                        <thead><tr><th>Noise TOP 파라미터</th><th>효과</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">Period 크게</td><td>넓고 부드러운 왜곡 (물 위의 물결)</td></tr>
+                            <tr><td class="accent-cyan">Period 작게</td><td>좁고 날카로운 왜곡 (유리 깨짐)</td></tr>
+                            <tr><td class="accent-cyan">Translate 변화</td><td>왜곡 패턴이 움직인다 (흐르는 물)</td></tr>
+                            <tr><td class="accent-cyan">Type 변경</td><td>Perlin, Simplex, Sparse &rarr; 왜곡의 질감이 달라진다</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex-col gap-sm">
+                    <div class="highlight-box">
+                        <p>Noise TOP의 Translate X에 <code>absTime.seconds * 0.1</code>을 넣으면 시간에 따라 노이즈가 움직인다.</p>
+                    </div>
+                    <p style="font-size:var(--small-size);"><strong>Displace Weight</strong>를 <code>0.01~0.05</code>에서 시작. 너무 크면 이미지가 완전히 깨진다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 12: 실습 B &#8212; Displace
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise B</div>
+            <h2 class="reveal">실습: Noise Displacement</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node">Movie File In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Displace</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Null</span>
+            </div>
+            <div style="text-align:center;font-size:var(--small-size);color:var(--text-dim);" class="reveal">&uarr; Noise TOP</div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>영상을 Displace TOP의 첫 번째 입력에 연결</li>
+                        <li><code>Noise TOP</code>을 두 번째 입력에 연결</li>
+                        <li>Displace Weight를 <strong>0.02</strong>에서 시작</li>
+                        <li>Noise TOP의 Translate X에 <code>absTime.seconds * 0.1</code> 입력</li>
+                    </ol>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>Displace Weight를 <strong>0.01 / 0.05 / 0.2</strong>로 바꿔보기</li>
+                        <li>Noise의 Period(Size)를 바꾸면 왜곡의 거칠기가 어떻게 달라지는가</li>
+                        <li>Noise의 Type을 바꿔보기 (Perlin, Simplex, Sparse)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 13: Feedback + Displace 결합
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Feedback + Displace</div>
+            <h2 class="reveal">결합 = 유기적 비주얼</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Level (0.95)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Displace</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Null</span>
+            </div>
+            <div style="text-align:center;font-size:var(--small-size);color:var(--text-dim);" class="reveal">&uarr; Noise TOP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &uarr; 원본 이미지</div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="highlight-box">
+                    <p>매 프레임마다 이전 결과가 <span class="accent-orange">살짝 왜곡</span>되면서 다시 쌓인다 &rarr; 이미지가 흘러가고, 녹아내리고, 퍼져나간다.</p>
+                </div>
+                <div>
+                    <table class="data-table">
+                        <thead><tr><th>설정</th><th>낮은 값</th><th>높은 값</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">Level opacity</td><td>잔상 빨리 사라짐 (0.9)</td><td>잔상 오래 남음 (0.99)</td></tr>
+                            <tr><td class="accent-cyan">Displace Weight</td><td>살짝 일렁임 (0.005)</td><td>심하게 뒤틀림 (0.1)</td></tr>
+                            <tr><td class="accent-cyan">Noise Period</td><td>날카로운 왜곡</td><td>부드러운 왜곡</td></tr>
+                            <tr><td class="accent-cyan">Noise Speed</td><td>느리게 변화</td><td>빠르게 변화</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="highlight-box reveal" style="background:rgba(76,175,110,0.08);border-color:var(--accent-green);">
+                <p>이 값들을 나중에 <span class="accent-green">CHOP으로 제어</span>하면 소리에 반응하는 비주얼이 된다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 14: SECTION &#8212; CHOP
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 2</div>
+            <h2 class="reveal">CHOP<br><span class="accent-green">시간에 따라 변하는 숫자</span></h2>
+            <p class="section-desc reveal">Channel Operator &#8212; 영상을 "움직이게 만드는" 도구</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 15: TOP vs CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">TOP vs CHOP</div>
+            <h2 class="reveal">두 세계의 비교</h2>
+            <div class="two-col" style="flex:1; align-items:center;">
+                <div class="info-card reveal" style="border:2px solid rgba(128,80,200,0.3); text-align:center; padding:clamp(1rem,2vw,2rem);">
+                    <div class="label" style="color:#a080d0;">보라색 와이어</div>
+                    <h3 style="font-size:var(--h2-size);margin:0.3em 0;">TOP</h3>
+                    <p style="font-size:var(--h3-size);color:var(--text-primary);margin-bottom:0.5em;">2D 이미지 (픽셀)</p>
+                    <p>이미지 미리보기</p>
+                    <p style="margin-top:0.5em;color:var(--accent-orange);">"이 이미지를 어떻게 바꿀까?"</p>
+                </div>
+                <div class="info-card reveal" style="border:2px solid rgba(76,175,110,0.3); text-align:center; padding:clamp(1rem,2vw,2rem);">
+                    <div class="label" style="color:var(--accent-green);">녹색 와이어</div>
+                    <h3 style="font-size:var(--h2-size);margin:0.3em 0;">CHOP</h3>
+                    <p style="font-size:var(--h3-size);color:var(--text-primary);margin-bottom:0.5em;">숫자의 흐름 (채널)</p>
+                    <p>그래프 (파형)</p>
+                    <p style="margin-top:0.5em;color:var(--accent-green);">"이 숫자를 어떻게 만들까?"</p>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>TOP이 <strong>사진</strong>이라면, CHOP은 <strong>심전도 그래프</strong>다. "영상의 색, 밝기, 위치, 재생 속도, 컷 전환을 <span class="accent-orange">숫자로 제어</span>한다 &#8212; 그 숫자를 만들고 다듬는 도구가 CHOP이다."</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 16: CHOP 핵심 요소
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">CHOP Fundamentals</div>
+            <h2 class="reveal">CHOP의 세 가지 핵심 요소</h2>
+            <div class="three-col" style="flex:1; align-items:start;">
+                <div class="info-card reveal" style="text-align:center;">
+                    <div class="knob" style="margin:0 auto clamp(0.5rem,1vw,0.8rem);"></div>
+                    <h3 class="accent-orange">Channel (채널)</h3>
+                    <p>하나의 데이터 흐름</p>
+                    <div style="margin-top:0.5em;font-size:var(--small-size);color:var(--text-dim);">마우스 x좌표, 오디오 볼륨</div>
+                </div>
+                <div class="info-card reveal" style="text-align:center;">
+                    <div class="knob" style="margin:0 auto clamp(0.5rem,1vw,0.8rem);"></div>
+                    <h3 class="accent-green">Sample (샘플)</h3>
+                    <p>매 순간 기록되는 하나의 값</p>
+                    <div style="margin-top:0.5em;font-size:var(--small-size);color:var(--text-dim);">현재 프레임에서의 마우스 x</div>
+                </div>
+                <div class="info-card reveal" style="text-align:center;">
+                    <div class="knob" style="margin:0 auto clamp(0.5rem,1vw,0.8rem);"></div>
+                    <h3 class="accent-blue">Sample Rate</h3>
+                    <p>1초에 몇 번 값을 기록하는가</p>
+                    <div style="margin-top:0.5em;font-size:var(--small-size);color:var(--text-dim);">컨트롤: 60Hz / 오디오: 44100Hz</div>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>CHOP을 처음 배울 때 가장 중요한 습관: <span class="accent-orange">항상 Viewer를 열어두고 값이 어떻게 움직이는지 관찰한다.</span></p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 17: CHOP 분류
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">CHOP Categories</div>
+            <h2 class="reveal">CHOP의 세 가지 역할</h2>
+            <div class="flow-diagram reveal" style="margin:0;">
+                <span class="flow-node highlight">생성 Generator</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">가공 Filter</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">출력 Output</span>
+            </div>
+            <div class="reveal">
+                <table class="data-table">
+                    <thead><tr><th>역할</th><th>하는 일</th><th>대표 CHOP</th></tr></thead>
+                    <tbody>
+                        <tr><td class="accent-cyan">생성</td><td>값을 만들어낸다</td><td>LFO, Noise, Constant</td></tr>
+                        <tr><td class="accent-cyan">입력</td><td>외부 데이터를 가져온다</td><td>Mouse In, Keyboard In, Audio Device In</td></tr>
+                        <tr><td class="accent-cyan">가공</td><td>값을 변환/처리한다</td><td>Math, Filter, Lag, Limit, Logic, Analyze</td></tr>
+                        <tr><td class="accent-cyan">출력</td><td>가공된 값을 전달한다</td><td>Null (+ Export/Reference)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight" style="font-size:inherit;">입력(Input)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green" style="font-size:inherit;">변환(Process)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue" style="font-size:inherit;">출력(Output)</span>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);text-align:center;">이 구조를 몸에 익히면 입력 장치가 바뀌어도 같은 방식으로 응용할 수 있다.</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 18: LFO CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Generator CHOP</div>
+            <h2 class="reveal">LFO CHOP &#8212; 반복하는 파형</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm">
+                    <div class="reveal">
+                        <p>LFO = Low Frequency Oscillator. 일정한 주기로 반복되는 값을 만든다.</p>
+                        <table class="data-table" style="margin-top:0.5em;">
+                            <thead><tr><th>파라미터</th><th>설명</th></tr></thead>
+                            <tbody>
+                                <tr><td class="accent-cyan">Frequency</td><td>1초에 몇 번 반복 (Hz). 0.5 = 2초에 한 번</td></tr>
+                                <tr><td class="accent-cyan">Amplitude</td><td>파형의 크기. 1이면 -1~1 범위</td></tr>
+                                <tr><td class="accent-cyan">Type</td><td>Sin / Square / Triangle / Ramp</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="highlight-box reveal">
+                        <p>Frequency를 아주 낮게 (0.05~0.2) 설정하면 천천히 숨 쉬는 듯한 움직임이 나온다.</p>
+                    </div>
+                </div>
+                <div class="flex-col gap-sm reveal">
+                    <div class="code-block" style="line-height:2;">
+<span class="keyword">Sin</span>  (사인파):   ~~~~  &rarr; 부드러운, 호흡, 물결
+<span class="keyword">Square</span> (사각파): __|__|  &rarr; 깜빡임, ON/OFF
+<span class="keyword">Triangle</span> (삼각): /\/\/\  &rarr; 기계적 왕복
+<span class="keyword">Ramp</span>  (톱니파):  /|/|/|  &rarr; 스크롤, 반복 이동</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 19: Noise CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Generator CHOP</div>
+            <h2 class="reveal">Noise CHOP &#8212; 유기적 변화</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm reveal">
+                    <p>유기적이고 불규칙한 변화를 만든다. LFO가 "기계적 반복"이라면 Noise는 "자연스러운 흔들림"이다.</p>
+                    <div class="two-col" style="gap:var(--element-gap);">
+                        <div class="info-card">
+                            <h3 class="accent-orange">LFO</h3>
+                            <ul style="padding-left:1em;"><li>패턴이 정확히 반복</li><li>기계적, 규칙적</li><li>펄스, 호흡, 회전</li></ul>
+                        </div>
+                        <div class="info-card">
+                            <h3 class="accent-green">Noise</h3>
+                            <ul style="padding-left:1em;"><li>반복하지 않음</li><li>유기적, 자연적</li><li>떨림, 흔들림, 바람</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <table class="data-table">
+                        <thead><tr><th>파라미터</th><th>설명</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">Period</td><td>클수록 변화가 느리다</td></tr>
+                            <tr><td class="accent-cyan">Amplitude</td><td>출력값의 범위</td></tr>
+                            <tr><td class="accent-cyan">Seed</td><td>같은 설정이라도 Seed가 다르면 다른 패턴</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 20: 입력 계열 CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Input CHOPs</div>
+            <h2 class="reveal">입력 계열 CHOP</h2>
+            <div class="three-col" style="flex:1;">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">Mouse In CHOP</h3>
+                    <p>마우스의 위치와 버튼 상태를 채널로 가져온다.</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">출력: <code>tx</code>, <code>ty</code>, <code>lselect</code>, <code>mselect</code>, <code>rselect</code></p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">Keyboard In CHOP</h3>
+                    <p>Keys 파라미터에 감지할 키를 지정 (예: <code>a b space</code>).</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">눌리면 1, 아니면 0.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">Audio Device In CHOP</h3>
+                    <p>마이크나 시스템 오디오를 가져온다. 오디오 리액티브의 시작점.</p>
+                    <table class="data-table" style="margin-top:0.3em;">
+                        <tbody>
+                            <tr><td class="accent-cyan">Device</td><td>어떤 오디오 장치를 사용할지</td></tr>
+                            <tr><td class="accent-cyan">Volume</td><td>입력 볼륨 조절</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>Mac에서 시스템 오디오를 캡처하려면 <strong>BlackHole</strong> 같은 가상 오디오 드라이버가 필요할 수 있다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 21: Math CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Filter CHOP &#8212; 가장 중요</div>
+            <h2 class="reveal">Math CHOP &#11088; &#8212; 범위 변환</h2>
+            <div class="highlight-box reveal" style="background:rgba(212,132,62,0.12);border-color:var(--accent-orange);">
+                <p style="font-size:var(--h3-size);color:var(--text-primary);">인터랙션이 안 되는 대부분의 경우는 값을 못 받는 게 아니라, <span class="accent-orange">받은 값을 적절한 범위로 못 바꾸는 것</span>이다.</p>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div>
+                    <h3>Range 탭 &#8212; 핵심 기능</h3>
+                    <table class="data-table">
+                        <thead><tr><th>입력</th><th>실제 범위</th><th>필요한 범위</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">마우스 X</td><td>0 ~ 1920</td><td>-1 ~ 1 (Transform tx)</td></tr>
+                            <tr><td class="accent-cyan">오디오 RMS</td><td>0 ~ 0.01</td><td>0 ~ 2 (Level brightness)</td></tr>
+                            <tr><td class="accent-cyan">센서값</td><td>300 ~ 700</td><td>0 ~ 1 (opacity)</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top:0.5em;font-size:var(--small-size);"><strong>From Range</strong>: 입력값의 범위 / <strong>To Range</strong>: 출력값의 범위</p>
+                </div>
+                <div class="info-card">
+                    <h3>다른 기능들</h3>
+                    <table class="data-table">
+                        <tbody>
+                            <tr><td class="accent-cyan">Mult</td><td>값을 배율로 키우거나 줄인다</td></tr>
+                            <tr><td class="accent-cyan">Add</td><td>오프셋 추가</td></tr>
+                            <tr><td class="accent-cyan">Abs</td><td>절대값</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 22: Filter CHOPs
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Filter CHOPs</div>
+            <h2 class="reveal">Analyze / Filter / Lag / Limit CHOP</h2>
+            <div class="three-col" style="flex:1;">
+                <div class="info-card reveal" style="border-top:3px solid var(--accent-orange);">
+                    <h3 class="accent-orange">Analyze CHOP</h3>
+                    <p>복잡한 신호를 <strong>하나의 제어값으로 요약</strong>. 오디오 리액티브의 핵심.</p>
+                    <table class="data-table" style="margin-top:0.5em;">
+                        <tbody>
+                            <tr><td class="accent-cyan">RMS Power</td><td>전체 에너지</td></tr>
+                            <tr><td class="accent-cyan">Maximum</td><td>순간 피크</td></tr>
+                            <tr><td class="accent-cyan">Average</td><td>부드러운 평균</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-card reveal" style="border-top:3px solid var(--accent-green);">
+                    <h3 class="accent-green">Filter / Lag CHOP &#8212; 스무딩</h3>
+                    <div class="code-block" style="margin-top:0.5em;font-size:clamp(0.55rem,0.8vw,0.7rem);">
+<span class="comment">스무딩 전:</span> /_\/_\/_\/_\
+<span class="comment">스무딩 후:</span> ~~~~~~~~</div>
+                    <p style="font-size:var(--small-size);margin-top:0.5em;"><code>Lag CHOP</code>: Lag 값(초)만 설정. 0.5이면 변화를 0.5초에 걸쳐 부드럽게 따라간다.</p>
+                </div>
+                <div class="info-card reveal" style="border-top:3px solid var(--accent-blue);">
+                    <h3 class="accent-blue">Limit CHOP</h3>
+                    <p>값이 너무 튀거나 범위를 벗어나는 것을 <strong>방지하는 안전장치</strong>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 23: Logic / Trigger / Count
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Filter CHOPs</div>
+            <h2 class="reveal">Logic / Trigger / Count CHOP</h2>
+            <div class="three-col" style="flex:1;">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">Logic CHOP &#8212; 임계값 ON/OFF</h3>
+                    <div class="code-block" style="font-size:clamp(0.55rem,0.8vw,0.7rem);">
+입력:  0.2  0.5  <span class="keyword">0.8</span>  0.3  <span class="keyword">0.9</span>  0.4
+임계:       --- 0.6 ---
+출력:   0    0   <span class="keyword">1</span>    0   <span class="keyword">1</span>    0</div>
+                    <p style="font-size:var(--small-size);margin-top:0.5em;">"소리가 일정 수준 이상이면 장면 전환" 같은 구조에 필요.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">Trigger CHOP &#8212; 한 번만 반응</h3>
+                    <ul style="padding-left:1em;font-size:var(--small-size);">
+                        <li>임계값을 넘는 <strong>순간</strong> 한 번 펄스를 만든다</li>
+                        <li>Attack &rarr; Sustain &rarr; Release 시간 설정 가능</li>
+                    </ul>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">Count CHOP &#8212; 카운트</h3>
+                    <ul style="padding-left:1em;font-size:var(--small-size);">
+                        <li>입력 신호가 올라갈 때마다 <strong>카운트 1 증가</strong></li>
+                        <li>Switch TOP의 인덱스로 쓰면 컷 전환</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p><strong>Logic</strong>은 "값이 높은 동안 계속 1", <strong>Trigger</strong>는 "넘는 순간 한 번 반응"</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 24: 연속값 vs 사건
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Continuous vs Event</div>
+            <h2 class="reveal">연속값 vs 사건(Event)</h2>
+            <div class="two-col reveal" style="max-width:900px;">
+                <div class="info-card" style="border:2px solid rgba(212,132,62,0.3);text-align:center;">
+                    <h3 class="accent-orange" style="font-size:var(--h2-size);">연속값</h3>
+                    <p style="margin:0.5em 0;">매 순간 변하는 값. 부드럽게 변화한다.</p>
+                    <div style="font-size:var(--small-size);color:var(--text-dim);">마우스 위치, 오디오 레벨, 센서 거리<br>&rarr; 밝기, 위치, 크기, 색상 제어에 적합</div>
+                </div>
+                <div class="info-card" style="border:2px solid rgba(74,158,206,0.3);text-align:center;">
+                    <h3 class="accent-blue" style="font-size:var(--h2-size);">사건 (Event)</h3>
+                    <p style="margin:0.5em 0;">특정 순간에 발생하는 신호. 0 또는 1.</p>
+                    <div style="font-size:var(--small-size);color:var(--text-dim);">키를 눌렀다, 임계값을 넘었다<br>&rarr; Switch, 재생 시작, 이펙트 발동에 적합</div>
+                </div>
+            </div>
+            <div class="highlight-box reveal" style="max-width:700px;">
+                <p>"입력값이 있다"와 "사건이 발생했다"는 <span class="accent-orange">다른 문제</span>다. 이 구분이 명확해야 인터랙션 설계가 깔끔해진다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 25: VIDEO &#8212; NONOTAK LATE SPECULATION
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">NONOTAK &#8212; LATE SPECULATION MEDLEY</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">Noemi Schipfer &times; Takami Nakamoto (2013)</p>
+            <div class="vid-container reveal" data-vimeo="75064950">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>40분 오디오비주얼 퍼포먼스. 기하학적 빛 패턴이 전자 음악에 정밀하게 동기화되어 공간을 변형시킨다.</p>
+                <a href="https://www.nonotak.com/_LATE-SPECULATION-1" target="_blank">nonotak.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 26: VIDEO &#8212; NONOTAK DAYDREAM
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">NONOTAK &#8212; DAYDREAM V.4</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">A/V Installation, GLOW NEXT (2014)</p>
+            <div class="vid-container reveal" data-vimeo="111889372">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>가상 공간과 실제 공간의 경계를 흐리며 관객을 현실에서의 짧은 이탈로 이끄는 설치 작품.</p>
+                <a href="https://www.nonotak.com/_daydream-v-4" target="_blank">nonotak.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 27: VIDEO &#8212; SKALAR
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">Christopher Bauder &times; Kangding Ray &#8212; SKALAR</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">Large-scale kinetic light installation (2018)</p>
+            <div class="vid-container reveal" data-vimeo="332163180">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>빛, 움직임, 안개, 사운드를 하나의 시퀀스로 통합한 대형 오디오비주얼 설치. 추상적 형태와 리듬 변화가 음악 구조와 함께 전개되며 공간 전체를 하나의 악기처럼 다룬다.</p>
+                <a href="https://www.whitevoid.com/skalar/" target="_blank">whitevoid.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 28: SECTION &#8212; CHOP Reference
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 3</div>
+            <h2 class="reveal">CHOP Reference<br><span class="accent-blue">값을 파라미터에 연결하는 법</span></h2>
+            <p class="section-desc reveal">CHOP에서 만든 숫자를 TOP의 파라미터로 보내는 세 가지 방법</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 29: CHOP Reference 개요
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">CHOP Reference</div>
+            <h2 class="reveal">CHOP Reference란</h2>
+            <p class="reveal">CHOP에서 만들고 가공한 값을 TOP(또는 다른 오퍼레이터)의 <strong>파라미터에 연결</strong>하는 것.</p>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">값을 만들고 (생성/입력)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">값을 다듬고 (가공)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">값을 연결한다 (Reference/Export)</span>
+            </div>
+            <div class="reveal">
+                <table class="data-table" style="max-width:800px;">
+                    <thead><tr><th>방법</th><th>난이도</th><th>방향</th><th>특징</th></tr></thead>
+                    <tbody>
+                        <tr><td class="accent-cyan">Export (드래그)</td><td>쉬움</td><td>CHOP &rarr; 파라미터</td><td>가장 간단. 파라미터가 잠긴다</td></tr>
+                        <tr><td class="accent-cyan">Reference (표현식)</td><td>중간</td><td>CHOP &rarr; 파라미터</td><td>수식 가능. 유연하다</td></tr>
+                        <tr><td class="accent-cyan">Bind</td><td>어려움</td><td>양방향</td><td>파라미터를 바꾸면 CHOP도 바뀐다</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 30: Export (드래그)
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Method 1 &#8212; 가장 쉽다</div>
+            <h2 class="reveal">드래그 익스포트 (Export)</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm">
+                    <div class="reveal">
+                        <h3>사용법</h3>
+                        <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                            <li>CHOP 노드의 우측 하단에 마우스를 올리면 <code>+</code> 아이콘이 나타난다</li>
+                            <li>이 <code>+</code>를 클릭하고 드래그해서 연결하고 싶은 <strong>파라미터 위에</strong> 놓는다</li>
+                            <li>드롭하면 채널 선택 메뉴가 나온다</li>
+                            <li>원하는 채널을 선택하면 연결 완료</li>
+                        </ol>
+                    </div>
+                    <div class="info-card reveal" style="border-left:3px solid var(--accent-green);">
+                        <p>연결된 파라미터는 <span class="accent-green"><strong>녹색 배경</strong></span>으로 표시. CHOP이 제어 중이므로 수동 조작 불가.</p>
+                        <p style="margin-top:0.3em;font-size:var(--small-size);">해제: 파라미터를 우클릭 &rarr; <strong>Unexport</strong></p>
+                    </div>
+                </div>
+                <div class="flex-col gap-sm reveal">
+                    <div class="info-card" style="border:2px solid rgba(76,175,110,0.2);text-align:center;padding:clamp(1.5rem,3vw,3rem);">
+                        <div class="knob" style="margin:0 auto;width:clamp(40px,5vw,60px);height:clamp(40px,5vw,60px);"></div>
+                        <div style="margin-top:1em;font-family:var(--font-mono);font-size:var(--small-size);color:var(--accent-green);">CHOP +</div>
+                        <div style="margin:0.5em 0;font-size:2em;">&darr;</div>
+                        <div style="font-family:var(--font-mono);font-size:var(--small-size);background:rgba(76,175,110,0.15);padding:0.3em 0.8em;border-radius:3px;display:inline-block;">파라미터에 드롭</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 31: 실습 C &#8212; LFO 자동 움직임
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise C</div>
+            <h2 class="reveal">실습: LFO로 영상 자동 움직이기</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node">LFO CHOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Math CHOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">[Export]</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Transform TOP (tx)</span>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li><code>Movie File In TOP</code>으로 영상 불러오기</li>
+                        <li><code>LFO CHOP</code> &#8212; Type: Sin, Frequency: 0.3</li>
+                        <li><code>Math CHOP</code> &#8212; Range: From -1~1, To -0.5~0.5</li>
+                        <li>Math CHOP의 <code>+</code> 아이콘을 드래그 &rarr; Transform TOP의 <code>tx</code>에 놓기</li>
+                    </ol>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>영상이 좌우로 부드럽게 반복 이동하는가</li>
+                        <li>Frequency를 바꿔보면 속도가 달라지는가</li>
+                        <li>LFO의 Type을 <strong>Square</strong>로 바꾸면 느낌이 어떻게 달라지는가</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 32: 실습 E &#8212; 마우스 + 스무딩
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise E</div>
+            <h2 class="reveal">실습: 마우스 제어 + 스무딩</h2>
+            <div class="flow-diagram reveal" style="font-size:clamp(0.55rem,0.9vw,0.75rem);">
+                <span class="flow-node">Mouse In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Select (tx)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Math</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Lag</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">[Export]</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Transform TOP (tx)</span>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li><code>Mouse In CHOP</code> &rarr; <code>Select CHOP</code> (tx만)</li>
+                        <li><code>Math CHOP</code> Range: From 0~1920, To -1~1</li>
+                        <li><code>Lag CHOP</code>: Lag 0.2</li>
+                        <li>Transform TOP의 tx에 Export</li>
+                        <li>같은 구조로 ty &rarr; Level brightness</li>
+                    </ol>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>마우스를 빠르게 움직였을 때 Lag 없으면 어떻고, 있으면 어떤가</li>
+                        <li>Lag 값을 <strong>0.05 / 0.2 / 1.0</strong>으로 바꿔보기</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 33: Reference (표현식)
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Method 2 &#8212; 유연하다</div>
+            <h2 class="reveal">Reference (표현식)</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm">
+                    <div class="reveal">
+                        <h3>기본 문법</h3>
+                        <div class="code-block" style="font-size:clamp(0.7rem,1.1vw,0.95rem);">
+<span class="keyword">op</span>(<span class="string">'CHOP이름'</span>)[<span class="string">'채널이름'</span>]</div>
+                    </div>
+                    <div class="reveal">
+                        <h3>예시</h3>
+                        <table class="data-table">
+                            <tbody>
+                                <tr><td class="accent-cyan"><code>op('lfo1')['chan1']</code></td><td>lfo1의 chan1 값</td></tr>
+                                <tr><td class="accent-cyan"><code>op('mouse1')['tx']</code></td><td>마우스 X 위치</td></tr>
+                                <tr><td class="accent-cyan"><code>op('analyze1')['chan1']</code></td><td>오디오 분석값</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="flex-col gap-sm">
+                    <div class="reveal">
+                        <h3>수식도 가능</h3>
+                        <div class="code-block" style="font-size:clamp(0.6rem,0.9vw,0.8rem);">
+<span class="keyword">op</span>(<span class="string">'lfo1'</span>)[<span class="string">'chan1'</span>] * 2          <span class="comment"># 값을 2배로</span>
+<span class="keyword">op</span>(<span class="string">'mouse1'</span>)[<span class="string">'tx'</span>] + 0.5        <span class="comment"># 오프셋</span>
+<span class="keyword">op</span>(<span class="string">'audio1'</span>)[<span class="string">'chan1'</span>] * 10 + 1   <span class="comment"># 10배 + 오프셋</span></div>
+                    </div>
+                    <div class="info-card reveal" style="border-left:3px solid var(--accent-blue);">
+                        <p>연결된 파라미터는 <span class="accent-blue"><strong>파란색/보라색 배경</strong></span>으로 표시.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 34: 실습 D &#8212; Reference 표현식
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise D</div>
+            <h2 class="reveal">실습: Reference 표현식 연습</h2>
+            <p class="reveal">실습 C에 이어서 <code>Level TOP</code>을 추가한다.</p>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>Level TOP의 <strong>Opacity</strong> 파라미터를 우클릭 &rarr; Expression Mode 활성화</li>
+                        <li>다음 표현식 입력:</li>
+                    </ol>
+                    <div class="code-block" style="margin-top:0.5em;font-size:clamp(0.6rem,0.9vw,0.8rem);">
+<span class="keyword">op</span>(<span class="string">'math1'</span>)[<span class="string">'chan1'</span>] * 0.5 + 0.5</div>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>LFO가 움직이면서 동시에 opacity도 변하는가</li>
+                        <li><code>* 0.5 + 0.5</code> 부분을 바꿔보면 어떻게 달라지는가</li>
+                        <li>Export(녹색)와 Reference(파란색)의 파라미터 색 차이 확인</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 35: Bind + 세 가지 비교
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Method 3 + Comparison</div>
+            <h2 class="reveal">Bind CHOP + 세 가지 비교</h2>
+            <p class="reveal"><strong>Bind CHOP</strong>: CHOP 채널과 파라미터를 양방향으로 연결. 파라미터를 바꾸면 CHOP도 바뀐다.</p>
+            <div class="reveal" style="overflow:auto;max-width:100%;">
+                <table class="data-table" style="max-width:900px;margin:0 auto;">
+                    <thead><tr><th></th><th>Export (드래그)</th><th>Reference (표현식)</th><th>Bind</th></tr></thead>
+                    <tbody>
+                        <tr><td>난이도</td><td class="accent-green">쉬움</td><td class="accent-orange">중간</td><td>어려움</td></tr>
+                        <tr><td>방향</td><td>CHOP &rarr; 파라미터</td><td>CHOP &rarr; 파라미터</td><td>양방향</td></tr>
+                        <tr><td>파라미터 색</td><td style="color:var(--accent-green);">녹색</td><td style="color:var(--accent-blue);">파란색/보라색</td><td style="color:var(--accent-green);">녹색</td></tr>
+                        <tr><td>수식 가능</td><td>불가</td><td class="accent-green">가능</td><td>제한적</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">처음 배울 때 &rarr; Export</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">계산 필요 &rarr; Reference</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">양방향 &rarr; Bind</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 36: SECTION &#8212; Audio Reactive
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 4</div>
+            <h2 class="reveal">Audio Reactive<br><span class="accent-purple">오디오 리액티브 비주얼의 원리</span></h2>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 37: 오디오 리액티브 정의
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Audio Reactive Visuals</div>
+            <h2 class="reveal">오디오 리액티브 비주얼이란</h2>
+            <p class="reveal"><strong>소리 데이터를 실시간으로 분석</strong>하여 영상의 파라미터를 제어하는 것.</p>
+            <div class="four-col reveal">
+                <div class="info-card" style="text-align:center;">
+                    <div class="led led-orange led-pulse" style="margin:0 auto 0.5em;"></div>
+                    <h3 style="font-size:var(--body-size);">라이브 VJing</h3>
+                    <p style="font-size:var(--small-size);">DJ와 실시간 비주얼</p>
+                </div>
+                <div class="info-card" style="text-align:center;">
+                    <div class="led led-green led-pulse" style="margin:0 auto 0.5em;animation-delay:0.3s;"></div>
+                    <h3 style="font-size:var(--body-size);">뮤직비디오</h3>
+                    <p style="font-size:var(--small-size);">음악에 동기화된 영상</p>
+                </div>
+                <div class="info-card" style="text-align:center;">
+                    <div class="led led-blue led-pulse" style="margin:0 auto 0.5em;animation-delay:0.6s;"></div>
+                    <h3 style="font-size:var(--body-size);">설치 미술</h3>
+                    <p style="font-size:var(--small-size);">환경 사운드에 반응</p>
+                </div>
+                <div class="info-card" style="text-align:center;">
+                    <div class="led led-orange led-pulse" style="margin:0 auto 0.5em;animation-delay:0.9s;"></div>
+                    <h3 style="font-size:var(--body-size);">제너레이티브</h3>
+                    <p style="font-size:var(--small-size);">알고리즘 시각 패턴</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 38: 오디오 리액티브 파이프라인
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Audio Analysis Pipeline</div>
+            <h2 class="reveal">오디오 리액티브 파이프라인</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Audio In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Analyze (RMS)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Math (범위)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Lag (스무딩)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Null</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Export</span>
+            </div>
+            <div class="reveal">
+                <table class="data-table">
+                    <thead><tr><th>Step</th><th>CHOP</th><th>역할</th></tr></thead>
+                    <tbody>
+                        <tr><td class="accent-cyan">1. 입력</td><td>Audio Device In</td><td>마이크 / 시스템 오디오를 가져온다</td></tr>
+                        <tr><td class="accent-cyan">2. 분석</td><td>Analyze (RMS Power)</td><td>복잡한 파형 &rarr; 하나의 에너지 값</td></tr>
+                        <tr><td class="accent-cyan">3. 범위</td><td>Math (Range)</td><td>0~0.01 &rarr; 0~2 같은 범위 변환</td></tr>
+                        <tr><td class="accent-cyan">4. 스무딩</td><td>Lag</td><td>거친 변화를 부드럽게</td></tr>
+                        <tr><td class="accent-cyan">5. 정리</td><td>Null</td><td>이름 붙여서 깔끔하게 정리</td></tr>
+                        <tr><td class="accent-cyan">6. 연결</td><td>Export / Reference</td><td>TOP 파라미터에 연결</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box reveal">
+                <p>이 구조가 오디오 리액티브의 <span class="accent-orange">기본 뼈대</span>다. 여기서 파라미터만 바꾸면 다양한 반응을 만들 수 있다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 39: 실습 F &#8212; Audio → 밝기
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise F</div>
+            <h2 class="reveal">실습: 소리에 반응하는 밝기</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Audio In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Analyze (RMS)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Math</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Lag</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Null</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Export &rarr; Level</span>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li><code>Audio Device In CHOP</code> &#8212; 마이크 또는 시스템 오디오 선택</li>
+                        <li><code>Analyze CHOP</code> &#8212; Function: <strong>RMS Power</strong></li>
+                        <li><code>Math CHOP</code> &#8212; Range: From 0~0.01, To 0~2</li>
+                        <li><code>Lag CHOP</code> &#8212; Up: 0.05, Down: 0.3</li>
+                        <li><code>Null CHOP</code> &#8212; 이름을 <code>audio_level</code>로 변경</li>
+                        <li>Level TOP의 <strong>Brightness</strong>에 Export</li>
+                    </ol>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>소리가 크면 밝아지고, 조용하면 어두워지는가</li>
+                        <li>From Range를 잘못 설정하면 어떻게 되는가 (0~1 vs 0~0.01)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 40: 오디오 분석값의 종류
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Audio Analysis</div>
+            <h2 class="reveal">오디오 분석값의 종류</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="reveal">
+                    <table class="data-table">
+                        <thead><tr><th>분석값</th><th>설명</th><th>용도</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">RMS Power</td><td>전체적인 에너지/볼륨</td><td>밝기, 크기 등 연속 반응</td></tr>
+                            <tr><td class="accent-cyan">Peak</td><td>순간 최대값</td><td>드럼 킥 같은 순간적 충격에 반응</td></tr>
+                            <tr><td class="accent-cyan">주파수 분리 (FFT)</td><td>저음/중음/고음 분리</td><td>저음&rarr;배경, 고음&rarr;디테일</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-card reveal" style="border-top:3px solid var(--accent-purple);">
+                    <h3 class="accent-purple">audioAnalysis (Palette)</h3>
+                    <p>Palette에서 바로 가져다 쓸 수 있는 분석 컴포넌트</p>
+                    <table class="data-table" style="margin-top:0.5em;">
+                        <tbody>
+                            <tr><td class="accent-cyan">low</td><td>베이스, 킥 드럼</td></tr>
+                            <tr><td class="accent-cyan">mid</td><td>보컬, 기타</td></tr>
+                            <tr><td class="accent-cyan">high</td><td>하이햇, 심벌즈</td></tr>
+                            <tr><td class="accent-cyan">kick</td><td>킥 드럼 감지</td></tr>
+                            <tr><td class="accent-cyan">level</td><td>전체 볼륨 레벨</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 41: 실습 G &#8212; Audio → Displace
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise G</div>
+            <h2 class="reveal">실습: 소리에 반응하는 Displacement</h2>
+            <p class="reveal">실습 F의 CHOP 네트워크를 그대로 활용.</p>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>단계</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>TOP: Movie File In &rarr; Displace TOP &rarr; Null TOP</li>
+                        <li>Noise TOP을 Displace의 두 번째 입력에 연결</li>
+                        <li>Displace Weight 파라미터에 Reference 표현식 입력:</li>
+                    </ol>
+                    <div class="code-block" style="margin-top:0.5em;font-size:clamp(0.6rem,0.9vw,0.8rem);">
+<span class="keyword">op</span>(<span class="string">'audio_level'</span>)[<span class="string">'chan1'</span>] * 0.05</div>
+                </div>
+                <div class="info-card">
+                    <h3>확인 사항</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>소리가 크면 왜곡이 강해지고, 조용하면 원본에 가까운가</li>
+                        <li><code>* 0.05</code>를 <code>* 0.1</code>, <code>* 0.2</code>로 바꿔보기</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 42: 실습 I &#8212; 임계값 장면 전환
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise I</div>
+            <h2 class="reveal">실습: 임계값 기반 장면 전환</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="flex-col gap-sm">
+                    <div class="info-card reveal" style="border-left:3px solid var(--accent-orange);">
+                        <h3 class="accent-orange">연속값 경로</h3>
+                        <p style="font-size:var(--small-size);">audio_level &rarr; Level/Displace (밝기, 왜곡)</p>
+                    </div>
+                    <div class="info-card reveal" style="border-left:3px solid var(--accent-blue);">
+                        <h3 class="accent-blue">사건 경로</h3>
+                        <div class="flow-diagram" style="padding:0.3em 0;justify-content:flex-start;">
+                            <span class="flow-node" style="font-size:clamp(0.5rem,0.7vw,0.65rem);">audio_level</span>
+                            <span class="flow-arrow">&rarr;</span>
+                            <span class="flow-node" style="font-size:clamp(0.5rem,0.7vw,0.65rem);">Logic</span>
+                            <span class="flow-arrow">&rarr;</span>
+                            <span class="flow-node" style="font-size:clamp(0.5rem,0.7vw,0.65rem);">Count</span>
+                            <span class="flow-arrow">&rarr;</span>
+                            <span class="flow-node blue" style="font-size:clamp(0.5rem,0.7vw,0.65rem);">Switch</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-card reveal">
+                    <h3>설정</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>Logic: Off When <code>0.4</code>, On When <code>0.6</code></li>
+                        <li>Count: Limit &rarr; Loop, Max &rarr; 영상 개수 - 1</li>
+                        <li>Switch TOP에 여러 영상 연결</li>
+                        <li>Count &rarr; Switch Index에 Export</li>
+                    </ul>
+                    <div class="highlight-box" style="margin-top:0.5em;">
+                        <p><span class="accent-orange">연속값</span>(밝기) + <span class="accent-blue">사건</span>(전환)이 동시에 작동!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 43: Lag의 미감
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Interaction Aesthetics</div>
+            <h2 class="reveal">인터랙션의 미감 &#8212; Lag의 힘</h2>
+            <div class="highlight-box reveal" style="max-width:700px;background:rgba(212,132,62,0.12);border-color:var(--accent-orange);">
+                <p style="font-size:var(--h3-size);color:var(--text-primary);">"반응하는가?"만큼 "<span class="accent-orange">어떻게</span> 반응하는가?"가 중요하다</p>
+            </div>
+            <div class="two-col reveal" style="max-width:900px;">
+                <div class="info-card">
+                    <h3>비대칭 Lag 설정</h3>
+                    <table class="data-table">
+                        <thead><tr><th>설정</th><th>효과</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan" style="font-size:clamp(0.6rem,0.8vw,0.75rem);">Up 0.05 / Down 0.3</td><td>빠른 반응 + 긴 여운 &rarr; <span class="accent-orange">펀치감</span></td></tr>
+                            <tr><td class="accent-cyan" style="font-size:clamp(0.6rem,0.8vw,0.75rem);">Up 0.3 / Down 0.05</td><td>느린 반응 + 빠른 소멸 &rarr; <span class="accent-blue">몽환적</span></td></tr>
+                            <tr><td class="accent-cyan" style="font-size:clamp(0.6rem,0.8vw,0.75rem);">Up 0.1 / Down 0.1</td><td>대칭적 &rarr; <span class="accent-green">중립적</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-card">
+                    <h3>나쁜 예 vs 좋은 예</h3>
+                    <div class="code-block" style="font-size:clamp(0.55rem,0.8vw,0.7rem);">
+<span class="comment">나쁜 예:</span>
+소리 &rarr; 즉시 밝기 100% &rarr; <span class="keyword">거칠고 불쾌</span>
+
+<span class="comment">좋은 예:</span>
+소리 &rarr; 0.1초에 상승 &rarr; 0.5초에 하강
+&rarr; <span class="string">호흡감이 있다</span></div>
+                </div>
+            </div>
+            <div class="highlight-box reveal" style="max-width:700px;background:rgba(76,175,110,0.08);border-color:var(--accent-green);">
+                <p>인터랙션은 <span class="accent-green">"편집과 리듬의 문제"</span>이기도 하다. 값 하나로 무엇을 얼마나 바꿀 것인가 &#8212; 이 선택이 영상의 인상과 감정을 결정한다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 44: 가공 기법 총정리
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Core Skill</div>
+            <h2 class="reveal">가공 기법 총정리</h2>
+            <div class="reveal" style="max-width:800px;overflow:auto;">
+                <table class="data-table">
+                    <thead><tr><th>기법</th><th>CHOP</th><th>효과</th><th>언제 쓰는가</th></tr></thead>
+                    <tbody>
+                        <tr><td class="accent-cyan">범위 변환</td><td>Math (Range)</td><td>입력 &rarr; 출력 범위 매핑</td><td>거의 항상</td></tr>
+                        <tr><td class="accent-cyan">스무딩</td><td>Filter / Lag</td><td>거친 값을 부드럽게</td><td>센서, 오디오</td></tr>
+                        <tr><td class="accent-cyan">클램핑</td><td>Limit</td><td>값이 튀는 것 방지</td><td>안전장치</td></tr>
+                        <tr><td class="accent-cyan">임계값</td><td>Logic</td><td>특정 값 이상에서만 반응</td><td>이벤트 생성</td></tr>
+                        <tr><td class="accent-cyan">반전</td><td>Math (Mult: -1)</td><td>반응 방향 뒤집기</td><td>반대 반응</td></tr>
+                        <tr><td class="accent-cyan">절대값</td><td>Math (Abs)</td><td>음수를 양수로</td><td>양쪽 = 같은 반응</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box reveal" style="max-width:700px;">
+                <p>좋은 인터랙션은 입력 자체보다 <span class="accent-orange">가공 방식</span>에서 나온다</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 45: 실습 H &#8212; Audio → Feedback
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Exercise H</div>
+            <h2 class="reveal">실습: 소리에 반응하는 Feedback</h2>
+            <div class="flow-diagram reveal" style="margin:0;">
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Level (A)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Displace</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Null</span>
+            </div>
+            <div class="two-col reveal" style="flex:1;">
+                <div class="info-card">
+                    <h3>Level opacity (Reference)</h3>
+                    <div class="code-block" style="font-size:clamp(0.6rem,0.9vw,0.8rem);">
+0.9 + <span class="keyword">op</span>(<span class="string">'audio_level'</span>)[<span class="string">'chan1'</span>] * 0.08</div>
+                    <p style="margin-top:0.5em;font-size:var(--small-size);">기본 0.9 &rarr; 소리 크면 0.98까지 &rarr; 잔상이 더 오래 남음</p>
+                </div>
+                <div class="info-card">
+                    <h3>Displace Weight (Reference)</h3>
+                    <div class="code-block" style="font-size:clamp(0.6rem,0.9vw,0.8rem);">
+<span class="keyword">op</span>(<span class="string">'audio_level'</span>)[<span class="string">'chan1'</span>] * 0.03</div>
+                    <p style="margin-top:0.5em;font-size:var(--small-size);">소리가 크면 왜곡 강해짐</p>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>두 파라미터를 <span class="accent-orange">동시에 제어</span> &#8212; 소리가 크면 잔상이 더 오래 남고 + 왜곡이 강해진다!</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 46: VIDEO &#8212; Ryoji Ikeda test pattern
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">Ryoji Ikeda &#8212; test pattern</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">Ryoji Ikeda Studio, Times Square Midnight Moment (2014)</p>
+            <div class="vid-container reveal" data-vimeo="113093736">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>텍스트, 소리, 사진, 영상을 0과 1의 바코드 패턴으로 변환해 초고속으로 투사하는 대표적 오디오비주얼 작업. 소리와 이미지가 거의 하나의 신호처럼 결합된다.</p>
+                <a href="https://www.ryojiikeda.com/project/testpattern/" target="_blank">ryojiikeda.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 47: VIDEO &#8212; Deep Web
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">Christopher Bauder &times; Robert Henke &#8212; Deep Web</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">Kinetic audiovisual installation, CTM Festival Berlin (2016)</p>
+            <div class="vid-container reveal" data-vimeo="181986986">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>175개의 구동 구체와 레이저, 멀티채널 사운드가 정밀하게 동기화된 대형 설치. 공간 전체를 하나의 네트워크 구조처럼 경험하게 만드는 작품이다.</p>
+                <a href="https://roberthenke.com/installations/deepweb.html" target="_blank">roberthenke.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 48: VIDEO &#8212; Tarik Barri Versum
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">Tarik Barri &#8212; Versum 2017 (excerpts)</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">Tarik Barri ft. Lea Fabrikant (2017)</p>
+            <div class="vid-container reveal" data-vimeo="222723783">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>Tarik Barri가 직접 개발한 소프트웨어 Versum으로 만든 3D 오디오비주얼 퍼포먼스. 카메라 이동과 음향 생성이 같은 가상 공간 안에서 함께 작곡된다.</p>
+                <a href="https://vimeo.com/222723783" target="_blank">vimeo.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 49: VIDEO &#8212; 404.zero Circle of Light
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &#8212; Artist</div>
+            <h2 class="reveal">404.zero &#8212; The Circle of Light</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);">Circle of Light Festival (2017)</p>
+            <div class="vid-container reveal" data-vimeo="237152011">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>TouchDesigner, GLSL, 3D 렌더링, 모듈러 신스를 결합해 건축 파사드에 생성형 그래픽을 투사한 작품. 실시간 계산 기반의 빛 패턴과 사운드 결합이 선명하다.</p>
+                <a href="https://www.404zero.com/audiovisual" target="_blank">404zero.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 50: SECTION &#8212; Hands-On
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 5</div>
+            <h2 class="reveal">Hands-On<br><span class="accent-cyan">종합 실습 &#8212; 나만의 작업 만들기</span></h2>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 51: 미니 과제
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Mini Project</div>
+            <h2 class="reveal">나만의 오디오 리액티브 비주얼</h2>
+            <div class="two-col" style="flex:1;">
+                <div class="info-card reveal" style="border:2px solid var(--accent-orange);">
+                    <h3 class="accent-orange">과제 조건</h3>
+                    <ul style="padding-left:1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>오디오 입력 사용 <strong>필수</strong></li>
+                        <li>가공 CHOP <strong>2개 이상</strong> 사용</li>
+                        <li>TOP 파라미터 <strong>2개 이상</strong> 제어</li>
+                        <li><strong>연속값 제어 1개</strong>와 <strong>이벤트 제어 1개</strong>를 모두 포함</li>
+                        <li>Feedback TOP 또는 Displace TOP 중 <strong>1개 이상</strong> 활용</li>
+                    </ul>
+                </div>
+                <div class="info-card reveal">
+                    <h3>아이디어 예시</h3>
+                    <table class="data-table">
+                        <thead><tr><th>아이디어</th><th>연속값</th><th>이벤트</th></tr></thead>
+                        <tbody>
+                            <tr><td style="font-family:var(--font-body);">Feedback 잔상</td><td>소리&rarr;opacity/왜곡</td><td>킥&rarr;색상 전환</td></tr>
+                            <tr><td style="font-family:var(--font-body);">Displacement</td><td>소리&rarr;Weight</td><td>큰 소리&rarr;글리치 전환</td></tr>
+                            <tr><td style="font-family:var(--font-body);">주파수 분리</td><td>저음&rarr;스케일</td><td>전체 볼륨&rarr;장면 전환</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 52: SECTION &#8212; Summary
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 6</div>
+            <h2 class="reveal">Summary<br><span style="color:var(--text-secondary);">정리와 다음 단계</span></h2>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 53: 핵심 원칙
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Principles</div>
+            <h2 class="reveal">핵심 원칙 4가지</h2>
+            <div class="flex-col gap-sm" style="flex:1;max-width:800px;margin:0 auto;width:100%;">
+                <div class="info-card reveal" style="border-left:3px solid var(--accent-orange);">
+                    <h3 class="accent-orange" style="margin:0;">1. 인터랙션은 "값을 설계하는 일"이다</h3>
+                    <p>TOP 수업이 화면을 만드는 수업이었다면, CHOP 수업은 화면을 <strong>움직이게 만드는</strong> 수업이다.</p>
+                </div>
+                <div class="info-card reveal" style="border-left:3px solid var(--accent-green);">
+                    <h3 class="accent-green" style="margin:0;">2. 좋은 인터랙션은 가공 방식에서 나온다</h3>
+                    <p>마우스를 받는 것은 쉽다. 그 값을 적당한 속도, 범위, 감도, 리듬으로 <strong>가공하는 것</strong>이 어렵고 중요하다.</p>
+                </div>
+                <div class="info-card reveal" style="border-left:3px solid var(--accent-blue);">
+                    <h3 class="accent-blue" style="margin:0;">3. 센서 데이터는 대부분 더럽다</h3>
+                    <p>실제 입력은 예쁘게 들어오지 않는다. 스무딩, 클램핑, 임계값 조절은 거의 필수.</p>
+                </div>
+                <div class="info-card reveal" style="border-left:3px solid var(--accent-purple);">
+                    <h3 class="accent-purple" style="margin:0;">4. 인터랙션은 서사와 편집의 문제</h3>
+                    <p>빠르게 튈 것인가, 천천히 따라올 것인가 &#8212; 이 선택이 영상의 인상과 감정을 결정한다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 54: Cheat Sheet &#8212; TOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Cheat Sheet</div>
+            <h2 class="reveal">오퍼레이터 목록 &#8212; TOP</h2>
+            <div class="reveal">
+                <table class="data-table" style="max-width:700px;">
+                    <thead><tr><th>TOP</th><th>역할</th></tr></thead>
+                    <tbody>
+                        <tr><td class="accent-cyan">Movie File In</td><td>영상/이미지 불러오기</td></tr>
+                        <tr><td class="accent-cyan">Transform</td><td>이동, 회전, 스케일</td></tr>
+                        <tr><td class="accent-cyan">Level</td><td>밝기, 감마, 불투명도</td></tr>
+                        <tr><td class="accent-cyan">Composite / Over</td><td>합성</td></tr>
+                        <tr><td class="accent-cyan">Switch</td><td>여러 입력 중 선택</td></tr>
+                        <tr><td class="accent-cyan">Feedback</td><td>이전 프레임 피드백 &rarr; 잔상, 트레일</td></tr>
+                        <tr><td class="accent-cyan">Displace</td><td>이미지 왜곡 &rarr; 물결, 글리치</td></tr>
+                        <tr><td class="accent-cyan">Noise</td><td>절차적 노이즈 생성</td></tr>
+                        <tr><td class="accent-cyan">Null</td><td>네트워크 정리</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 55: Cheat Sheet &#8212; CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Cheat Sheet</div>
+            <h2 class="reveal">오퍼레이터 목록 &#8212; CHOP</h2>
+            <div class="reveal">
+                <table class="data-table" style="max-width:700px;">
+                    <thead><tr><th>CHOP</th><th>역할</th></tr></thead>
+                    <tbody>
+                        <tr><td class="accent-cyan">Mouse In / Keyboard In</td><td>마우스/키보드 입력</td></tr>
+                        <tr><td class="accent-cyan">Audio Device In</td><td>오디오 입력</td></tr>
+                        <tr><td class="accent-cyan">Audio Spectrum</td><td>주파수 분석 (FFT)</td></tr>
+                        <tr><td class="accent-cyan">LFO / Noise</td><td>반복 파형 / 유기적 변화 생성</td></tr>
+                        <tr><td class="accent-cyan">Math</td><td>범위 변환 &#8212; 가장 중요</td></tr>
+                        <tr><td class="accent-cyan">Analyze</td><td>신호 요약 (RMS, Max)</td></tr>
+                        <tr><td class="accent-cyan">Filter / Lag</td><td>스무딩</td></tr>
+                        <tr><td class="accent-cyan">Limit</td><td>범위 제한 (안전장치)</td></tr>
+                        <tr><td class="accent-cyan">Logic</td><td>임계값 ON/OFF</td></tr>
+                        <tr><td class="accent-cyan">Trigger / Count</td><td>사건 생성 / 카운트</td></tr>
+                        <tr><td class="accent-cyan">Select</td><td>채널 선택</td></tr>
+                        <tr><td class="accent-cyan">Null</td><td>네트워크 정리</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 56: 자주 나오는 질문
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Q&amp;A</div>
+            <h2 class="reveal">자주 나오는 질문</h2>
+            <div class="reveal">
+                <table class="data-table">
+                    <thead><tr><th>증상</th><th>해결</th></tr></thead>
+                    <tbody>
+                        <tr><td>"값이 너무 튀어요"</td><td>Filter, Lag, Math, Limit으로 다듬는다</td></tr>
+                        <tr><td>"반응은 하는데 느낌이 별로"</td><td>감도, 속도, 반응 곡선 조절. 인터랙션 = 값의 디자인</td></tr>
+                        <tr><td>"어떤 CHOP를 써야 할지 모르겠어요"</td><td>1.입력? 2.값 변환? 3.사건 생성? 4.어디에 연결?</td></tr>
+                        <tr><td>"Feedback이 하얗게 번져요"</td><td>Level opacity가 1 이상. 반드시 1 미만으로</td></tr>
+                        <tr><td>"Displace가 너무 깨져요"</td><td>Weight가 너무 크다. 0.01~0.05에서 시작</td></tr>
+                        <tr><td>"Export가 안 돼요"</td><td>CHOP Viewer 켜져 있는지, Export 플래그 활성화 확인</td></tr>
+                        <tr><td>"Reference 표현식 에러"</td><td>op 이름 오타, 작은따옴표, 채널 이름 정확한지 확인</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 57: 핵심 키워드
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;justify-content:center;">
+            <div class="label reveal">Key Terms</div>
+            <h2 class="reveal">핵심 키워드</h2>
+            <div class="reveal" style="display:flex;flex-wrap:wrap;gap:clamp(0.3rem,0.6vw,0.5rem);justify-content:center;max-width:800px;margin-top:var(--content-gap);">
+                <span class="flow-node">channel</span>
+                <span class="flow-node">sample</span>
+                <span class="flow-node">sample rate</span>
+                <span class="flow-node highlight">range</span>
+                <span class="flow-node highlight">mapping</span>
+                <span class="flow-node green">smoothing</span>
+                <span class="flow-node blue">threshold</span>
+                <span class="flow-node blue">trigger</span>
+                <span class="flow-node green">export</span>
+                <span class="flow-node green">reference</span>
+                <span class="flow-node highlight">feedback</span>
+                <span class="flow-node highlight">displacement</span>
+                <span class="flow-node">RMS</span>
+                <span class="flow-node">FFT</span>
+                <span class="flow-node highlight">audio reactive</span>
+                <span class="flow-node">interaction pipeline</span>
+                <span class="flow-node blue">continuous vs event</span>
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <!-- ============================================
+       JAVASCRIPT — Presentation Controller
+       ============================================ -->
+    <script>
+    function loadVideo(overlay) {
+        const container = overlay.parentElement;
+        const vimeoId = container.dataset.vimeo;
+        if (vimeoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1&title=0&byline=0';
+            iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+            iframe.allowFullscreen = true;
+            container.appendChild(iframe);
+            overlay.classList.add('hidden');
+        }
+    }
+
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.currentSlide = 0;
+            this.totalSlides = this.slides.length;
+            this.isScrolling = false;
+
+            this.setupIntersectionObserver();
+            this.setupKeyboardNav();
+            this.setupTouchNav();
+            this.setupWheelNav();
+            this.setupProgressBar();
+            this.setupOverview();
+            this.updateSlideNumber();
+
+            // Show first slide
+            this.slides[0].classList.add('visible');
+
+            // Hide keyboard hint after interaction
+            setTimeout(() => {
+                const hint = document.getElementById('keyboardHint');
+                if (hint) hint.style.opacity = '0';
+            }, 8000);
+        }
+
+        setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        const idx = Array.from(this.slides).indexOf(entry.target);
+                        if (idx >= 0) {
+                            this.currentSlide = idx;
+                            this.updateSlideNumber();
+                            this.updateProgressBar();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            this.slides.forEach(slide => observer.observe(slide));
+        }
+
+        setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide + 1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide - 1);
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    this.goToSlide(0);
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    this.goToSlide(this.totalSlides - 1);
+                } else if (e.key === 'n' || e.key === 'N') {
+                    document.body.classList.toggle('show-notes');
+                } else if (e.key === 'o' || e.key === 'O') {
+                    this.toggleOverview();
+                } else if (e.key === 'f' || e.key === 'F') {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen?.();
+                    } else {
+                        document.exitFullscreen?.();
+                    }
+                } else if (e.key === 'Escape') {
+                    const ov = document.getElementById('overviewOverlay');
+                    if (ov.classList.contains('active')) {
+                        ov.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        setupTouchNav() {
+            let startY = 0;
+            let startX = 0;
+            document.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            document.addEventListener('touchend', (e) => {
+                const dy = startY - e.changedTouches[0].clientY;
+                const dx = startX - e.changedTouches[0].clientX;
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+                    if (dy > 0) this.goToSlide(this.currentSlide + 1);
+                    else this.goToSlide(this.currentSlide - 1);
+                }
+            }, { passive: true });
+        }
+
+        setupWheelNav() {
+            let lastWheel = 0;
+            document.addEventListener('wheel', (e) => {
+                const now = Date.now();
+                if (now - lastWheel < 800) return;
+                lastWheel = now;
+                if (e.deltaY > 0) this.goToSlide(this.currentSlide + 1);
+                else if (e.deltaY < 0) this.goToSlide(this.currentSlide - 1);
+            }, { passive: true });
+        }
+
+        goToSlide(idx) {
+            if (idx < 0 || idx >= this.totalSlides) return;
+            this.currentSlide = idx;
+            this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+            this.updateSlideNumber();
+            this.updateProgressBar();
+        }
+
+        setupProgressBar() {
+            this.progressBar = document.getElementById('progressBar');
+            this.updateProgressBar();
+        }
+
+        updateProgressBar() {
+            if (!this.progressBar) return;
+            const pct = ((this.currentSlide + 1) / this.totalSlides) * 100;
+            this.progressBar.style.width = pct + '%';
+        }
+
+        updateSlideNumber() {
+            const el = document.getElementById('slideNumber');
+            if (el) {
+                const cur = String(this.currentSlide + 1).padStart(2, '0');
+                const tot = String(this.totalSlides).padStart(2, '0');
+                el.textContent = `${cur} / ${tot}`;
+            }
+        }
+
+        setupOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            this.slides.forEach((slide, i) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'overview-thumb' + (i === this.currentSlide ? ' current' : '');
+                const h2 = slide.querySelector('h2');
+                const label = slide.querySelector('.label, .part-number, .practice-badge');
+                let text = `Slide ${i + 1}`;
+                if (label) text = label.textContent.trim();
+                if (h2) text += '\n' + h2.textContent.trim().substring(0, 40);
+                thumb.textContent = text;
+                thumb.addEventListener('click', () => {
+                    overlay.classList.remove('active');
+                    this.goToSlide(i);
+                });
+                overlay.appendChild(thumb);
+            });
+        }
+
+        toggleOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                overlay.querySelectorAll('.overview-thumb').forEach((t, i) => {
+                    t.classList.toggle('current', i === this.currentSlide);
+                });
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        new SlidePresentation();
+    });
+    </script>
+
+</body>
+</html>
