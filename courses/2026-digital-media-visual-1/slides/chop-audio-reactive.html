@@ -1370,11 +1370,15 @@
                     </div>
                 </div>
                 <div class="flex-col gap-sm reveal">
-                    <div class="code-block" style="line-height:2;">
-<span class="keyword">Sin</span>  (사인파):   ~~~~  &rarr; 부드러운, 호흡, 물결
-<span class="keyword">Square</span> (사각파): __|__|  &rarr; 깜빡임, ON/OFF
-<span class="keyword">Triangle</span> (삼각): /\/\/\  &rarr; 기계적 왕복
-<span class="keyword">Ramp</span>  (톱니파):  /|/|/|  &rarr; 스크롤, 반복 이동</div>
+                    <div id="lfo-demo-wrap" style="position:relative;">
+                        <canvas id="lfoCanvas" style="width:100%;height:120px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;"></canvas>
+                        <div style="display:flex;gap:6px;margin-top:6px;">
+                            <button class="lfo-btn active" data-type="sin" style="flex:1;padding:4px 0;font-family:var(--font-mono);font-size:var(--label-size);background:rgba(212,132,62,0.25);color:#d4843e;border:1px solid rgba(212,132,62,0.4);border-radius:4px;cursor:pointer;">Sin</button>
+                            <button class="lfo-btn" data-type="square" style="flex:1;padding:4px 0;font-family:var(--font-mono);font-size:var(--label-size);background:rgba(232,224,212,0.05);color:var(--text-secondary);border:1px solid rgba(232,224,212,0.15);border-radius:4px;cursor:pointer;">Square</button>
+                            <button class="lfo-btn" data-type="triangle" style="flex:1;padding:4px 0;font-family:var(--font-mono);font-size:var(--label-size);background:rgba(232,224,212,0.05);color:var(--text-secondary);border:1px solid rgba(232,224,212,0.15);border-radius:4px;cursor:pointer;">Triangle</button>
+                            <button class="lfo-btn" data-type="ramp" style="flex:1;padding:4px 0;font-family:var(--font-mono);font-size:var(--label-size);background:rgba(232,224,212,0.05);color:var(--text-secondary);border:1px solid rgba(232,224,212,0.15);border-radius:4px;cursor:pointer;">Ramp</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1404,7 +1408,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="reveal">
+                <div class="reveal flex-col gap-sm">
                     <table class="data-table">
                         <thead><tr><th>파라미터</th><th>설명</th></tr></thead>
                         <tbody>
@@ -1413,6 +1417,16 @@
                             <tr><td class="accent-cyan">Seed</td><td>같은 설정이라도 Seed가 다르면 다른 패턴</td></tr>
                         </tbody>
                     </table>
+                    <div style="display:flex;gap:8px;margin-top:4px;">
+                        <div style="flex:1;text-align:center;">
+                            <div style="font-family:var(--font-mono);font-size:var(--label-size);color:var(--accent-orange);margin-bottom:3px;">LFO</div>
+                            <canvas id="cmpLfoCanvas" style="width:100%;height:80px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;"></canvas>
+                        </div>
+                        <div style="flex:1;text-align:center;">
+                            <div style="font-family:var(--font-mono);font-size:var(--label-size);color:var(--accent-green);margin-bottom:3px;">Noise</div>
+                            <canvas id="cmpNoiseCanvas" style="width:100%;height:80px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1546,25 +1560,20 @@
             <div class="three-col" style="flex:1;">
                 <div class="info-card reveal">
                     <h3 class="accent-orange">Logic CHOP &#8212; 임계값 ON/OFF</h3>
-                    <div class="code-block" style="font-size:clamp(0.55rem,0.8vw,0.7rem);">
-입력:  0.2  0.5  <span class="keyword">0.8</span>  0.3  <span class="keyword">0.9</span>  0.4
-임계:       --- 0.6 ---
-출력:   0    0   <span class="keyword">1</span>    0   <span class="keyword">1</span>    0</div>
-                    <p style="font-size:var(--small-size);margin-top:0.5em;">"소리가 일정 수준 이상이면 장면 전환" 같은 구조에 필요.</p>
+                    <canvas id="logicCanvas" style="width:100%;height:100px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;margin-top:4px;cursor:ns-resize;"></canvas>
+                    <p style="font-size:var(--label-size);margin-top:3px;color:var(--text-dim);">Threshold: <span id="threshLabel">0.50</span> &#8212; 드래그로 조절</p>
                 </div>
                 <div class="info-card reveal">
                     <h3 class="accent-green">Trigger CHOP &#8212; 한 번만 반응</h3>
-                    <ul style="padding-left:1em;font-size:var(--small-size);">
-                        <li>임계값을 넘는 <strong>순간</strong> 한 번 펄스를 만든다</li>
-                        <li>Attack &rarr; Sustain &rarr; Release 시간 설정 가능</li>
-                    </ul>
+                    <canvas id="triggerCanvas" style="width:100%;height:100px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;margin-top:4px;"></canvas>
+                    <p style="font-size:var(--label-size);margin-top:3px;color:var(--text-dim);">Attack &rarr; Sustain &rarr; Release</p>
                 </div>
                 <div class="info-card reveal">
                     <h3 class="accent-blue">Count CHOP &#8212; 카운트</h3>
-                    <ul style="padding-left:1em;font-size:var(--small-size);">
-                        <li>입력 신호가 올라갈 때마다 <strong>카운트 1 증가</strong></li>
-                        <li>Switch TOP의 인덱스로 쓰면 컷 전환</li>
-                    </ul>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                        <div id="countDisplay" style="font-family:var(--font-mono);font-size:clamp(1.8rem,3vw,2.5rem);color:var(--accent-blue);font-weight:700;min-width:2.5em;text-align:center;">0</div>
+                        <div style="font-size:var(--label-size);color:var(--text-dim);">임계값을 넘을 때마다<br>카운트 +1</div>
+                    </div>
                 </div>
             </div>
             <div class="highlight-box reveal">
@@ -1587,12 +1596,20 @@
                 <div class="info-card" style="border:2px solid rgba(212,132,62,0.3);text-align:center;">
                     <h3 class="accent-orange" style="font-size:var(--h2-size);">연속값</h3>
                     <p style="margin:0.5em 0;">매 순간 변하는 값. 부드럽게 변화한다.</p>
-                    <div style="font-size:var(--small-size);color:var(--text-dim);">마우스 위치, 오디오 레벨, 센서 거리<br>&rarr; 밝기, 위치, 크기, 색상 제어에 적합</div>
+                    <canvas id="contCanvas" style="width:100%;height:60px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;margin:6px 0;"></canvas>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+                        <div id="contSquare" style="width:32px;height:32px;border-radius:4px;background:var(--accent-orange);transition:none;"></div>
+                        <span style="font-size:var(--label-size);color:var(--text-dim);">값에 따라 부드럽게 변화</span>
+                    </div>
                 </div>
                 <div class="info-card" style="border:2px solid rgba(74,158,206,0.3);text-align:center;">
                     <h3 class="accent-blue" style="font-size:var(--h2-size);">사건 (Event)</h3>
                     <p style="margin:0.5em 0;">특정 순간에 발생하는 신호. 0 또는 1.</p>
-                    <div style="font-size:var(--small-size);color:var(--text-dim);">키를 눌렀다, 임계값을 넘었다<br>&rarr; Switch, 재생 시작, 이펙트 발동에 적합</div>
+                    <canvas id="eventCanvas" style="width:100%;height:60px;border-radius:6px;background:#292929;border:1px solid rgba(232,224,212,0.15);display:block;margin:6px 0;"></canvas>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+                        <div id="eventSquare" style="width:32px;height:32px;border-radius:4px;background:var(--accent-blue);transition:none;"></div>
+                        <span style="font-size:var(--label-size);color:var(--text-dim);">임계값을 넘으면 ON/OFF</span>
+                    </div>
                 </div>
             </div>
             <div class="highlight-box reveal" style="max-width:700px;">
@@ -2776,6 +2793,508 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         new SlidePresentation();
+
+        /* =============================================
+           INTERACTIVE CANVAS DEMOS
+           ============================================= */
+
+        // --- Utility: smooth noise ---
+        function createSmoothNoise(seed) {
+            const pts = [];
+            let s = seed || 0;
+            function seededRand() { s = (s * 9301 + 49297) % 233280; return s / 233280; }
+            for (let i = 0; i < 512; i++) pts.push(seededRand() * 2 - 1);
+            return function(t) {
+                const idx = ((t % pts.length) + pts.length) % pts.length;
+                const i0 = Math.floor(idx), i1 = (i0 + 1) % pts.length;
+                const f = idx - i0;
+                const sf = f * f * (3 - 2 * f); // smoothstep
+                return pts[i0] * (1 - sf) + pts[i1] * sf;
+            };
+        }
+
+        // --- Utility: resize canvas to CSS size ---
+        function fitCanvas(c) {
+            const dpr = window.devicePixelRatio || 1;
+            const r = c.getBoundingClientRect();
+            if (c.width !== Math.round(r.width * dpr) || c.height !== Math.round(r.height * dpr)) {
+                c.width = Math.round(r.width * dpr);
+                c.height = Math.round(r.height * dpr);
+            }
+            return dpr;
+        }
+
+        // --- Visibility observer for all demo canvases ---
+        const activedemos = new Map(); // id -> { draw, rafId }
+
+        function registerDemo(canvasId, drawFn) {
+            activedemos.set(canvasId, { draw: drawFn, rafId: null, visible: false });
+        }
+
+        const demoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                const id = e.target.id;
+                const demo = activeDemo(id);
+                if (!demo) return;
+                if (e.isIntersecting && !demo.visible) {
+                    demo.visible = true;
+                    function loop() {
+                        demo.draw();
+                        demo.rafId = requestAnimationFrame(loop);
+                    }
+                    loop();
+                } else if (!e.isIntersecting && demo.visible) {
+                    demo.visible = false;
+                    if (demo.rafId) cancelAnimationFrame(demo.rafId);
+                    demo.rafId = null;
+                }
+            });
+        }, { threshold: 0.1 });
+
+        function activeDemo(id) { return activedemos.get(id); }
+
+        function startDemo(canvasId) {
+            const el = document.getElementById(canvasId);
+            if (el) demoObserver.observe(el);
+        }
+
+        /* =============================================
+           SLIDE 18: LFO Waveform Visualizer
+           ============================================= */
+        (function() {
+            const canvas = document.getElementById('lfoCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let waveType = 'sin';
+            let offset = 0;
+
+            // Button handling
+            document.querySelectorAll('.lfo-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.lfo-btn').forEach(b => {
+                        b.style.background = 'rgba(232,224,212,0.05)';
+                        b.style.color = 'var(--text-secondary)';
+                        b.style.borderColor = 'rgba(232,224,212,0.15)';
+                        b.classList.remove('active');
+                    });
+                    btn.style.background = 'rgba(212,132,62,0.25)';
+                    btn.style.color = '#d4843e';
+                    btn.style.borderColor = 'rgba(212,132,62,0.4)';
+                    btn.classList.add('active');
+                    waveType = btn.dataset.type;
+                });
+            });
+
+            function waveValue(t) {
+                const p = t % 1;
+                switch(waveType) {
+                    case 'sin': return Math.sin(p * Math.PI * 2);
+                    case 'square': return p < 0.5 ? 1 : -1;
+                    case 'triangle': return p < 0.5 ? (p * 4 - 1) : (3 - p * 4);
+                    case 'ramp': return p * 2 - 1;
+                    default: return Math.sin(p * Math.PI * 2);
+                }
+            }
+
+            function draw() {
+                const dpr = fitCanvas(canvas);
+                const w = canvas.width, h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+
+                // Grid lines
+                ctx.strokeStyle = '#3a3a3a';
+                ctx.lineWidth = 1;
+                for (let gy = 0; gy <= 4; gy++) {
+                    const yy = (gy / 4) * h;
+                    ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke();
+                }
+                // Center line brighter
+                ctx.strokeStyle = '#4a4a4a';
+                ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+
+                // Waveform
+                ctx.strokeStyle = '#d4843e';
+                ctx.lineWidth = 2.5 * dpr;
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                const cycles = 3;
+                for (let x = 0; x < w; x++) {
+                    const t = (x / w) * cycles + offset;
+                    const v = waveValue(t);
+                    const y = h / 2 - v * (h * 0.38);
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Glow
+                ctx.strokeStyle = 'rgba(212,132,62,0.2)';
+                ctx.lineWidth = 6 * dpr;
+                ctx.beginPath();
+                for (let x = 0; x < w; x++) {
+                    const t = (x / w) * cycles + offset;
+                    const v = waveValue(t);
+                    const y = h / 2 - v * (h * 0.38);
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                offset += 0.008;
+            }
+
+            registerDemo('lfoCanvas', draw);
+            startDemo('lfoCanvas');
+        })();
+
+        /* =============================================
+           SLIDE 19: LFO vs Noise Comparison
+           ============================================= */
+        (function() {
+            const cLfo = document.getElementById('cmpLfoCanvas');
+            const cNoise = document.getElementById('cmpNoiseCanvas');
+            if (!cLfo || !cNoise) return;
+            const ctxL = cLfo.getContext('2d');
+            const ctxN = cNoise.getContext('2d');
+            const noise = createSmoothNoise(42);
+            let t = 0;
+
+            function drawWave(cvs, cctx, color, valueFn) {
+                const dpr = fitCanvas(cvs);
+                const w = cvs.width, h = cvs.height;
+                cctx.clearRect(0, 0, w, h);
+                // grid
+                cctx.strokeStyle = '#3a3a3a'; cctx.lineWidth = 1;
+                cctx.beginPath(); cctx.moveTo(0, h/2); cctx.lineTo(w, h/2); cctx.stroke();
+                // wave
+                cctx.strokeStyle = color;
+                cctx.lineWidth = 2 * dpr;
+                cctx.lineJoin = 'round';
+                cctx.beginPath();
+                for (let x = 0; x < w; x++) {
+                    const v = valueFn(x / w);
+                    const y = h / 2 - v * (h * 0.38);
+                    if (x === 0) cctx.moveTo(x, y); else cctx.lineTo(x, y);
+                }
+                cctx.stroke();
+            }
+
+            function draw() {
+                drawWave(cLfo, ctxL, '#d4843e', (x) => Math.sin((x * 3 + t) * Math.PI * 2));
+                drawWave(cNoise, ctxN, '#4caf6e', (x) => noise((x * 40 + t * 8) % 512));
+                t += 0.005;
+            }
+
+            registerDemo('cmpLfoCanvas', draw);
+            startDemo('cmpLfoCanvas');
+            // Also observe the noise canvas to the same demo
+            demoObserver.observe(cNoise);
+        })();
+
+        /* =============================================
+           SLIDE 23: Logic / Trigger / Count
+           ============================================= */
+        (function() {
+            const logicCvs = document.getElementById('logicCanvas');
+            const triggerCvs = document.getElementById('triggerCanvas');
+            const countEl = document.getElementById('countDisplay');
+            const threshLabel = document.getElementById('threshLabel');
+            if (!logicCvs) return;
+
+            const ctxL = logicCvs.getContext('2d');
+            const ctxT = triggerCvs ? triggerCvs.getContext('2d') : null;
+            const noise = createSmoothNoise(77);
+            let threshold = 0.5;
+            let t = 0;
+            let count = 0;
+            let prevAbove = false;
+
+            // Trigger pulse state
+            let triggerPhase = 'idle'; // idle, attack, sustain, release
+            let triggerTime = 0;
+            const attackDur = 0.08, sustainDur = 0.15, releaseDur = 0.3;
+
+            // Threshold dragging
+            let dragging = false;
+            logicCvs.addEventListener('mousedown', (e) => { dragging = true; updateThreshold(e); });
+            window.addEventListener('mousemove', (e) => { if (dragging) updateThreshold(e); });
+            window.addEventListener('mouseup', () => { dragging = false; });
+
+            function updateThreshold(e) {
+                const rect = logicCvs.getBoundingClientRect();
+                const y = (e.clientY - rect.top) / rect.height;
+                threshold = Math.max(0.05, Math.min(0.95, 1 - y));
+                if (threshLabel) threshLabel.textContent = threshold.toFixed(2);
+            }
+
+            function getSignal(x, time) {
+                return noise((x * 30 + time * 6) % 512) * 0.5 + 0.5; // 0..1
+            }
+
+            function drawLogic() {
+                const dpr = fitCanvas(logicCvs);
+                const w = logicCvs.width, h = logicCvs.height;
+                ctxL.clearRect(0, 0, w, h);
+
+                // Threshold fill below for ON regions
+                ctxL.fillStyle = 'rgba(76,175,110,0.12)';
+                let inRegion = false;
+                let regionStart = 0;
+                for (let x = 0; x <= w; x++) {
+                    const v = getSignal(x / w, t);
+                    const above = v > threshold;
+                    if (above && !inRegion) { regionStart = x; inRegion = true; }
+                    if ((!above || x === w) && inRegion) {
+                        const thY = h * (1 - threshold);
+                        ctxL.fillRect(regionStart, thY, x - regionStart, h - thY);
+                        inRegion = false;
+                    }
+                }
+
+                // Grid
+                ctxL.strokeStyle = '#3a3a3a'; ctxL.lineWidth = 1;
+                ctxL.beginPath(); ctxL.moveTo(0, h/2); ctxL.lineTo(w, h/2); ctxL.stroke();
+
+                // Threshold line
+                const thY = h * (1 - threshold);
+                ctxL.strokeStyle = '#d4843e';
+                ctxL.lineWidth = 1.5 * dpr;
+                ctxL.setLineDash([6, 4]);
+                ctxL.beginPath(); ctxL.moveTo(0, thY); ctxL.lineTo(w, thY); ctxL.stroke();
+                ctxL.setLineDash([]);
+
+                // Signal
+                ctxL.strokeStyle = 'rgba(232,224,212,0.6)';
+                ctxL.lineWidth = 1.5 * dpr;
+                ctxL.lineJoin = 'round';
+                ctxL.beginPath();
+                for (let x = 0; x < w; x++) {
+                    const v = getSignal(x / w, t);
+                    const y = h * (1 - v);
+                    if (x === 0) ctxL.moveTo(x, y); else ctxL.lineTo(x, y);
+                }
+                ctxL.stroke();
+
+                // Output: green segments on top of signal where > threshold
+                ctxL.strokeStyle = '#4caf6e';
+                ctxL.lineWidth = 2.5 * dpr;
+                ctxL.beginPath();
+                let drawing = false;
+                for (let x = 0; x < w; x++) {
+                    const v = getSignal(x / w, t);
+                    const y = h * (1 - v);
+                    if (v > threshold) {
+                        if (!drawing) { ctxL.moveTo(x, y); drawing = true; }
+                        else ctxL.lineTo(x, y);
+                    } else { drawing = false; }
+                }
+                ctxL.stroke();
+
+                // Count crossings at rightmost edge
+                const curVal = getSignal(0.98, t);
+                const curAbove = curVal > threshold;
+                if (curAbove && !prevAbove) {
+                    count++;
+                    if (countEl) countEl.textContent = count;
+                    // Fire trigger
+                    triggerPhase = 'attack';
+                    triggerTime = 0;
+                }
+                prevAbove = curAbove;
+
+                t += 0.004;
+            }
+
+            function drawTrigger() {
+                if (!ctxT || !triggerCvs) return;
+                const dpr = fitCanvas(triggerCvs);
+                const w = triggerCvs.width, h = triggerCvs.height;
+                ctxT.clearRect(0, 0, w, h);
+
+                // Grid
+                ctxT.strokeStyle = '#3a3a3a'; ctxT.lineWidth = 1;
+                ctxT.beginPath(); ctxT.moveTo(0, h * 0.8); ctxT.lineTo(w, h * 0.8); ctxT.stroke();
+                ctxT.beginPath(); ctxT.moveTo(0, h * 0.2); ctxT.lineTo(w, h * 0.2); ctxT.stroke();
+
+                // Advance trigger
+                triggerTime += 0.016;
+                let pulseVal = 0;
+                if (triggerPhase === 'attack') {
+                    pulseVal = Math.min(1, triggerTime / attackDur);
+                    if (triggerTime >= attackDur) { triggerPhase = 'sustain'; triggerTime = 0; }
+                } else if (triggerPhase === 'sustain') {
+                    pulseVal = 1;
+                    if (triggerTime >= sustainDur) { triggerPhase = 'release'; triggerTime = 0; }
+                } else if (triggerPhase === 'release') {
+                    pulseVal = Math.max(0, 1 - triggerTime / releaseDur);
+                    if (triggerTime >= releaseDur) { triggerPhase = 'idle'; triggerTime = 0; }
+                }
+
+                // Draw stored pulse shape (a static ADSR shape + current indicator)
+                const totalDur = attackDur + sustainDur + releaseDur;
+                ctxT.strokeStyle = '#4caf6e';
+                ctxT.lineWidth = 2 * dpr;
+                ctxT.beginPath();
+
+                // Draw ADSR shape
+                const padX = w * 0.1;
+                const usableW = w * 0.8;
+                const baseY = h * 0.8;
+                const topY = h * 0.2;
+                const aEnd = padX + usableW * (attackDur / totalDur);
+                const sEnd = padX + usableW * ((attackDur + sustainDur) / totalDur);
+                const rEnd = padX + usableW;
+
+                ctxT.moveTo(padX, baseY);
+                ctxT.lineTo(aEnd, topY);
+                ctxT.lineTo(sEnd, topY);
+                ctxT.lineTo(rEnd, baseY);
+                ctxT.stroke();
+
+                // Fill under
+                ctxT.fillStyle = 'rgba(76,175,110,0.1)';
+                ctxT.beginPath();
+                ctxT.moveTo(padX, baseY);
+                ctxT.lineTo(aEnd, topY);
+                ctxT.lineTo(sEnd, topY);
+                ctxT.lineTo(rEnd, baseY);
+                ctxT.closePath();
+                ctxT.fill();
+
+                // Current pulse indicator dot
+                if (triggerPhase !== 'idle') {
+                    let dotX, dotY;
+                    if (triggerPhase === 'attack') {
+                        const frac = triggerTime / attackDur;
+                        dotX = padX + (aEnd - padX) * frac;
+                        dotY = baseY + (topY - baseY) * frac;
+                    } else if (triggerPhase === 'sustain') {
+                        const frac = triggerTime / sustainDur;
+                        dotX = aEnd + (sEnd - aEnd) * frac;
+                        dotY = topY;
+                    } else {
+                        const frac = triggerTime / releaseDur;
+                        dotX = sEnd + (rEnd - sEnd) * frac;
+                        dotY = topY + (baseY - topY) * frac;
+                    }
+                    ctxT.fillStyle = '#4caf6e';
+                    ctxT.beginPath();
+                    ctxT.arc(dotX, dotY, 4 * dpr, 0, Math.PI * 2);
+                    ctxT.fill();
+
+                    // Glow
+                    ctxT.fillStyle = 'rgba(76,175,110,0.3)';
+                    ctxT.beginPath();
+                    ctxT.arc(dotX, dotY, 8 * dpr, 0, Math.PI * 2);
+                    ctxT.fill();
+                }
+
+                // Labels
+                ctxT.fillStyle = 'rgba(232,224,212,0.3)';
+                ctxT.font = `${10 * dpr}px var(--font-mono), monospace`;
+                ctxT.fillText('A', aEnd - 8 * dpr, topY - 6 * dpr);
+                ctxT.fillText('S', (aEnd + sEnd) / 2 - 4 * dpr, topY - 6 * dpr);
+                ctxT.fillText('R', rEnd - 8 * dpr, topY - 6 * dpr);
+            }
+
+            function drawAll() {
+                drawLogic();
+                drawTrigger();
+            }
+
+            registerDemo('logicCanvas', drawAll);
+            startDemo('logicCanvas');
+            if (triggerCvs) demoObserver.observe(triggerCvs);
+        })();
+
+        /* =============================================
+           SLIDE 24: Continuous vs Event
+           ============================================= */
+        (function() {
+            const contCvs = document.getElementById('contCanvas');
+            const eventCvs = document.getElementById('eventCanvas');
+            const contSq = document.getElementById('contSquare');
+            const eventSq = document.getElementById('eventSquare');
+            if (!contCvs || !eventCvs) return;
+
+            const ctxC = contCvs.getContext('2d');
+            const ctxE = eventCvs.getContext('2d');
+            let t = 0;
+            const evtThreshold = 0.5;
+
+            function draw() {
+                const dprC = fitCanvas(contCvs);
+                const dprE = fitCanvas(eventCvs);
+                const wC = contCvs.width, hC = contCvs.height;
+                const wE = eventCvs.width, hE = eventCvs.height;
+
+                // --- Continuous ---
+                ctxC.clearRect(0, 0, wC, hC);
+                ctxC.strokeStyle = '#3a3a3a'; ctxC.lineWidth = 1;
+                ctxC.beginPath(); ctxC.moveTo(0, hC/2); ctxC.lineTo(wC, hC/2); ctxC.stroke();
+
+                ctxC.strokeStyle = '#d4843e';
+                ctxC.lineWidth = 2 * dprC;
+                ctxC.lineJoin = 'round';
+                ctxC.beginPath();
+                let curContVal = 0;
+                for (let x = 0; x < wC; x++) {
+                    const v = Math.sin((x / wC * 3 + t) * Math.PI * 2);
+                    const y = hC / 2 - v * (hC * 0.38);
+                    if (x === 0) ctxC.moveTo(x, y); else ctxC.lineTo(x, y);
+                    if (x === wC - 1) curContVal = v;
+                }
+                ctxC.stroke();
+
+                // Update continuous square
+                if (contSq) {
+                    const norm = (curContVal + 1) / 2; // 0..1
+                    const sz = 16 + norm * 20;
+                    contSq.style.width = sz + 'px';
+                    contSq.style.height = sz + 'px';
+                    contSq.style.opacity = 0.3 + norm * 0.7;
+                }
+
+                // --- Event ---
+                ctxE.clearRect(0, 0, wE, hE);
+                ctxE.strokeStyle = '#3a3a3a'; ctxE.lineWidth = 1;
+                ctxE.beginPath(); ctxE.moveTo(0, hE/2); ctxE.lineTo(wE, hE/2); ctxE.stroke();
+
+                // Threshold line
+                const thY = hE / 2 - evtThreshold * (hE * 0.38) * 2 + hE * 0.38;
+                ctxE.strokeStyle = 'rgba(212,132,62,0.5)';
+                ctxE.lineWidth = 1;
+                ctxE.setLineDash([4, 3]);
+                ctxE.beginPath(); ctxE.moveTo(0, hE * 0.3); ctxE.lineTo(wE, hE * 0.3); ctxE.stroke();
+                ctxE.setLineDash([]);
+
+                ctxE.strokeStyle = '#4a9ece';
+                ctxE.lineWidth = 2 * dprE;
+                ctxE.lineJoin = 'round';
+                ctxE.beginPath();
+                let curEventVal = 0;
+                for (let x = 0; x < wE; x++) {
+                    const v = Math.sin((x / wE * 3 + t) * Math.PI * 2);
+                    const y = hE / 2 - v * (hE * 0.38);
+                    if (x === 0) ctxE.moveTo(x, y); else ctxE.lineTo(x, y);
+                    if (x === wE - 1) curEventVal = v;
+                }
+                ctxE.stroke();
+
+                // Update event square: ON/OFF snap
+                if (eventSq) {
+                    const isOn = curEventVal > 0.3;
+                    eventSq.style.opacity = isOn ? '1' : '0.15';
+                    eventSq.style.width = isOn ? '36px' : '32px';
+                    eventSq.style.height = isOn ? '36px' : '32px';
+                    eventSq.style.boxShadow = isOn ? '0 0 12px rgba(74,158,206,0.5)' : 'none';
+                }
+
+                t += 0.008;
+            }
+
+            registerDemo('contCanvas', draw);
+            startDemo('contCanvas');
+            demoObserver.observe(eventCvs);
+        })();
     });
     </script>
 
