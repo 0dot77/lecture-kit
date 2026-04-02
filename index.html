@@ -11,12 +11,12 @@
     />
   </head>
   <body class="min-h-screen grid-bg-page">
-    <!-- Panel frame with corner screws -->
+    <!-- Panel frame -->
     <div class="page-frame"></div>
     <div class="page-screw-bl"></div>
     <div class="page-screw-br"></div>
 
-    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+    <div id="app" class="max-w-4xl mx-auto px-6 py-16" style="display: none; position: relative; z-index: 1;">
       <!-- Header -->
       <header class="mb-16">
         <!-- Signal decoration -->
@@ -86,8 +86,14 @@
     </div>
 
     <script type="module">
-      import { init } from "/shared/components.js";
-      init();
+      import { initPasswordGate, init } from "/shared/components.js";
+
+      // Password: "0706" → hash: "1484365"
+      const authorized = initPasswordGate("1484365");
+      if (authorized) {
+        document.getElementById("app").style.display = "block";
+        init();
+      }
     </script>
   </body>
 </html>

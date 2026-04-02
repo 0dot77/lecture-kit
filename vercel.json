@@ -2,7 +2,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/courses/:path*", "destination": "/courses/:path*" }
+{ "source": "/courses/:path*", "destination": "/courses/:path*" }
   ]
 }
