@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3주차: VAE, Sampler, Scheduler — ComfyUI 기초 강의</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <style>
+      /* ─── Interactive demos ─── */
+      .demo-canvas {
+        background: var(--color-bg-deep);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        display: block;
+        width: 100%;
+      }
+      .demo-controls {
+        display: flex; gap: 0.5rem; flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+      }
+      .demo-btn {
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        background: var(--color-surface-alt);
+        border: 1px solid var(--color-border);
+        color: var(--color-text-muted);
+        font-size: 0.75rem;
+        font-family: var(--font-mono);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .demo-btn:hover { border-color: var(--color-border-light); color: var(--color-text); }
+      .demo-btn.active {
+        border-color: var(--color-accent-blue);
+        color: var(--color-accent-blue);
+        background: color-mix(in srgb, var(--color-accent-blue) 10%, transparent);
+      }
+      .demo-slider-wrap {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.5rem 0;
+      }
+      .demo-slider-wrap label {
+        font-size: 0.75rem; font-family: var(--font-mono);
+        color: var(--color-text-dim); min-width: 80px;
+      }
+      .demo-slider-wrap input[type=range] {
+        flex: 1; accent-color: var(--color-accent-blue);
+        height: 4px; cursor: pointer;
+      }
+      .demo-slider-wrap .val {
+        font-size: 0.8rem; font-family: var(--font-mono);
+        color: var(--color-accent-blue); min-width: 2.5rem; text-align: right;
+      }
+      /* Pipeline flow animation */
+      .pipeline-flow {
+        display: flex; align-items: center; gap: 0; justify-content: center;
+        padding: 2rem 1rem; flex-wrap: wrap;
+      }
+      .pipe-node {
+        padding: 0.6rem 1rem; border-radius: 8px;
+        font-size: 0.78rem; font-family: var(--font-mono);
+        font-weight: 600; white-space: nowrap;
+        border: 1px solid; position: relative;
+        transition: all 0.3s;
+      }
+      .pipe-node.highlight {
+        transform: scale(1.08);
+        box-shadow: 0 0 20px color-mix(in srgb, var(--node-color, var(--color-accent-blue)) 40%, transparent);
+      }
+      .pipe-arrow {
+        width: 28px; height: 2px; position: relative; flex-shrink: 0;
+      }
+      .pipe-arrow::after {
+        content: ""; position: absolute; right: 0; top: -3px;
+        border: 4px solid transparent; border-left: 6px solid;
+      }
+      .pipe-data {
+        position: absolute; top: -1.2rem; left: 50%;
+        transform: translateX(-50%); font-size: 0.6rem;
+        font-family: var(--font-mono); white-space: nowrap;
+        opacity: 0; transition: opacity 0.3s;
+      }
+      .pipe-data.show { opacity: 1; }
+      /* Sampler cards */
+      .sampler-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.5rem;
+      }
+      .sampler-card {
+        padding: 0.875rem; border-radius: 8px;
+        background: var(--color-surface); border: 1px solid var(--color-border);
+        cursor: pointer; transition: all 0.25s;
+        text-align: center;
+      }
+      .sampler-card:hover { border-color: var(--color-border-light); }
+      .sampler-card.selected {
+        border-color: var(--color-accent-purple);
+        background: color-mix(in srgb, var(--color-accent-purple) 8%, transparent);
+      }
+      .sampler-card .name {
+        font-family: var(--font-mono); font-size: 0.8rem;
+        font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem;
+      }
+      .sampler-card .desc {
+        font-size: 0.7rem; color: var(--color-text-dim);
+      }
+      /* Scheduler curve preview */
+      .scheduler-preview {
+        display: flex; gap: 1rem; align-items: stretch;
+      }
+      .scheduler-option {
+        flex: 1; padding: 1rem; border-radius: 8px;
+        background: var(--color-surface); border: 1px solid var(--color-border);
+        cursor: pointer; transition: all 0.25s; text-align: center;
+      }
+      .scheduler-option:hover { border-color: var(--color-border-light); }
+      .scheduler-option.selected {
+        border-color: var(--color-accent-green);
+        background: color-mix(in srgb, var(--color-accent-green) 8%, transparent);
+      }
+      .scheduler-option .sch-name {
+        font-family: var(--font-mono); font-size: 0.8rem;
+        font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text);
+      }
+      /* KSampler node interactive */
+      .ksampler-node {
+        background: var(--color-bg-deep);
+        border: 1px solid var(--color-border);
+        border-radius: 10px; padding: 1.5rem;
+        max-width: 420px; margin: 0 auto;
+      }
+      .ksampler-node .node-title {
+        font-family: var(--font-mono); font-size: 0.85rem;
+        font-weight: 700; color: var(--color-accent-purple);
+        padding-bottom: 0.75rem; margin-bottom: 0.75rem;
+        border-bottom: 1px solid var(--color-border);
+        text-align: center;
+      }
+      .ksampler-node .param-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.4rem 0; font-size: 0.8rem;
+      }
+      .ksampler-node .param-name {
+        font-family: var(--font-mono); color: var(--color-text-dim);
+      }
+      .ksampler-node .param-val {
+        font-family: var(--font-mono); font-weight: 600;
+        padding: 0.15rem 0.5rem; border-radius: 4px;
+        background: var(--color-surface-alt); border: 1px solid var(--color-border);
+        transition: all 0.3s;
+      }
+      .ksampler-node .param-val.changed {
+        border-color: var(--color-accent-blue);
+        color: var(--color-accent-blue);
+      }
+      @media (max-width: 640px) {
+        .pipeline-flow { gap: 0.25rem; }
+        .pipe-arrow { width: 16px; }
+        .pipe-node { font-size: 0.7rem; padding: 0.4rem 0.6rem; }
+        .scheduler-preview { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <!-- Section Nav -->
+    <nav class="section-nav no-print" id="sectionNav">
+      <a href="#review" data-section="0"><span class="nav-label">00 — 복습</span></a>
+      <a href="#vae" data-section="1"><span class="nav-label">01 — VAE</span></a>
+      <a href="#sampler" data-section="2"><span class="nav-label">02 — Sampler</span></a>
+      <a href="#scheduler" data-section="3"><span class="nav-label">03 — Scheduler</span></a>
+      <a href="#cfg-scale" data-section="4"><span class="nav-label">04 — CFG Scale</span></a>
+      <a href="#steps" data-section="5"><span class="nav-label">05 — Steps</span></a>
+      <a href="#ksampler" data-section="6"><span class="nav-label">06 — KSampler</span></a>
+      <a href="#practice" data-section="7"><span class="nav-label">07 — 실습</span></a>
+      <a href="#references" data-section="8"><span class="nav-label">08 — 레퍼런스</span></a>
+    </nav>
+
+    <div class="lecture-page">
+      <!-- ═══ Hero Header ═══ -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">VAE</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent); color: var(--color-accent-purple);">Sampler</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-green) 15%, transparent); color: var(--color-accent-green);">Scheduler</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">CFG</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3" style="letter-spacing: -0.03em;">
+          3주차: VAE, Sampler, Scheduler 깊이 파기
+        </h1>
+        <p style="color: var(--color-text-muted);" class="text-base leading-relaxed max-w-2xl">
+          1~2주차에서 "노드를 연결하면 이미지가 나온다"는 것을 경험했다면, 이번 주는 <strong style="color: var(--color-text);">왜 그 결과가 나오는지</strong>를 이해하는 시간이다. KSampler 안에 숨어 있는 파라미터를 하나씩 분해하고, 의도대로 제어할 수 있게 된다.
+        </p>
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-orange), var(--color-accent-purple), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- ═══ Learning Objectives ═══ -->
+      <div class="module-card mb-8">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          학습 목표
+        </div>
+        <div class="module-card-body">
+          <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> VAE Encode/Decode의 역할과 Latent Space 개념을 설명할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> Sampler와 Scheduler의 차이를 구분하고, 상황에 맞는 조합을 선택할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> CFG Scale과 Steps가 결과에 미치는 영향을 예측할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> XY Plot을 활용하여 파라미터를 체계적으로 비교할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> 자신의 작업 스타일에 맞는 "나만의 기본 프리셋"을 설정할 수 있다</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ═══ TOC ═══ -->
+      <div class="toc mb-16">
+        <div class="toc-header">목차</div>
+        <div class="toc-body">
+          <a href="#review" class="toc-item"><span class="toc-dot" style="background: var(--color-text-dim);"></span><span class="toc-num">00</span>복습 — Stable Diffusion의 구조</a>
+          <a href="#vae" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-orange);"></span><span class="toc-num">01</span>VAE — Latent Space의 출입구</a>
+          <a href="#sampler" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-purple);"></span><span class="toc-num">02</span>Sampler — 노이즈를 제거하는 알고리즘</a>
+          <a href="#scheduler" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-green);"></span><span class="toc-num">03</span>Scheduler — 노이즈 제거의 속도 곡선</a>
+          <a href="#cfg-scale" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-blue);"></span><span class="toc-num">04</span>CFG Scale — 프롬프트 충실도 조절기</a>
+          <a href="#steps" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-orange);"></span><span class="toc-num">05</span>Steps — 반복 횟수와 품질의 관계</a>
+          <a href="#ksampler" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-purple);"></span><span class="toc-num">06</span>KSampler — 파라미터 종합 시뮬레이터</a>
+          <a href="#practice" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-green);"></span><span class="toc-num">07</span>실습 활동</a>
+          <a href="#references" class="toc-item"><span class="toc-dot" style="background: var(--color-accent-blue);"></span><span class="toc-num">08</span>참고 자료</a>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 00 — Review                             -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="review">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-text-muted);">00</span>
+          <span class="section-title">복습 — Stable Diffusion의 구조</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            3주차 본격 내용에 들어가기 전, 1~2주차 핵심 개념을 정리하고 오늘 배울 파라미터들이 어디에 위치하는지 연결한다.
+          </p>
+
+          <!-- Interactive SD Pipeline -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              Stable Diffusion 이미지 생성 과정 — 노드를 클릭하여 설명 확인
+            </div>
+            <div class="module-card-body" style="padding: 0;">
+              <div id="sd-pipeline" class="pipeline-flow" style="min-height: 120px;">
+                <div class="pipe-node sd-pipe-node" data-comp="prompt" onclick="showSDDetail(this)" style="--node-color: var(--color-text-muted); background: color-mix(in srgb, var(--color-text-muted) 12%, transparent); border-color: color-mix(in srgb, var(--color-text-muted) 30%, transparent); color: var(--color-text-muted); cursor: pointer;">
+                  프롬프트
+                  <span class="pipe-data" style="color: var(--color-text-muted);">텍스트 입력</span>
+                </div>
+                <div class="pipe-arrow" style="background: var(--color-text-dim);">
+                  <span style="position:absolute;right:0;top:-3px;border:4px solid transparent;border-left:6px solid var(--color-text-dim);"></span>
+                </div>
+                <div class="pipe-node sd-pipe-node" data-comp="clip" onclick="showSDDetail(this)" style="--node-color: var(--color-accent-green); background: color-mix(in srgb, var(--color-accent-green) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-green) 30%, transparent); color: var(--color-accent-green); cursor: pointer;">
+                  CLIP
+                  <span class="pipe-data" style="color: var(--color-accent-green);">텍스트 → 벡터</span>
+                </div>
+                <div class="pipe-arrow" style="background: var(--color-accent-green);">
+                  <span style="position:absolute;right:0;top:-3px;border:4px solid transparent;border-left:6px solid var(--color-accent-green);"></span>
+                </div>
+                <div class="pipe-node sd-pipe-node" data-comp="unet" onclick="showSDDetail(this)" style="--node-color: var(--color-accent-purple); background: color-mix(in srgb, var(--color-accent-purple) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-purple) 30%, transparent); color: var(--color-accent-purple); cursor: pointer;">
+                  U-Net
+                  <span class="pipe-data" style="color: var(--color-accent-purple);">노이즈 제거</span>
+                </div>
+                <div class="pipe-arrow" style="background: var(--color-accent-orange);">
+                  <span style="position:absolute;right:0;top:-3px;border:4px solid transparent;border-left:6px solid var(--color-accent-orange);"></span>
+                </div>
+                <div class="pipe-node sd-pipe-node" data-comp="vae" onclick="showSDDetail(this)" style="--node-color: var(--color-accent-orange); background: color-mix(in srgb, var(--color-accent-orange) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-orange) 30%, transparent); color: var(--color-accent-orange); cursor: pointer;">
+                  VAE
+                  <span class="pipe-data" style="color: var(--color-accent-orange);">Latent → 이미지</span>
+                </div>
+              </div>
+              <!-- Detail area -->
+              <div id="sd-detail" style="padding: 1rem 1.25rem; border-top: 1px solid var(--color-border); min-height: 60px;">
+                <p class="text-sm" style="color: var(--color-text-dim); margin: 0; text-align: center;">위 노드를 클릭하면 각 구성 요소의 역할을 확인할 수 있습니다</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkpoint breakdown -->
+          <h3 class="text-lg font-semibold mb-4">체크포인트 안에 뭐가 들어있나</h3>
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            체크포인트(.safetensors) 하나에는 <strong style="color: var(--color-text);">3개의 모델</strong>이 합쳐져 있다. ComfyUI에서 Checkpoint Loader의 출력이 MODEL, CLIP, VAE 세 갈래로 나뉘는 이유가 바로 이것이다.
+          </p>
+
+          <div class="module-card mb-6">
+            <div class="module-card-body" style="padding: 0;">
+              <table class="data-table">
+                <thead>
+                  <tr><th>구성 요소</th><th>역할</th><th>비유</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: var(--color-accent-purple); font-family: var(--font-mono); font-size: 0.8rem;">U-Net</td>
+                    <td>노이즈를 제거하는 핵심 엔진. 구조, 디테일, 스타일 결정</td>
+                    <td>그림을 그리는 "손"</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--color-accent-green); font-family: var(--font-mono); font-size: 0.8rem;">CLIP</td>
+                    <td>텍스트 프롬프트를 모델이 이해하는 벡터로 변환</td>
+                    <td>지시를 "통역"하는 번역가</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--color-accent-orange); font-family: var(--font-mono); font-size: 0.8rem;">VAE</td>
+                    <td>Latent ↔ 픽셀 이미지 변환</td>
+                    <td>작업실과 전시장 사이의 "운반책"</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- CLIP details -->
+          <details class="mb-6">
+            <summary>
+              <span style="color: var(--color-accent-green);">&#9679;</span>
+              CLIP 심화 — 토큰 제한과 CLIP Skip
+              <span class="chevron">&#9654;</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-4" style="color: var(--color-text-muted);">
+                <strong style="color: var(--color-text);">CLIP(Contrastive Language-Image Pre-training)</strong>은 텍스트와 이미지를 같은 공간에서 이해하는 모델이다. 프롬프트가 구체적일수록 더 명확한 벡터를 생성한다.
+              </p>
+
+              <!-- Token counter interactive -->
+              <div class="module-card mb-4">
+                <div class="module-card-header">
+                  <span class="module-dot" style="background: var(--color-accent-green);"></span>
+                  토큰 카운터 — 프롬프트를 입력해보세요
+                </div>
+                <div class="module-card-body">
+                  <textarea id="token-input" placeholder="a cinematic photo of a mountain at golden hour, with dramatic clouds and warm light" rows="2" style="width: 100%; background: var(--color-bg-deep); border: 1px solid var(--color-border); border-radius: 6px; padding: 0.75rem; color: var(--color-text); font-size: 0.85rem; font-family: var(--font-sans); resize: vertical;" oninput="updateTokenCount()"></textarea>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                    <span class="text-xs" style="color: var(--color-text-dim);">대략적 토큰 수 (실제 CLIP 토크나이저와 다를 수 있음)</span>
+                    <span id="token-count" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--color-accent-green);">0 / 77</span>
+                  </div>
+                  <div style="margin-top: 0.5rem; height: 6px; background: var(--color-bg-deep); border-radius: 3px; overflow: hidden; border: 1px solid var(--color-border);">
+                    <div id="token-bar" style="height: 100%; width: 0%; background: var(--color-accent-green); border-radius: 3px; transition: all 0.3s;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <ul style="list-style: none; padding: 0;" class="space-y-2 text-sm" style="color: var(--color-text-muted);">
+                <li class="flex gap-2" style="color: var(--color-text-muted);"><span style="color: var(--color-accent-green);">&#9679;</span> <strong style="color: var(--color-text);">토큰 제한:</strong> CLIP은 한 번에 약 77개 토큰만 처리. 긴 프롬프트는 뒷부분이 잘린다</li>
+                <li class="flex gap-2" style="color: var(--color-text-muted);"><span style="color: var(--color-accent-orange);">&#9679;</span> <strong style="color: var(--color-text);">단어 순서:</strong> CLIP은 단어의 순서보다 각 단어의 존재 여부에 더 민감</li>
+                <li class="flex gap-2" style="color: var(--color-text-muted);"><span style="color: var(--color-accent-purple);">&#9679;</span> <strong style="color: var(--color-text);">CLIP Skip:</strong> CLIP의 마지막 레이어를 건너뛰는 기법. Skip 2를 쓰면 더 추상적/예술적 결과 (애니메이션 스타일에서 자주 사용)</li>
+              </ul>
+            </div>
+          </details>
+
+          <!-- Model comparison interactive -->
+          <h3 class="text-lg font-semibold mb-4">모델 비교 — SD 1.5, SDXL, FLUX</h3>
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              모델 카드 — 클릭하여 상세 비교
+            </div>
+            <div class="module-card-body">
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;" id="model-cards">
+                <div class="sampler-card selected" data-model="sd15" onclick="selectModel(this)" style="text-align: left; padding: 1rem;">
+                  <div class="name" style="color: var(--color-accent-blue); margin-bottom: 0.5rem;">SD 1.5</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-dim); margin-bottom: 0.25rem;">512 x 512</div>
+                  <div style="font-size: 0.7rem; color: var(--color-text-dim);">4~6 GB VRAM</div>
+                </div>
+                <div class="sampler-card" data-model="sdxl" onclick="selectModel(this)" style="text-align: left; padding: 1rem;">
+                  <div class="name" style="color: var(--color-accent-purple); margin-bottom: 0.5rem;">SDXL</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-dim); margin-bottom: 0.25rem;">1024 x 1024</div>
+                  <div style="font-size: 0.7rem; color: var(--color-text-dim);">8~12 GB VRAM</div>
+                </div>
+                <div class="sampler-card" data-model="flux" onclick="selectModel(this)" style="text-align: left; padding: 1rem;">
+                  <div class="name" style="color: var(--color-accent-orange); margin-bottom: 0.5rem;">FLUX</div>
+                  <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-dim); margin-bottom: 0.25rem;">1024 x 1024+</div>
+                  <div style="font-size: 0.7rem; color: var(--color-text-dim);">12~24 GB VRAM</div>
+                </div>
+              </div>
+              <div id="model-detail" style="background: var(--color-bg-deep); border-radius: 8px; padding: 1rem 1.25rem; margin-top: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span id="model-detail-name" style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--color-accent-blue);">SD 1.5</span>
+                  <span id="model-detail-clip" class="badge" style="background: color-mix(in srgb, var(--color-accent-green) 15%, transparent); color: var(--color-accent-green); font-size: 0.65rem;">CLIP ViT-L/14</span>
+                </div>
+                <p id="model-detail-desc" class="text-sm" style="color: var(--color-text-muted); margin-bottom: 0.5rem;">가장 가볍고 빠름. LoRA, ControlNet 생태계가 가장 풍부. AnimateDiff 사용 가능.</p>
+                <span id="model-detail-use" class="text-xs" style="color: var(--color-text-dim);">추천: 빠른 실험, 영상 생성(AnimateDiff)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Motivating question -->
+          <div class="callout callout-concept">
+            <div class="callout-label">오늘의 질문</div>
+            <strong style="color: var(--color-text);">"같은 프롬프트인데 왜 결과가 다를까?"</strong><br>
+            <span style="color: var(--color-text-muted);">같은 시드를 써도 설정에 따라 결과가 달라진다. 그 이유가 바로 오늘 다룰 <strong style="color: var(--color-text);">Sampler, Scheduler, CFG, Steps</strong> 때문이다.</span>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 01 — VAE                                -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="vae">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-orange);">01</span>
+          <span class="section-title">VAE — Latent Space의 출입구</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            VAE(Variational Autoencoder)는 <strong style="color: var(--color-text);">이미지 ↔ Latent 변환기</strong>다. Stable Diffusion은 픽셀을 직접 다루지 않고 압축된 Latent Space에서 노이즈를 제거하며 작업한다.
+          </p>
+
+          <!-- Interactive Pipeline -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              VAE 파이프라인 — 클릭하여 데이터 흐름 확인
+            </div>
+            <div class="module-card-body" style="padding: 0;">
+              <div id="vae-pipeline" class="pipeline-flow" style="min-height: 120px;">
+                <!-- txt2img flow -->
+                <div class="pipe-node" data-step="1" style="--node-color: var(--color-accent-purple); background: color-mix(in srgb, var(--color-accent-purple) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-purple) 30%, transparent); color: var(--color-accent-purple);">
+                  Noise
+                  <span class="pipe-data" style="color: var(--color-accent-purple);">랜덤 Latent</span>
+                </div>
+                <div class="pipe-arrow" style="background: var(--color-accent-purple);">
+                  <span style="position:absolute;right:0;top:-3px;border:4px solid transparent;border-left:6px solid var(--color-accent-purple);"></span>
+                </div>
+                <div class="pipe-node" data-step="2" style="--node-color: var(--color-accent-blue); background: color-mix(in srgb, var(--color-accent-blue) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-blue) 30%, transparent); color: var(--color-accent-blue);">
+                  KSampler
+                  <span class="pipe-data" style="color: var(--color-accent-blue);">노이즈 제거</span>
+                </div>
+                <div class="pipe-arrow" style="background: var(--color-accent-blue);">
+                  <span style="position:absolute;right:0;top:-3px;border:4px solid transparent;border-left:6px solid var(--color-accent-blue);"></span>
+                </div>
+                <div class="pipe-node" data-step="3" style="--node-color: var(--color-accent-orange); background: color-mix(in srgb, var(--color-accent-orange) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-orange) 30%, transparent); color: var(--color-accent-orange);">
+                  VAE Decode
+                  <span class="pipe-data" style="color: var(--color-accent-orange);">Latent → Pixel</span>
+                </div>
+                <div class="pipe-arrow" style="background: var(--color-accent-green);">
+                  <span style="position:absolute;right:0;top:-3px;border:4px solid transparent;border-left:6px solid var(--color-accent-green);"></span>
+                </div>
+                <div class="pipe-node" data-step="4" style="--node-color: var(--color-accent-green); background: color-mix(in srgb, var(--color-accent-green) 12%, transparent); border-color: color-mix(in srgb, var(--color-accent-green) 30%, transparent); color: var(--color-accent-green);">
+                  Image
+                  <span class="pipe-data" style="color: var(--color-accent-green);">최종 출력</span>
+                </div>
+              </div>
+              <div class="demo-controls" style="border-radius: 0; border-left: none; border-right: none; border-bottom: none; justify-content: center;">
+                <button class="demo-btn" onclick="animatePipeline('txt2img')">txt2img 흐름</button>
+                <button class="demo-btn" onclick="animatePipeline('img2img')">img2img 흐름</button>
+                <button class="demo-btn" onclick="animatePipeline('reset')">리셋</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">핵심 비유</div>
+            VAE Encode는 <strong>zip 압축</strong>, VAE Decode는 <strong>zip 해제</strong>와 같다. Stable Diffusion은 이 압축된 공간(Latent Space)에서 작업하기 때문에 빠르고 효율적이다.
+          </div>
+
+          <!-- VAE 종류 테이블 -->
+          <h3 class="text-lg font-semibold mb-4">VAE 종류</h3>
+          <div class="module-card mb-6">
+            <div class="module-card-body" style="padding: 0;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>구분</th>
+                    <th>설명</th>
+                    <th>사용 시점</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: var(--color-accent-orange); font-family: var(--font-mono); font-size: 0.8rem;">내장 VAE</td>
+                    <td>체크포인트에 포함된 VAE</td>
+                    <td>기본값. 대부분의 경우 충분</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--color-accent-purple); font-family: var(--font-mono); font-size: 0.8rem;">외부 VAE</td>
+                    <td>별도 VAE 파일 로드 (예: vae-ft-mse-840000)</td>
+                    <td>색감이 탁하거나 디테일이 부족할 때</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--color-accent-green); font-family: var(--font-mono); font-size: 0.8rem;">VAE Decode (Tiled)</td>
+                    <td>타일 단위로 분할 디코딩</td>
+                    <td>VRAM 부족 또는 고해상도 처리 시</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 02 — Sampler                            -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="sampler">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-purple);">02</span>
+          <span class="section-title">Sampler — 노이즈를 제거하는 알고리즘</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            Sampler는 <strong style="color: var(--color-text);">노이즈가 가득한 Latent에서 이미지를 "발견"해내는 알고리즘</strong>이다. 같은 프롬프트, 같은 시드라도 Sampler에 따라 결과가 달라진다.
+          </p>
+
+          <!-- Interactive Sampler Selection -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              Sampler 선택 — 클릭하여 특성 비교
+            </div>
+            <div class="module-card-body">
+              <div class="sampler-grid mb-4" id="sampler-grid">
+                <div class="sampler-card selected" data-sampler="euler" onclick="selectSampler(this)">
+                  <div class="name">Euler</div>
+                  <div class="desc">빠르고 안정적</div>
+                </div>
+                <div class="sampler-card" data-sampler="euler_a" onclick="selectSampler(this)">
+                  <div class="name">Euler a</div>
+                  <div class="desc">창의적 변형</div>
+                </div>
+                <div class="sampler-card" data-sampler="dpmpp_2m" onclick="selectSampler(this)">
+                  <div class="name">DPM++ 2M</div>
+                  <div class="desc">범용 추천</div>
+                </div>
+                <div class="sampler-card" data-sampler="dpmpp_sde" onclick="selectSampler(this)">
+                  <div class="name">DPM++ SDE</div>
+                  <div class="desc">최고 품질</div>
+                </div>
+                <div class="sampler-card" data-sampler="uni_pc" onclick="selectSampler(this)">
+                  <div class="name">UniPC</div>
+                  <div class="desc">적은 Steps OK</div>
+                </div>
+              </div>
+              <!-- Detail panel -->
+              <div id="sampler-detail" style="background: var(--color-bg-deep); border-radius: 8px; padding: 1rem 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span id="sampler-detail-name" style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--color-accent-purple);">Euler</span>
+                  <span id="sampler-detail-type" class="badge" style="background: color-mix(in srgb, var(--color-accent-green) 15%, transparent); color: var(--color-accent-green);">결정론적</span>
+                </div>
+                <p id="sampler-detail-desc" class="text-sm" style="color: var(--color-text-muted); margin-bottom: 0.5rem;">가장 기본적이고 안정적인 Sampler. 입문자에게 추천. 스텝을 늘리면 결과가 수렴한다.</p>
+                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                  <span class="text-xs" style="color: var(--color-text-dim);">권장 Steps: <strong id="sampler-detail-steps" style="color: var(--color-text);">20~30</strong></span>
+                  <span class="text-xs" style="color: var(--color-text-dim);">속도: <strong id="sampler-detail-speed" style="color: var(--color-accent-green);">빠름</strong></span>
+                  <span class="text-xs" style="color: var(--color-text-dim);">용도: <strong id="sampler-detail-use" style="color: var(--color-text);">빠른 테스트, 프롬프트 실험</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Convergence visualization -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              수렴(Convergence) 시각화 — 결정론적 vs 확률적
+            </div>
+            <div class="module-card-body" style="padding: 0;">
+              <canvas id="convergence-canvas" class="demo-canvas" height="200"></canvas>
+              <div class="demo-controls">
+                <button class="demo-btn active" data-conv="deterministic" onclick="setConvergence(this, 'deterministic')">결정론적 (Euler, DPM++ 2M)</button>
+                <button class="demo-btn" data-conv="stochastic" onclick="setConvergence(this, 'stochastic')">확률적 (Euler a, DPM++ SDE)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label">영상 디자이너 팁</div>
+            아이디어 탐색 단계에서는 <strong>Euler a</strong>로 다양한 변형을 보고, 최종 결과물은 <strong>DPM++ 2M Karras</strong>로 안정적인 출력을 얻는 2단계 전략이 효율적이다.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 03 — Scheduler                          -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="scheduler">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-green);">03</span>
+          <span class="section-title">Scheduler — 노이즈 제거의 속도 곡선</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            Scheduler는 <strong style="color: var(--color-text);">각 스텝에서 노이즈를 얼마나 제거할지의 스케줄(시간표)</strong>을 결정한다. Sampler가 "어떻게"라면, Scheduler는 "얼마만큼씩"을 정한다.
+          </p>
+
+          <!-- Interactive Scheduler Curve -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-green);"></span>
+              노이즈 제거 커브 — 클릭하여 비교
+            </div>
+            <div class="module-card-body" style="padding: 0;">
+              <canvas id="scheduler-canvas" class="demo-canvas" height="240"></canvas>
+              <div style="padding: 1rem;">
+                <div class="scheduler-preview" id="scheduler-options">
+                  <div class="scheduler-option" data-sch="normal" onclick="selectScheduler(this)">
+                    <div class="sch-name">Normal</div>
+                    <div style="font-size: 0.7rem; color: var(--color-text-dim);">균등 제거</div>
+                    <div style="font-size: 0.7rem; color: var(--color-text-dim); margin-top: 0.25rem;">무난한 기본값</div>
+                  </div>
+                  <div class="scheduler-option selected" data-sch="karras" onclick="selectScheduler(this)">
+                    <div class="sch-name">Karras</div>
+                    <div style="font-size: 0.7rem; color: var(--color-text-dim);">후반부 집중</div>
+                    <div style="font-size: 0.7rem; color: var(--color-accent-green); margin-top: 0.25rem;">가장 인기</div>
+                  </div>
+                  <div class="scheduler-option" data-sch="exponential" onclick="selectScheduler(this)">
+                    <div class="sch-name">Exponential</div>
+                    <div style="font-size: 0.7rem; color: var(--color-text-dim);">지수적 감소</div>
+                    <div style="font-size: 0.7rem; color: var(--color-text-dim); margin-top: 0.25rem;">강한 대비</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Karras explanation -->
+          <details class="mb-6">
+            <summary>
+              <span style="color: var(--color-accent-green);">&#9679;</span>
+              Karras가 인기 있는 이유
+              <span class="chevron">&#9654;</span>
+            </summary>
+            <div class="details-body text-sm" style="color: var(--color-text-muted);">
+              <p class="mb-3">Normal이 각 스텝마다 동일하게 노이즈를 제거한다면, Karras는 <strong style="color: var(--color-text);">초반에 대략적 구조를 잡고, 후반에 세밀한 디테일에 집중</strong>한다.</p>
+              <ul style="list-style: none; padding: 0;" class="space-y-2">
+                <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> Normal: 30스텝 필요한 품질을 → Karras: 20~25스텝으로 도달</li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> 생성 속도 차이는 5~10% 정도로 미미</li>
+              </ul>
+            </div>
+          </details>
+
+          <!-- Recommended combos -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-green);"></span>
+              추천 조합
+            </div>
+            <div class="module-card-body" style="padding: 0;">
+              <table class="data-table">
+                <thead><tr><th>조합</th><th>용도</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent-green);">DPM++ 2M + Karras</td><td>가장 범용적. 일상 생성의 기본값으로 추천</td></tr>
+                  <tr><td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent-blue);">Euler + Karras</td><td>빠르고 선명. 테스트용</td></tr>
+                  <tr><td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent-purple);">DPM++ SDE + Karras</td><td>최고 품질. 최종 출력용</td></tr>
+                  <tr><td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent-orange);">Euler a + Normal</td><td>창의적 변형 탐색용</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 04 — CFG Scale                          -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="cfg-scale">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-blue);">04</span>
+          <span class="section-title">CFG Scale — 프롬프트 충실도 조절기</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            CFG(Classifier-Free Guidance) Scale은 <strong style="color: var(--color-text);">생성 이미지가 프롬프트를 얼마나 충실히 따를지</strong>를 결정한다.
+          </p>
+
+          <!-- Interactive CFG Slider -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              CFG Scale 시뮬레이터 — 슬라이더를 움직여보세요
+            </div>
+            <div class="module-card-body">
+              <div class="demo-slider-wrap">
+                <label>CFG Scale</label>
+                <input type="range" id="cfg-slider" min="1" max="20" value="7" step="1" oninput="updateCFG(this.value)">
+                <span class="val" id="cfg-value">7</span>
+              </div>
+              <!-- Visual bar -->
+              <div style="margin: 1rem 0; position: relative;">
+                <div style="display: flex; height: 40px; border-radius: 8px; overflow: hidden; border: 1px solid var(--color-border);">
+                  <div id="cfg-bar-creativity" style="background: var(--color-accent-purple); transition: flex 0.3s; flex: 13; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 0.65rem; font-family: var(--font-mono); color: white; opacity: 0.9;">창의성</span>
+                  </div>
+                  <div id="cfg-bar-fidelity" style="background: var(--color-accent-blue); transition: flex 0.3s; flex: 7; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 0.65rem; font-family: var(--font-mono); color: white; opacity: 0.9;">프롬프트 충실도</span>
+                  </div>
+                </div>
+                <!-- Markers -->
+                <div style="display: flex; justify-content: space-between; margin-top: 0.25rem; font-size: 0.6rem; font-family: var(--font-mono); color: var(--color-text-dim);">
+                  <span>1</span><span>5</span><span>10</span><span>15</span><span>20</span>
+                </div>
+              </div>
+              <!-- Description -->
+              <div id="cfg-description" style="background: var(--color-bg-deep); border-radius: 8px; padding: 0.875rem 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                  <span id="cfg-label" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--color-accent-green);">일반적 권장값</span>
+                  <span id="cfg-emoji" style="font-size: 1.2rem;"></span>
+                </div>
+                <p id="cfg-desc-text" class="text-sm" style="color: var(--color-text-muted); margin: 0;">프롬프트 반영과 자연스러움의 균형. "이 지시대로 그려줘"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label">영상 디자이너 팁</div>
+            톤/무드 작업에는 <strong>CFG 5~7</strong>이 자연스러운 컬러 그레이딩 효과를, 그래픽 요소가 강한 작업에는 <strong>CFG 8~10</strong>이 효과적이다.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 05 — Steps                              -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="steps">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-orange);">05</span>
+          <span class="section-title">Steps — 반복 횟수와 품질의 관계</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            Steps는 <strong style="color: var(--color-text);">노이즈 제거를 몇 번 반복할지</strong>를 정한다. 많을수록 좋은 것이 아니라, 수확 체감 지점이 있다.
+          </p>
+
+          <!-- Interactive Steps visualization -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              Steps별 품질 변화 — 슬라이더를 움직여보세요
+            </div>
+            <div class="module-card-body" style="padding: 0;">
+              <canvas id="steps-canvas" class="demo-canvas" height="220"></canvas>
+              <div style="padding: 0.75rem 1rem;">
+                <div class="demo-slider-wrap">
+                  <label>Steps</label>
+                  <input type="range" id="steps-slider" min="5" max="50" value="25" step="5" oninput="updateSteps(this.value)">
+                  <span class="val" id="steps-value">25</span>
+                </div>
+                <div id="steps-desc" style="background: var(--color-bg-deep); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 0.5rem;">
+                  <p class="text-sm" style="color: var(--color-text-muted); margin: 0;"><strong style="color: var(--color-accent-green);">일반적 권장 범위.</strong> 품질과 속도의 최적 균형. 대부분의 생성에 적합하다.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2-stage workflow -->
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label">실전 전략: 2단계 워크플로우</div>
+            <div class="step-list">
+              <div class="step-item"><div><strong style="color: var(--color-text);">탐색 단계:</strong> 10~15 Steps + Euler a → 빠르게 100장 생성, 마음에 드는 시드 선별</div></div>
+              <div class="step-item"><div><strong style="color: var(--color-text);">완성 단계:</strong> 선별한 시드로 25~30 Steps + DPM++ 2M Karras → 고품질 출력</div></div>
+            </div>
+            <p class="text-sm mt-3" style="color: var(--color-text-dim);">전부 고스텝으로 생성하는 것보다 <strong style="color: var(--color-text);">3~8배 빠르면서</strong> 동일한 최종 품질을 얻을 수 있다.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 06 — KSampler Interactive                -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="ksampler">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-purple);">06</span>
+          <span class="section-title">KSampler — 파라미터 종합 시뮬레이터</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <p class="text-sm leading-relaxed mb-6" style="color: var(--color-text-muted);">
+            지금까지 배운 모든 파라미터가 <strong style="color: var(--color-text);">KSampler 노드</strong> 하나에 모여 있다. 아래 시뮬레이터에서 각 값을 조절하며 추천 조합을 확인해보자.
+          </p>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              KSampler 파라미터 시뮬레이터
+            </div>
+            <div class="module-card-body">
+              <div class="ksampler-node mb-4" id="ksampler-sim">
+                <div class="node-title">KSampler</div>
+                <div class="param-row">
+                  <span class="param-name">seed</span>
+                  <span class="param-val" style="color: var(--color-text-dim); font-size: 0.75rem;">42</span>
+                </div>
+                <div class="param-row">
+                  <span class="param-name">steps</span>
+                  <span class="param-val" id="ks-steps">25</span>
+                </div>
+                <div class="param-row">
+                  <span class="param-name">cfg</span>
+                  <span class="param-val" id="ks-cfg">7</span>
+                </div>
+                <div class="param-row">
+                  <span class="param-name">sampler</span>
+                  <span class="param-val" id="ks-sampler">dpmpp_2m</span>
+                </div>
+                <div class="param-row">
+                  <span class="param-name">scheduler</span>
+                  <span class="param-val" id="ks-scheduler">karras</span>
+                </div>
+                <div class="param-row">
+                  <span class="param-name">denoise</span>
+                  <span class="param-val" id="ks-denoise">1.0</span>
+                </div>
+              </div>
+
+              <!-- Preset buttons -->
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+                <button class="demo-btn active" onclick="applyPreset(this, 'default')">기본 추천</button>
+                <button class="demo-btn" onclick="applyPreset(this, 'fast')">빠른 테스트</button>
+                <button class="demo-btn" onclick="applyPreset(this, 'quality')">최고 품질</button>
+                <button class="demo-btn" onclick="applyPreset(this, 'creative')">창의적 탐색</button>
+                <button class="demo-btn" onclick="applyPreset(this, 'img2img')">img2img</button>
+              </div>
+
+              <!-- Preset description -->
+              <div id="preset-desc" style="background: var(--color-bg-deep); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 0.75rem; text-align: center;">
+                <p class="text-sm" style="color: var(--color-text-muted); margin: 0;">DPM++ 2M + Karras, Steps 25, CFG 7 — 일상 생성의 기본값</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 07 — Practice                           -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="practice">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-green);">07</span>
+          <span class="section-title">실습 활동</span>
+        </div>
+
+        <div class="content-block mb-8">
+          <!-- Practice 1 -->
+          <details class="mb-4" open>
+            <summary>
+              <span class="badge badge-practice" style="font-size: 0.65rem;">실습 1</span>
+              XY Plot으로 Sampler/Scheduler 비교표 만들기
+              <span class="chevron">&#9654;</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                Efficiency Nodes의 XY Plot 기능으로 Sampler x Scheduler 조합을 격자 형태로 한 눈에 비교한다.
+              </p>
+              <div class="step-list mb-4">
+                <div class="step-item"><div>ComfyUI Manager에서 <code style="color: var(--color-accent-orange);">efficiency-nodes-comfyui</code> 설치</div></div>
+                <div class="step-item"><div>비교할 프롬프트 준비 (동일 시드 고정)</div></div>
+              </div>
+              <pre class="code-block"><code>설정:
+  X축: Sampler (Euler, Euler a, DPM++ 2M, DPM++ SDE, UniPC)
+  Y축: Scheduler (Normal, Karras, Exponential)
+  고정: Steps 25, CFG 7, 동일 시드
+
+관찰 포인트:
+  - 어떤 조합이 가장 선명한가?
+  - 어떤 조합이 가장 부드러운가?
+  - Ancestral Sampler(Euler a)가 다른 Sampler와 어떻게 다른가?</code></pre>
+            </div>
+          </details>
+
+          <!-- Practice 2 -->
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-practice" style="font-size: 0.65rem;">실습 2</span>
+              CFG Scale 비교
+              <span class="chevron">&#9654;</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                동일 프롬프트 + 시드로 CFG를 XY Plot으로 비교한다.
+              </p>
+              <pre class="code-block"><code>CFG 값: 1, 3, 5, 7, 10, 15
+관찰: 색감, 디테일, 아티팩트의 변화
+목표: "내 작업에 가장 적합한 CFG 범위" 기록</code></pre>
+            </div>
+          </details>
+
+          <!-- Practice 3 -->
+          <details class="mb-4">
+            <summary>
+              <span class="badge badge-practice" style="font-size: 0.65rem;">실습 3</span>
+              Steps 수렴 테스트
+              <span class="chevron">&#9654;</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                DPM++ 2M Karras로 Steps를 변경하며 수렴 지점을 찾는다.
+              </p>
+              <pre class="code-block"><code>Steps: 10, 15, 20, 25, 30, 50
+관찰: 품질 변화가 거의 없어지는 지점
+기록: 자신의 GPU 기준 Steps별 생성 시간 → 최적 지점 찾기</code></pre>
+            </div>
+          </details>
+
+          <!-- Practice 4 -->
+          <details class="mb-4">
+            <summary>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-border) 40%, transparent); color: var(--color-text-muted); font-size: 0.65rem;">선택</span>
+              VAE 교체 실험
+              <span class="chevron">&#9654;</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm" style="color: var(--color-text-muted);">
+                체크포인트 내장 VAE vs 외부 VAE (<code style="color: var(--color-accent-orange);">vae-ft-mse-840000</code>) 비교. 색감과 디테일의 차이를 관찰한다.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- 08 — References                         -->
+      <!-- ════════════════════════════════════════ -->
+      <section class="lecture-section" id="references">
+        <div class="section-label">
+          <span class="section-num" style="color: var(--color-accent-blue);">08</span>
+          <span class="section-title">참고 자료</span>
+        </div>
+
+        <div class="content-block">
+          <div class="module-card mb-4">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              Sampler & Scheduler
+            </div>
+            <div class="module-card-body">
+              <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+                <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span><a href="https://stable-diffusion-art.com/samplers/" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">Sampler 종합 가이드 — Stable Diffusion Art</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span><a href="https://www.apatero.com/blog/comfyui-sampler-selection-guide-2025" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">ComfyUI Sampler 선택 가이드 — Apatero</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span><a href="https://www.apatero.com/blog/comfyui-scheduler-selection-guide-2025" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">ComfyUI Scheduler 선택 가이드 — Apatero</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span><a href="https://comfyui.dev/docs/guides/Other%20Resources/sampler-and-scheduler-compatibility-matrix/" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">Sampler/Scheduler 호환성 매트릭스</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span><a href="https://civitai.com/articles/7484/understanding-stable-diffusion-samplers-beyond-image-comparisons" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">Sampler 심화 이해 — Civitai</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span><a href="https://civitai.com/articles/16231/sampler-and-scheduler-reference-for-hi-dream-flux-sdxl-illustrious-and-pony" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">모델별 Sampler/Scheduler 레퍼런스 — Civitai</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="module-card mb-4">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              VAE & 기타
+            </div>
+            <div class="module-card-body">
+              <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span><a href="https://comfyui-wiki.com/en/comfyui-nodes/latent/vae-decode" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">VAE Decode 노드 — ComfyUI Wiki</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span><a href="https://comfyui-wiki.com/en/comfyui-nodes/latent/vae-encode" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">VAE Encode 노드 — ComfyUI Wiki</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span><a href="https://vantagewithai.com/understanding-schedulers-in-comfyui-the-hidden-engine-behind-your-ai-image-quality/" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">Scheduler 이해하기 — Vantage with AI</a></li>
+                <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span><a href="https://learn.runcomfy.com/comfyui-xy-plots-for-enhanced-data-analysis-and-visualization" target="_blank" rel="noopener" style="color: var(--color-accent-blue); text-decoration: none;">XY Plot 튜토리얼 — RunComfy</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Next class preview -->
+          <div class="callout callout-concept">
+            <div class="callout-label">다음 수업 예고</div>
+            4주차에서는 <strong>체크포인트와 모델 생태계</strong>를 다룬다. SD 1.5, SDXL, FLUX 모델의 차이를 이해하고, Civitai에서 목적에 맞는 모델을 찾고 평가하는 방법을 배운다.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ═══ Footer ═══ -->
+      <footer class="mt-20 flex items-center justify-between" style="color: var(--color-text-dim);">
+        <a href="./" style="color: var(--color-text-dim); text-decoration: none; font-size: 0.75rem;" class="hover:text-[var(--color-text-muted)] transition-colors flex items-center gap-2">
+          <span class="sig-led sig-led-orange" style="width: 4px; height: 4px; box-shadow: none;"></span>
+          <span class="sig-label">&larr; ComfyUI 기초 강의</span>
+        </a>
+      </footer>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- Interactive Scripts                      -->
+    <!-- ════════════════════════════════════════ -->
+    <script type="module">
+      import { initCodeCopy, initPdfExport } from "/shared/components.js";
+      initCodeCopy();
+      initPdfExport();
+
+      // ─── Theme colors ───
+      const C = {
+        orange: '#d98c52', purple: '#9e80d4', green: '#5cb87a',
+        blue: '#5ba0d9', dim: '#555560', border: '#333338',
+        bg: '#141417', text: '#dcdce0', muted: '#78787f'
+      };
+
+      // ─── SD Pipeline Detail ───
+      const sdDetails = {
+        prompt: {
+          name: '텍스트 프롬프트',
+          color: C.muted,
+          desc: '사용자가 입력하는 텍스트 지시. "a cinematic photo of..." 같은 설명이 이미지 생성의 출발점이 된다. 프롬프트가 구체적일수록 의도에 가까운 결과를 얻을 수 있다.',
+        },
+        clip: {
+          name: 'CLIP — 텍스트 인코더',
+          color: C.green,
+          desc: '텍스트 프롬프트를 모델이 이해하는 숫자 벡터(임베딩)로 변환한다. 이 벡터가 U-Net에 "이런 방향으로 노이즈를 제거해라"는 가이드 역할을 한다. 약 77개 토큰 제한이 있다.',
+        },
+        unet: {
+          name: 'U-Net — 노이즈 제거 엔진',
+          color: C.purple,
+          desc: '이미지의 구조, 디테일, 스타일을 결정하는 핵심 엔진. Latent Space에서 노이즈를 반복적으로 제거하며 이미지를 "발견"한다. Sampler, Scheduler, CFG, Steps는 모두 이 U-Net의 동작 방식을 제어하는 파라미터다.',
+        },
+        vae: {
+          name: 'VAE — Latent ↔ 이미지 변환기',
+          color: C.orange,
+          desc: 'U-Net이 만든 Latent 결과를 실제 픽셀 이미지로 변환(Decode)한다. img2img에서는 반대로 이미지를 Latent로 압축(Encode)하는 역할도 한다. 오늘 첫 번째로 다룰 주제.',
+        },
+      };
+
+      window.showSDDetail = function(el) {
+        document.querySelectorAll('.sd-pipe-node').forEach(n => n.classList.remove('highlight'));
+        el.classList.add('highlight');
+        const d = sdDetails[el.dataset.comp];
+        const detail = document.getElementById('sd-detail');
+        detail.innerHTML = `
+          <div style="margin-bottom: 0.25rem;">
+            <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: ${d.color};">${d.name}</span>
+          </div>
+          <p class="text-sm" style="color: var(--color-text-muted); margin: 0;">${d.desc}</p>
+        `;
+      };
+
+      // ─── Token Counter ───
+      window.updateTokenCount = function() {
+        const text = document.getElementById('token-input').value;
+        // Rough approximation: split by spaces, commas, punctuation
+        const tokens = text.trim() ? text.trim().split(/[\s,]+/).length : 0;
+        const count = Math.min(tokens, 150);
+        const countEl = document.getElementById('token-count');
+        const bar = document.getElementById('token-bar');
+        const pct = Math.min(count / 77 * 100, 100);
+
+        countEl.textContent = `${count} / 77`;
+        bar.style.width = pct + '%';
+
+        if (count > 77) {
+          countEl.style.color = '#d45b5b';
+          bar.style.background = '#d45b5b';
+        } else if (count > 60) {
+          countEl.style.color = C.orange;
+          bar.style.background = C.orange;
+        } else {
+          countEl.style.color = C.green;
+          bar.style.background = C.green;
+        }
+      };
+
+      // ─── Model Selection ───
+      const modelData = {
+        sd15: {
+          name: 'SD 1.5', color: C.blue,
+          clip: 'CLIP ViT-L/14',
+          desc: '가장 가볍고 빠름. LoRA, ControlNet 생태계가 가장 풍부. AnimateDiff 사용 가능.',
+          use: '추천: 빠른 실험, 영상 생성(AnimateDiff)',
+        },
+        sdxl: {
+          name: 'SDXL', color: C.purple,
+          clip: 'CLIP ViT-L/14 + OpenCLIP ViT-bigG (듀얼)',
+          desc: '고해상도, 디테일 향상. 듀얼 CLIP으로 프롬프트 이해력이 크게 향상됨.',
+          use: '추천: 고품질 스틸 이미지, 콘셉트 아트',
+        },
+        flux: {
+          name: 'FLUX', color: C.orange,
+          clip: 'T5-XXL (텍스트 인코더)',
+          desc: 'Black Forest Labs 개발. 텍스트 렌더링, 손, 복잡한 구도에서 탁월. CLIP 대신 T5 사용.',
+          use: '추천: 텍스트가 포함된 디자인, 정교한 구도',
+        },
+      };
+
+      window.selectModel = function(el) {
+        document.querySelectorAll('#model-cards .sampler-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        const d = modelData[el.dataset.model];
+        document.getElementById('model-detail-name').textContent = d.name;
+        document.getElementById('model-detail-name').style.color = d.color;
+        document.getElementById('model-detail-clip').textContent = d.clip;
+        document.getElementById('model-detail-desc').textContent = d.desc;
+        document.getElementById('model-detail-use').textContent = d.use;
+      };
+
+      // ─── VAE Pipeline Animation ───
+      window.animatePipeline = function(mode) {
+        const pipeline = document.getElementById('vae-pipeline');
+        const nodes = pipeline.querySelectorAll('.pipe-node');
+        const datas = pipeline.querySelectorAll('.pipe-data');
+
+        // Reset
+        nodes.forEach(n => n.classList.remove('highlight'));
+        datas.forEach(d => d.classList.remove('show'));
+
+        if (mode === 'reset') return;
+
+        let steps;
+        if (mode === 'txt2img') {
+          steps = [0, 1, 2, 3]; // Noise → KSampler → VAE Decode → Image
+        } else {
+          steps = [3, 2, 1, 2, 3]; // conceptual: highlight in order showing encode path
+        }
+
+        steps.forEach((idx, i) => {
+          setTimeout(() => {
+            nodes.forEach(n => n.classList.remove('highlight'));
+            datas.forEach(d => d.classList.remove('show'));
+            nodes[idx].classList.add('highlight');
+            nodes[idx].querySelector('.pipe-data').classList.add('show');
+          }, i * 600);
+        });
+      };
+
+      // ─── Sampler Selection ───
+      const samplerData = {
+        euler:      { name: 'Euler', type: '결정론적', typeColor: C.green, desc: '가장 기본적이고 안정적인 Sampler. 입문자에게 추천. 스텝을 늘리면 결과가 수렴한다.', steps: '20~30', speed: '빠름', speedColor: C.green, use: '빠른 테스트, 프롬프트 실험' },
+        euler_a:    { name: 'Euler a', type: '확률적', typeColor: C.orange, desc: '매 스텝마다 랜덤 노이즈를 추가하여 같은 시드라도 다양한 결과를 생성. 수렴하지 않는다.', steps: '25~30', speed: '빠름', speedColor: C.green, use: '다양한 변형 탐색, 창의적 실험' },
+        dpmpp_2m:   { name: 'DPM++ 2M', type: '결정론적', typeColor: C.green, desc: '품질과 속도의 균형이 가장 뛰어난 범용 Sampler. 일상적인 생성에 가장 추천.', steps: '20~30', speed: '보통', speedColor: C.blue, use: '일상적인 생성 (가장 추천)' },
+        dpmpp_sde:  { name: 'DPM++ SDE', type: '확률적', typeColor: C.orange, desc: 'SDE 기반으로 풍부한 디테일을 생성. 느리지만 최고 품질을 목표로 할 때 사용.', steps: '25~40', speed: '느림', speedColor: C.orange, use: '최종 결과물, 포트폴리오' },
+        uni_pc:     { name: 'UniPC', type: '결정론적', typeColor: C.green, desc: '적은 스텝으로도 빠르게 수렴하는 효율적인 Sampler. 배치 작업에 유용.', steps: '15~20', speed: '빠름', speedColor: C.green, use: '빠른 프리뷰, 배치 작업' },
+      };
+
+      window.selectSampler = function(el) {
+        document.querySelectorAll('.sampler-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        const d = samplerData[el.dataset.sampler];
+        document.getElementById('sampler-detail-name').textContent = d.name;
+        const typeEl = document.getElementById('sampler-detail-type');
+        typeEl.textContent = d.type;
+        typeEl.style.background = `color-mix(in srgb, ${d.typeColor} 15%, transparent)`;
+        typeEl.style.color = d.typeColor;
+        document.getElementById('sampler-detail-desc').textContent = d.desc;
+        document.getElementById('sampler-detail-steps').textContent = d.steps;
+        const speedEl = document.getElementById('sampler-detail-speed');
+        speedEl.textContent = d.speed;
+        speedEl.style.color = d.speedColor;
+        document.getElementById('sampler-detail-use').textContent = d.use;
+      };
+
+      // ─── Convergence Canvas ───
+      const convCanvas = document.getElementById('convergence-canvas');
+      const convCtx = convCanvas.getContext('2d');
+      let convMode = 'deterministic';
+
+      function drawConvergence() {
+        const dpr = window.devicePixelRatio || 2;
+        const cssW = convCanvas.clientWidth;
+        const cssH = convCanvas.clientHeight;
+        convCanvas.width = cssW * dpr;
+        convCanvas.height = cssH * dpr;
+        convCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cw = cssW, ch = cssH;
+        convCtx.clearRect(0, 0, cw, ch);
+
+        const pad = { l: 50, r: 20, t: 20, b: 35 };
+        const gw = cw - pad.l - pad.r, gh = ch - pad.t - pad.b;
+
+        // Axes
+        convCtx.strokeStyle = C.border;
+        convCtx.lineWidth = 1;
+        convCtx.beginPath();
+        convCtx.moveTo(pad.l, pad.t);
+        convCtx.lineTo(pad.l, pad.t + gh);
+        convCtx.lineTo(pad.l + gw, pad.t + gh);
+        convCtx.stroke();
+
+        // Labels
+        convCtx.fillStyle = C.dim;
+        convCtx.font = '10px monospace';
+        convCtx.textAlign = 'center';
+        convCtx.fillText('Steps →', pad.l + gw / 2, ch - 5);
+        convCtx.save();
+        convCtx.translate(12, pad.t + gh / 2);
+        convCtx.rotate(-Math.PI / 2);
+        convCtx.fillText('변화량', 0, 0);
+        convCtx.restore();
+
+        // Step markers
+        const steps = [5, 10, 15, 20, 25, 30, 40, 50];
+        steps.forEach(s => {
+          const x = pad.l + (s / 50) * gw;
+          convCtx.fillStyle = C.dim;
+          convCtx.fillText(s, x, pad.t + gh + 14);
+        });
+
+        // Draw curves
+        const numPoints = 50;
+        if (convMode === 'deterministic') {
+          // Smooth convergence
+          convCtx.beginPath();
+          convCtx.strokeStyle = C.green;
+          convCtx.lineWidth = 2;
+          for (let i = 0; i < numPoints; i++) {
+            const t = i / (numPoints - 1);
+            const x = pad.l + t * gw;
+            const y = pad.t + gh - gh * Math.exp(-t * 4) * 0.85;
+            i === 0 ? convCtx.moveTo(x, y) : convCtx.lineTo(x, y);
+          }
+          convCtx.stroke();
+
+          // Convergence zone
+          convCtx.fillStyle = `rgba(92, 184, 122, 0.08)`;
+          convCtx.fillRect(pad.l + 0.4 * gw, pad.t, gw * 0.6, gh);
+          convCtx.fillStyle = C.green;
+          convCtx.font = '9px monospace';
+          convCtx.fillText('수렴 영역', pad.l + 0.7 * gw, pad.t + 14);
+        } else {
+          // Stochastic - keeps fluctuating
+          const seed = 12345;
+          let rng = seed;
+          const pseudoRandom = () => { rng = (rng * 16807 + 0) % 2147483647; return rng / 2147483647; };
+
+          convCtx.beginPath();
+          convCtx.strokeStyle = C.orange;
+          convCtx.lineWidth = 2;
+          for (let i = 0; i < numPoints; i++) {
+            const t = i / (numPoints - 1);
+            const x = pad.l + t * gw;
+            const base = Math.exp(-t * 2) * 0.5 + 0.3;
+            const noise = (pseudoRandom() - 0.5) * 0.3;
+            const y = pad.t + gh - gh * (base + noise);
+            i === 0 ? convCtx.moveTo(x, y) : convCtx.lineTo(x, y);
+          }
+          convCtx.stroke();
+
+          convCtx.fillStyle = C.orange;
+          convCtx.font = '9px monospace';
+          convCtx.fillText('수렴하지 않음 — 계속 변화', pad.l + 0.5 * gw, pad.t + 14);
+        }
+      }
+
+      window.setConvergence = function(btn, mode) {
+        convMode = mode;
+        document.querySelectorAll('[data-conv]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        drawConvergence();
+      };
+
+      // ─── Scheduler Curve Canvas ───
+      const schCanvas = document.getElementById('scheduler-canvas');
+      const schCtx = schCanvas.getContext('2d');
+      let selectedScheduler = 'karras';
+
+      const schedulerCurves = {
+        normal: (t) => 1 - t,
+        karras: (t) => {
+          const sigMax = 14.6, sigMin = 0.03;
+          const sigma = (sigMax ** (1/7) * (1 - t) + sigMin ** (1/7) * t) ** 7;
+          return sigma / sigMax;
+        },
+        exponential: (t) => Math.exp(-t * 5),
+      };
+
+      function drawScheduler() {
+        const dpr = window.devicePixelRatio || 2;
+        const cssW = schCanvas.clientWidth;
+        const cssH = schCanvas.clientHeight;
+        schCanvas.width = cssW * dpr;
+        schCanvas.height = cssH * dpr;
+        schCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cw = cssW, ch = cssH;
+        schCtx.clearRect(0, 0, cw, ch);
+
+        const pad = { l: 50, r: 20, t: 25, b: 35 };
+        const gw = cw - pad.l - pad.r, gh = ch - pad.t - pad.b;
+
+        // Grid
+        schCtx.strokeStyle = `rgba(51,51,56,0.5)`;
+        schCtx.lineWidth = 0.5;
+        for (let i = 0; i <= 4; i++) {
+          const y = pad.t + (i / 4) * gh;
+          schCtx.beginPath(); schCtx.moveTo(pad.l, y); schCtx.lineTo(pad.l + gw, y); schCtx.stroke();
+        }
+
+        // Axes
+        schCtx.strokeStyle = C.border;
+        schCtx.lineWidth = 1;
+        schCtx.beginPath();
+        schCtx.moveTo(pad.l, pad.t);
+        schCtx.lineTo(pad.l, pad.t + gh);
+        schCtx.lineTo(pad.l + gw, pad.t + gh);
+        schCtx.stroke();
+
+        // Labels
+        schCtx.fillStyle = C.dim;
+        schCtx.font = '10px monospace';
+        schCtx.textAlign = 'center';
+        schCtx.fillText('Step 진행 →', pad.l + gw / 2, ch - 5);
+        schCtx.save();
+        schCtx.translate(12, pad.t + gh / 2);
+        schCtx.rotate(-Math.PI / 2);
+        schCtx.fillText('노이즈 레벨', 0, 0);
+        schCtx.restore();
+
+        // Y-axis labels
+        schCtx.textAlign = 'right';
+        ['100%', '75%', '50%', '25%', '0%'].forEach((label, i) => {
+          schCtx.fillText(label, pad.l - 6, pad.t + (i / 4) * gh + 4);
+        });
+        schCtx.textAlign = 'center';
+
+        // Draw all curves dimly, selected one brightly
+        const colors = { normal: C.blue, karras: C.green, exponential: C.orange };
+        const names = { normal: 'Normal', karras: 'Karras', exponential: 'Exponential' };
+
+        for (const [name, fn] of Object.entries(schedulerCurves)) {
+          const isSelected = name === selectedScheduler;
+          schCtx.beginPath();
+          schCtx.strokeStyle = isSelected ? colors[name] : `rgba(85,85,96,0.3)`;
+          schCtx.lineWidth = isSelected ? 2.5 : 1;
+
+          const numPts = 80;
+          for (let i = 0; i <= numPts; i++) {
+            const t = i / numPts;
+            const x = pad.l + t * gw;
+            const y = pad.t + (1 - fn(t)) * gh;
+            i === 0 ? schCtx.moveTo(x, y) : schCtx.lineTo(x, y);
+          }
+          schCtx.stroke();
+
+          // Label at end
+          if (isSelected) {
+            const endY = pad.t + (1 - fn(1)) * gh;
+            schCtx.fillStyle = colors[name];
+            schCtx.font = 'bold 10px monospace';
+            schCtx.textAlign = 'left';
+            schCtx.fillText(names[name], pad.l + gw + 4, endY + 3);
+            schCtx.textAlign = 'center';
+          }
+        }
+
+        // Fill area under selected curve
+        const fn = schedulerCurves[selectedScheduler];
+        schCtx.beginPath();
+        schCtx.moveTo(pad.l, pad.t + gh);
+        for (let i = 0; i <= 80; i++) {
+          const t = i / 80;
+          schCtx.lineTo(pad.l + t * gw, pad.t + (1 - fn(t)) * gh);
+        }
+        schCtx.lineTo(pad.l + gw, pad.t + gh);
+        schCtx.closePath();
+        schCtx.fillStyle = `${colors[selectedScheduler]}10`;
+        schCtx.fill();
+      }
+
+      window.selectScheduler = function(el) {
+        document.querySelectorAll('.scheduler-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedScheduler = el.dataset.sch;
+        drawScheduler();
+      };
+
+      // ─── CFG Slider ───
+      const cfgRanges = [
+        { min: 1, max: 3, label: '프롬프트 거의 무시', color: C.purple, desc: '모델 자유도 최대. 추상적이고 드리미한 결과. "알아서 그려봐"' },
+        { min: 4, max: 6, label: '부드럽고 자연스러움', color: C.blue, desc: '약간의 창의적 해석. 자연스러운 톤과 무드. "대략 이런 느낌으로"' },
+        { min: 7, max: 8, label: '일반적 권장값', color: C.green, desc: '프롬프트 반영과 자연스러움의 균형. "이 지시대로 그려줘"' },
+        { min: 9, max: 12, label: '강한 프롬프트 추종', color: C.orange, desc: '색감이 진해지고 대비 증가. 그래픽 요소 강한 작업에 효과적. "정확히 이대로!"' },
+        { min: 13, max: 20, label: '과포화 위험', color: '#d45b5b', desc: '아티팩트 발생 위험. 이미지 깨짐 시작. "과하게 힘을 줌"' },
+      ];
+
+      window.updateCFG = function(val) {
+        val = parseInt(val);
+        document.getElementById('cfg-value').textContent = val;
+
+        // Update bar
+        const creativity = 20 - val;
+        const fidelity = val;
+        document.getElementById('cfg-bar-creativity').style.flex = creativity;
+        document.getElementById('cfg-bar-fidelity').style.flex = fidelity;
+
+        // Find range
+        const range = cfgRanges.find(r => val >= r.min && val <= r.max);
+        if (range) {
+          document.getElementById('cfg-label').textContent = range.label;
+          document.getElementById('cfg-label').style.color = range.color;
+          document.getElementById('cfg-desc-text').textContent = range.desc;
+        }
+
+        // Slider accent
+        document.getElementById('cfg-slider').style.accentColor = range ? range.color : C.blue;
+      };
+
+      // ─── Steps Canvas ───
+      const stepsCanvas = document.getElementById('steps-canvas');
+      const stepsCtx = stepsCanvas.getContext('2d');
+
+      function drawSteps(currentSteps) {
+        const dpr = window.devicePixelRatio || 2;
+        const cssW = stepsCanvas.clientWidth;
+        const cssH = stepsCanvas.clientHeight;
+        stepsCanvas.width = cssW * dpr;
+        stepsCanvas.height = cssH * dpr;
+        stepsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cw = cssW, ch = cssH;
+        stepsCtx.clearRect(0, 0, cw, ch);
+
+        const pad = { l: 50, r: 20, t: 25, b: 35 };
+        const gw = cw - pad.l - pad.r, gh = ch - pad.t - pad.b;
+
+        // Grid
+        stepsCtx.strokeStyle = `rgba(51,51,56,0.5)`;
+        stepsCtx.lineWidth = 0.5;
+        for (let i = 0; i <= 4; i++) {
+          const y = pad.t + (i / 4) * gh;
+          stepsCtx.beginPath(); stepsCtx.moveTo(pad.l, y); stepsCtx.lineTo(pad.l + gw, y); stepsCtx.stroke();
+        }
+
+        // Axes
+        stepsCtx.strokeStyle = C.border;
+        stepsCtx.lineWidth = 1;
+        stepsCtx.beginPath();
+        stepsCtx.moveTo(pad.l, pad.t); stepsCtx.lineTo(pad.l, pad.t + gh);
+        stepsCtx.lineTo(pad.l + gw, pad.t + gh); stepsCtx.stroke();
+
+        // Labels
+        stepsCtx.fillStyle = C.dim;
+        stepsCtx.font = '10px monospace';
+        stepsCtx.textAlign = 'center';
+        stepsCtx.fillText('Steps →', pad.l + gw / 2, ch - 5);
+
+        // Step markers
+        [5, 10, 15, 20, 25, 30, 40, 50].forEach(s => {
+          const x = pad.l + (s / 50) * gw;
+          stepsCtx.fillText(s, x, pad.t + gh + 14);
+        });
+
+        stepsCtx.save();
+        stepsCtx.translate(12, pad.t + gh / 2);
+        stepsCtx.rotate(-Math.PI / 2);
+        stepsCtx.fillText('품질', 0, 0);
+        stepsCtx.restore();
+
+        // Quality curve (logarithmic growth with plateau)
+        const qualityFn = (s) => 1 - Math.exp(-s / 12);
+
+        // Fill optimal zone (20-30)
+        stepsCtx.fillStyle = 'rgba(92, 184, 122, 0.06)';
+        const x20 = pad.l + (20 / 50) * gw;
+        const x30 = pad.l + (30 / 50) * gw;
+        stepsCtx.fillRect(x20, pad.t, x30 - x20, gh);
+
+        stepsCtx.fillStyle = C.green;
+        stepsCtx.font = '8px monospace';
+        stepsCtx.textAlign = 'center';
+        stepsCtx.fillText('권장 범위', (x20 + x30) / 2, pad.t + 12);
+
+        // Draw curve
+        stepsCtx.beginPath();
+        stepsCtx.strokeStyle = C.blue;
+        stepsCtx.lineWidth = 2;
+        for (let s = 1; s <= 50; s++) {
+          const x = pad.l + (s / 50) * gw;
+          const y = pad.t + gh - qualityFn(s) * gh * 0.9;
+          s === 1 ? stepsCtx.moveTo(x, y) : stepsCtx.lineTo(x, y);
+        }
+        stepsCtx.stroke();
+
+        // Current position marker
+        const cx = pad.l + (currentSteps / 50) * gw;
+        const cy = pad.t + gh - qualityFn(currentSteps) * gh * 0.9;
+
+        stepsCtx.beginPath();
+        stepsCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+        stepsCtx.fillStyle = C.orange;
+        stepsCtx.fill();
+        stepsCtx.strokeStyle = C.bg;
+        stepsCtx.lineWidth = 2;
+        stepsCtx.stroke();
+
+        // Vertical line
+        stepsCtx.beginPath();
+        stepsCtx.strokeStyle = `${C.orange}40`;
+        stepsCtx.lineWidth = 1;
+        stepsCtx.setLineDash([4, 4]);
+        stepsCtx.moveTo(cx, cy + 7);
+        stepsCtx.lineTo(cx, pad.t + gh);
+        stepsCtx.stroke();
+        stepsCtx.setLineDash([]);
+      }
+
+      const stepsDescs = {
+        5:  { text: '매우 거친 결과. 구도 확인 정도만 가능.', color: C.orange },
+        10: { text: '빠른 프리뷰. 구조가 잡히기 시작하지만 디테일 부족.', color: C.orange },
+        15: { text: '대부분의 구조가 잡힘. 빠른 아이디어 탐색에 적합.', color: C.blue },
+        20: { text: '권장 범위 시작. 대부분의 생성에 충분한 품질.', color: C.green },
+        25: { text: '일반적 권장 범위. 품질과 속도의 최적 균형.', color: C.green },
+        30: { text: '권장 범위 상한. 복잡한 장면의 미세한 디테일 개선.', color: C.green },
+        35: { text: '미세한 개선만 있음. 대부분의 경우 30 Steps와 차이 미미.', color: C.blue },
+        40: { text: '디테일 추가 있으나 시간 대비 효율 낮음.', color: C.muted },
+        45: { text: '대부분의 Sampler에서 품질 변화 미미. 시간 낭비 가능.', color: C.muted },
+        50: { text: '수확 체감 영역. 특수한 경우가 아니면 불필요.', color: C.dim },
+      };
+
+      window.updateSteps = function(val) {
+        val = parseInt(val);
+        document.getElementById('steps-value').textContent = val;
+        drawSteps(val);
+        const desc = stepsDescs[val];
+        if (desc) {
+          const el = document.getElementById('steps-desc').querySelector('p');
+          el.innerHTML = `<strong style="color: ${desc.color};">${val <= 10 ? '매우 거침' : val <= 15 ? '빠른 프리뷰' : val <= 30 ? '일반적 권장 범위' : val <= 35 ? '미세한 개선' : '수확 체감'}.</strong> ${desc.text}`;
+        }
+        document.getElementById('steps-slider').style.accentColor = desc ? desc.color : C.blue;
+      };
+
+      // ─── KSampler Presets ───
+      const presets = {
+        default:  { steps: 25, cfg: 7, sampler: 'dpmpp_2m', scheduler: 'karras', denoise: '1.0', desc: 'DPM++ 2M + Karras, Steps 25, CFG 7 — 일상 생성의 기본값' },
+        fast:     { steps: 12, cfg: 7, sampler: 'euler', scheduler: 'karras', denoise: '1.0', desc: 'Euler + Karras, Steps 12 — 빠른 테스트와 아이디어 스케치' },
+        quality:  { steps: 35, cfg: 7, sampler: 'dpmpp_sde', scheduler: 'karras', denoise: '1.0', desc: 'DPM++ SDE + Karras, Steps 35 — 최종 포트폴리오 출력' },
+        creative: { steps: 25, cfg: 5, sampler: 'euler_ancestral', scheduler: 'normal', denoise: '1.0', desc: 'Euler a + Normal, CFG 5 — 자유로운 변형 탐색' },
+        img2img:  { steps: 25, cfg: 7, sampler: 'dpmpp_2m', scheduler: 'karras', denoise: '0.55', desc: 'img2img: denoise 0.55로 원본의 구조를 유지하면서 변형' },
+      };
+
+      window.applyPreset = function(btn, name) {
+        const p = presets[name];
+        const sim = document.getElementById('ksampler-sim');
+
+        // Button state
+        btn.parentElement.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Animate values
+        ['steps', 'cfg', 'sampler', 'scheduler', 'denoise'].forEach(key => {
+          const el = document.getElementById(`ks-${key}`);
+          el.textContent = p[key];
+          el.classList.add('changed');
+          setTimeout(() => el.classList.remove('changed'), 600);
+        });
+
+        document.getElementById('preset-desc').querySelector('p').textContent = p.desc;
+      };
+
+      // ─── Initial draws ───
+      function initCanvases() {
+        drawConvergence();
+        drawScheduler();
+        drawSteps(25);
+      }
+
+      // Handle resize
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(initCanvases, 150);
+      });
+
+      // Init when DOM ready
+      initCanvases();
+    </script>
+  </body>
+</html>

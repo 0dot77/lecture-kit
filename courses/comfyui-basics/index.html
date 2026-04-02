@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ComfyUI 기초 강의</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <span style="color: var(--color-text-muted);">ComfyUI 기초 강의</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-orange sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-orange"></span>
+          <span class="sig-led sig-led-purple sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-purple"></span>
+          <span class="sig-led sig-led-green sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">Course — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          ComfyUI 기초 강의
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          ComfyUI for Video Designers — 13주 커리큘럼
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-orange), var(--color-accent-purple), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- Course Info -->
+      <div class="module-card mb-12">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+          강의 정보
+        </div>
+        <div class="module-card-body">
+          <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> 대상: 영상 디자이너 (입문~초급)</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> 수업 시간: 주 1회, 2~3시간</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> 도구: ComfyUI (로컬 설치)</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> 전제 조건: GPU 탑재 PC (VRAM 8GB 이상 권장)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Week List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">주차별 강의</h2>
+          <div class="sig-cable sig-cable-orange" style="max-width: 40px;"></div>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <!-- Week 1 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">01</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">Stable Diffusion 기본 원리와 ComfyUI 설치</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              Diffusion, Latent Space, 노드 기초, txt2img 워크플로우
+            </p>
+          </div>
+
+          <!-- Week 2 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">02</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">CLIP과 프롬프트 엔지니어링</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              CLIP, 프롬프트 엔지니어링, 토큰, 네거티브 프롬프트
+            </p>
+          </div>
+
+          <!-- Week 3 -->
+          <a href="./week-03.html" class="course-panel group">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">03</span>
+              <span class="sig-led sig-led-orange" style="width: 5px; height: 5px;"></span>
+              <h3 class="font-semibold group-hover:text-[var(--color-accent-orange)] transition-colors">
+                VAE, Sampler, Scheduler 깊이 파기
+              </h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              VAE, CFG Scale, Euler, DPM++, Karras, Steps 트레이드오프
+            </p>
+            <div class="flex items-center gap-2 mt-4 ml-[3.3rem] flex-wrap">
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">VAE</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent); color: var(--color-accent-purple);">Sampler</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-green) 15%, transparent); color: var(--color-accent-green);">Scheduler</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">CFG</span>
+            </div>
+          </a>
+
+          <!-- Week 4 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">04</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">ControlNet 기초</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              Canny, Depth, OpenPose, Lineart
+            </p>
+          </div>
+
+          <!-- Week 5 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">05</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">ControlNet 심화</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              멀티 ControlNet, Tile, 가중치 조절
+            </p>
+          </div>
+
+          <!-- Week 6 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">06</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">IP-Adapter</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              스타일 전이, 무드보드, FaceID
+            </p>
+          </div>
+
+          <!-- Week 7 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">07</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">Inpainting & Outpainting</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              마스크, Denoising, 부분 수정, 이미지 확장
+            </p>
+          </div>
+
+          <!-- Week 8 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">08</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">업스케일링 & 후처리 파이프라인</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              ESRGAN, Tiled, Face Restore, 4K 출력
+            </p>
+          </div>
+
+          <!-- Week 9 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">09</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">LoRA</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              스타일 LoRA, 학습, 멀티 LoRA
+            </p>
+          </div>
+
+          <!-- Week 10 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">10</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">AnimateDiff 기초</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              txt2vid, 모션 모듈, 프롬프트 스케줄링
+            </p>
+          </div>
+
+          <!-- Week 11 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">11</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">AnimateDiff 심화 & Wan 2.x</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              ControlNet 연동, Wan 2.1/2.2, 비디오 모델
+            </p>
+          </div>
+
+          <!-- Week 12 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">12</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">커스텀 노드 & 워크플로우 설계</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              Manager, Impact Pack, App Mode
+            </p>
+          </div>
+
+          <!-- Week 13 -->
+          <div class="course-panel" style="opacity: 0.5; cursor: default;">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">13</span>
+              <span class="sig-led" style="width: 5px; height: 5px; background: var(--color-text-dim);"></span>
+              <h3 class="font-semibold">최종 프로젝트</h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              파이프라인 설계, 발표, 피드백
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>
