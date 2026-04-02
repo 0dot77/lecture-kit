@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1주차: AI와 대화하기 — Vibe to Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    /* ─── Design Tokens ─── */
+    :root {
+      --cream: #F0EAE0;
+      --cream-light: #F7F3ED;
+      --blue: #1A3D6D;
+      --blue-light: #2B5A96;
+      --blue-pale: #C8D8EA;
+      --blue-wash: rgba(26, 61, 109, 0.06);
+      --red: #D94F30;
+      --red-light: #E8725A;
+      --red-pale: #F2D0C7;
+      --ink: #1A1A2E;
+      --ink-muted: #4A4A5A;
+      --ink-dim: #8A8A96;
+      --border: rgba(26, 61, 109, 0.15);
+      --border-strong: rgba(26, 61, 109, 0.3);
+      --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+      --font-display: "Georgia", "Times New Roman", serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: rgba(26, 61, 109, 0.2);
+    }
+
+    /* ─── Wave Decorations (SVG backgrounds) ─── */
+    .wave-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 200px;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0.08;
+    }
+
+    .wave-top svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .wave-corner {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.04;
+    }
+
+    .wave-corner-bl { bottom: -40px; left: -40px; width: 300px; height: 300px; }
+    .wave-corner-tr { top: -40px; right: -40px; width: 250px; height: 250px; }
+
+    /* ─── Page Layout ─── */
+    .page-container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ─── Hero Section ─── */
+    .hero {
+      position: relative;
+      padding: 5rem 0 3rem;
+      text-align: center;
+      border-bottom: 2px solid var(--blue);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      border: 1.5px solid var(--blue);
+      border-radius: 2px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--red);
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-meta {
+      font-size: 0.8rem;
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+
+    .hero-wave-line {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 2rem;
+    }
+
+    .hero-wave-line span {
+      display: block;
+      width: 3px;
+      height: 24px;
+      border-radius: 2px;
+      background: var(--blue);
+      animation: heroWave 2s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    @keyframes heroWave {
+      0%, 100% { transform: scaleY(0.33); opacity: 0.3; }
+      50% { transform: scaleY(1); opacity: 0.7; }
+    }
+
+    /* ─── Section Navigation (sticky side) ─── */
+    .side-nav {
+      position: fixed;
+      left: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      z-index: 50;
+    }
+
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--ink-dim);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+
+    .side-nav a .nav-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: transparent;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .side-nav a .nav-text {
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .side-nav a:hover .nav-text {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .side-nav a.active .nav-dot {
+      background: var(--blue);
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 61, 109, 0.15);
+    }
+
+    .side-nav a.active {
+      color: var(--blue);
+    }
+
+    /* ─── Content Sections ─── */
+    .content-section {
+      padding: 3.5rem 0 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .content-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-num {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1;
+      opacity: 0.15;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.8;
+      max-width: 640px;
+    }
+
+    /* ─── Cards Grid ─── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--blue);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border-strong);
+      box-shadow: 4px 4px 0 rgba(26, 61, 109, 0.06);
+      transform: translate(-2px, -2px);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-week {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.5rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.375rem;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .card-active {
+      border-color: var(--blue);
+      background: white;
+    }
+
+    .card-active::after {
+      content: "TODAY";
+      position: absolute;
+      top: 0.75rem; right: 0.75rem;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: white;
+      background: var(--red);
+      padding: 0.15rem 0.5rem;
+      border-radius: 1px;
+    }
+
+    /* ─── Timeline (schedule) ─── */
+    .timeline {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: calc(0.65rem + 4px);
+      top: 1.5rem; bottom: 1rem;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--blue), var(--blue-pale), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 1rem 0 1.5rem;
+      cursor: pointer;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -1.85rem;
+      top: 1.15rem;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 2px solid var(--blue);
+      transition: all 0.3s;
+      z-index: 1;
+    }
+
+    .timeline-item:first-child::before {
+      top: 1.15rem;
+    }
+
+    .timeline-item:hover::before {
+      background: var(--blue);
+      box-shadow: 0 0 0 4px rgba(26, 61, 109, 0.12);
+    }
+
+    .timeline-item.is-break::before {
+      border-color: var(--ink-dim);
+      border-style: dashed;
+    }
+
+    .timeline-time {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-dim);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--blue);
+    }
+
+    .timeline-desc {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      margin-top: 0.25rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s;
+      opacity: 0;
+    }
+
+    .timeline-item.expanded .timeline-desc {
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    .timeline-duration {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--ink-dim);
+      background: var(--blue-wash);
+      padding: 0.1rem 0.4rem;
+      border-radius: 2px;
+      margin-left: 0.5rem;
+    }
+
+    /* ─── Comparison Table ─── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+
+    .compare-table thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+      background: var(--blue);
+      border: 1px solid var(--blue);
+    }
+
+    .compare-table thead th:first-child {
+      background: var(--ink-muted);
+      border-color: var(--ink-muted);
+    }
+
+    .compare-table tbody td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
+      background: var(--cream-light);
+      vertical-align: top;
+    }
+
+    .compare-table tbody td:first-child {
+      font-weight: 600;
+      color: var(--ink);
+      background: white;
+    }
+
+    .compare-table tbody tr:hover td {
+      background: white;
+    }
+
+    /* ─── Info Panels ─── */
+    .info-panel {
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+    }
+
+    .info-panel-header {
+      background: var(--blue);
+      color: white;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-panel-body {
+      padding: 1.25rem;
+      background: var(--cream-light);
+    }
+
+    .info-panel-body p {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .info-panel-body ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .info-panel-body li {
+      position: relative;
+      padding-left: 1.25rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .info-panel-body li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 6px; height: 6px;
+      background: var(--red);
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
+
+    /* ─── Red accent panel ─── */
+    .info-panel-red .info-panel-header {
+      background: var(--red);
+    }
+
+    .info-panel-red {
+      border-color: var(--red-pale);
+    }
+
+    /* ─── Code Block ─── */
+    .code-block {
+      position: relative;
+      background: var(--blue);
+      border-radius: 3px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: var(--blue-pale);
+    }
+
+    .code-block .comment {
+      color: rgba(200, 216, 234, 0.4);
+    }
+
+    .code-block .highlight {
+      color: #F7D794;
+    }
+
+    .code-block .copy-btn {
+      position: absolute;
+      top: 0.5rem; right: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 3px;
+      color: rgba(255,255,255,0.5);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.65rem;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+      opacity: 0;
+    }
+
+    .code-block:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .code-block .copy-btn:hover {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    /* ─── Expandable / Accordion ─── */
+    .expandable {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin: 0.75rem 0;
+      overflow: hidden;
+    }
+
+    .expandable-trigger {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--cream-light);
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--blue);
+      transition: background 0.2s;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-sans);
+    }
+
+    .expandable-trigger:hover {
+      background: white;
+    }
+
+    .expandable-trigger .arrow {
+      font-size: 0.7rem;
+      color: var(--ink-dim);
+      transition: transform 0.3s;
+      margin-left: auto;
+    }
+
+    .expandable.open .expandable-trigger .arrow {
+      transform: rotate(90deg);
+    }
+
+    .expandable-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      background: white;
+      border-top: 1px solid var(--border);
+    }
+
+    .expandable.open .expandable-content {
+      max-height: 1200px;
+    }
+
+    .expandable-inner {
+      padding: 1.25rem;
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    /* ─── Pricing / Plan Table ─── */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .plan-card {
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      padding: 1.5rem;
+      background: var(--cream-light);
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .plan-card:hover {
+      border-color: var(--blue);
+      box-shadow: 4px 4px 0 rgba(26, 61, 109, 0.06);
+      transform: translate(-2px, -2px);
+    }
+
+    .plan-card.recommended {
+      border-color: var(--blue);
+      background: white;
+      position: relative;
+    }
+
+    .plan-card.recommended::after {
+      content: "RECOMMENDED";
+      position: absolute;
+      top: -0.6rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: white;
+      background: var(--red);
+      padding: 0.15rem 0.6rem;
+      border-radius: 1px;
+    }
+
+    .plan-name {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .plan-price {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .plan-price small {
+      font-size: 0.5em;
+      color: var(--ink-dim);
+      font-family: var(--font-sans);
+      font-weight: 400;
+    }
+
+    .plan-desc {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    /* ─── Hands-on Box ─── */
+    .hands-on {
+      border: 2px solid var(--red);
+      border-radius: 3px;
+      padding: 2rem;
+      margin: 2rem 0;
+      background: white;
+      position: relative;
+    }
+
+    .hands-on::before {
+      content: "HANDS-ON";
+      position: absolute;
+      top: -0.6rem; left: 1.5rem;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: white;
+      background: var(--red);
+      padding: 0.15rem 0.75rem;
+    }
+
+    .hands-on h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--blue);
+      margin-bottom: 0.75rem;
+    }
+
+    .hands-on p, .hands-on li {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .hands-on ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0;
+    }
+
+    .hands-on li {
+      padding-left: 1.25rem;
+      position: relative;
+      margin-bottom: 0.375rem;
+    }
+
+    .hands-on li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0.55rem;
+      width: 8px; height: 8px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+    }
+
+    /* ─── Quote / Pullquote ─── */
+    .pullquote {
+      position: relative;
+      padding: 2rem 2rem 2rem 2.5rem;
+      margin: 2rem 0;
+      border-left: 4px solid var(--blue);
+      background: var(--blue-wash);
+    }
+
+    .pullquote p {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--blue);
+      line-height: 1.6;
+    }
+
+    .pullquote-red {
+      border-left-color: var(--red);
+      background: rgba(217, 79, 48, 0.04);
+    }
+
+    .pullquote-red p {
+      color: var(--red);
+    }
+
+    /* ─── Steps List ─── */
+    .step-list {
+      counter-reset: steps;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .step-item {
+      counter-increment: steps;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .step-item::before {
+      content: counter(steps);
+      flex-shrink: 0;
+      width: 1.75rem; height: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: var(--blue);
+      color: white;
+      margin-top: 0.1rem;
+    }
+
+    /* ─── Pattern Decoration ─── */
+    .pattern-strip {
+      height: 40px;
+      background-image:
+        radial-gradient(circle, var(--blue) 1px, transparent 1px);
+      background-size: 12px 12px;
+      opacity: 0.06;
+      margin: 3rem 0;
+    }
+
+    /* ─── Footer ─── */
+    .doc-footer {
+      border-top: 2px solid var(--blue);
+      padding: 2.5rem 0 4rem;
+      margin-top: 3rem;
+      text-align: center;
+    }
+
+    .doc-footer p {
+      font-size: 0.8rem;
+      color: var(--ink-dim);
+      line-height: 1.8;
+    }
+
+    .doc-footer a {
+      color: var(--blue);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .doc-footer a:hover {
+      border-color: var(--blue);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .side-nav { display: none; }
+      .page-container { padding: 0 1rem; }
+      .hero { padding: 3rem 0 2rem; }
+      .plan-grid { grid-template-columns: 1fr; }
+      .card-grid { grid-template-columns: 1fr; }
+      .section-num { font-size: 2rem; }
+      .section-title { font-size: 1.4rem; }
+    }
+
+    /* ─── Print ─── */
+    @media print {
+      body { background: white; }
+      .side-nav, .wave-corner, .hero-wave-line { display: none; }
+      .content-section { opacity: 1; transform: none; }
+    }
+
+    /* ─── Chat vs Agent interactive toggle ─── */
+    .toggle-compare {
+      display: flex;
+      gap: 0;
+      margin: 1.5rem 0;
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 0.6rem;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--cream-light);
+      color: var(--ink-dim);
+      border: none;
+      font-family: var(--font-sans);
+    }
+
+    .toggle-btn.active {
+      background: var(--blue);
+      color: white;
+    }
+
+    .toggle-panel {
+      display: none;
+      padding: 1.5rem;
+      background: var(--cream-light);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 3px 3px;
+      margin-top: -1px;
+    }
+
+    .toggle-panel.active {
+      display: block;
+    }
+
+    .toggle-panel h4 {
+      font-size: 0.95rem;
+      color: var(--blue);
+      margin-bottom: 0.75rem;
+    }
+
+    .toggle-panel p, .toggle-panel li {
+      font-size: 0.88rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .toggle-panel ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .toggle-panel li {
+      padding-left: 1rem;
+      position: relative;
+      margin-bottom: 0.375rem;
+    }
+
+    .toggle-panel li::before {
+      content: ">";
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    /* ─── Two-col comparison ─── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 640px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Wave corner decorations -->
+<div class="wave-corner wave-corner-bl">
+  <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 300 C60 260, 80 200, 60 140 C40 80, 90 20, 160 40 C230 60, 200 120, 180 180 C160 240, 100 280, 0 300Z" fill="var(--blue)"/>
+    <path d="M40 300 C80 270, 100 220, 90 170 C80 120, 110 70, 160 80 C210 90, 190 140, 170 190 C150 240, 110 270, 40 300Z" fill="var(--blue)" opacity="0.5"/>
+  </svg>
+</div>
+<div class="wave-corner wave-corner-tr">
+  <svg viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M250 0 C200 30, 160 80, 180 130 C200 180, 150 220, 100 200 C50 180, 80 120, 120 80 C160 40, 220 10, 250 0Z" fill="var(--blue)"/>
+  </svg>
+</div>
+
+<!-- Side Navigation -->
+<nav class="side-nav" id="sideNav">
+  <a href="#intro" class="active"><span class="nav-dot"></span><span class="nav-text">Intro</span></a>
+  <a href="#overview"><span class="nav-dot"></span><span class="nav-text">Overview</span></a>
+  <a href="#schedule"><span class="nav-dot"></span><span class="nav-text">Schedule</span></a>
+  <a href="#roundtable"><span class="nav-dot"></span><span class="nav-text">Roundtable</span></a>
+  <a href="#claude"><span class="nav-dot"></span><span class="nav-text">Claude</span></a>
+  <a href="#terminal"><span class="nav-dot"></span><span class="nav-text">Terminal</span></a>
+  <a href="#setup"><span class="nav-dot"></span><span class="nav-text">Setup</span></a>
+  <a href="#agent"><span class="nav-dot"></span><span class="nav-text">Agent</span></a>
+  <a href="#practice"><span class="nav-dot"></span><span class="nav-text">Practice</span></a>
+  <a href="#wrapup"><span class="nav-dot"></span><span class="nav-text">Wrap-up</span></a>
+</nav>
+
+<div class="page-container">
+
+  <!-- ═══════ HERO ═══════ -->
+  <header class="hero content-section" id="intro">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Week 01 — Vibe to Code
+    </div>
+    <h1>AI와 <em>대화</em>하기</h1>
+    <p class="hero-sub">Claude의 다양한 형태를 체험하고, AI가 단순 챗봇이 아닌<br>창작 에이전트가 될 수 있음을 감각적으로 이해한다.</p>
+    <p class="hero-meta">2026.04.03 (금) 17:00–20:00</p>
+    <div class="hero-wave-line" aria-hidden="true">
+      <span style="animation-delay:0s"></span>
+      <span style="animation-delay:0.1s"></span>
+      <span style="animation-delay:0.2s"></span>
+      <span style="animation-delay:0.3s"></span>
+      <span style="animation-delay:0.4s"></span>
+      <span style="animation-delay:0.5s"></span>
+      <span style="animation-delay:0.6s"></span>
+      <span style="animation-delay:0.7s"></span>
+      <span style="animation-delay:0.8s"></span>
+      <span style="animation-delay:0.9s"></span>
+      <span style="animation-delay:1.0s"></span>
+    </div>
+  </header>
+
+  <!-- ═══════ WORKSHOP INTRO ═══════ -->
+  <section class="content-section" id="overview">
+    <div class="section-divider">
+      <span class="section-num">01</span>
+      <span class="section-line"></span>
+      <span class="section-label">Overview</span>
+    </div>
+
+    <div class="pullquote">
+      <p>이 워크숍은 코딩 수업이 아닙니다.<br>
+      자신의 취향, 무드, 반복, 리듬을 코드와 규칙으로 <strong>번역</strong>해보는 실험실입니다.</p>
+    </div>
+
+    <p class="section-desc" style="margin-bottom: 2rem;">
+      4주 후 목표: 다시 꺼내 쓸 수 있는 나만의 창작 워크플로우를 만들어본다.
+    </p>
+
+    <h3 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 1rem;">4주 여정</h3>
+    <div class="card-grid">
+      <div class="card card-active">
+        <div class="card-week">Week 01</div>
+        <h3>AI와 대화하기</h3>
+        <p>Claude를 만난다</p>
+      </div>
+      <div class="card">
+        <div class="card-week">Week 02</div>
+        <h3>나의 언어를 Claude에게 가르치기</h3>
+        <p>내 프로젝트를 세팅한다</p>
+      </div>
+      <div class="card">
+        <div class="card-week">Week 03</div>
+        <h3>만들기: 바이브를 코드로</h3>
+        <p>만든다</p>
+      </div>
+      <div class="card">
+        <div class="card-week">Week 04</div>
+        <h3>시스템으로, 그리고 밖으로</h3>
+        <p>시스템으로 확장하고 세상에 내보낸다</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ SCHEDULE ═══════ -->
+  <section class="content-section" id="schedule">
+    <div class="section-divider">
+      <span class="section-num">02</span>
+      <span class="section-line"></span>
+      <span class="section-label">Schedule</span>
+    </div>
+
+    <div class="section-title">오늘의 흐름</div>
+
+    <div class="timeline">
+      <div class="timeline-item expanded">
+        <div class="timeline-time">17:00–17:30</div>
+        <div class="timeline-title">라운드테이블: 나와 AI <span class="timeline-duration">30min</span></div>
+        <div class="timeline-desc">서로 소개하고, AI를 어떻게 쓰고 있는지 나눠봅니다.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-time">17:30–18:10</div>
+        <div class="timeline-title">Claude 에코시스템 <span class="timeline-duration">40min</span></div>
+        <div class="timeline-desc">claude.ai, Claude Code를 직접 체험하고 설치합니다.</div>
+      </div>
+      <div class="timeline-item is-break">
+        <div class="timeline-time">18:10–18:20</div>
+        <div class="timeline-title" style="color: var(--ink-dim);">쉬는 시간 <span class="timeline-duration">10min</span></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-time">18:20–18:50</div>
+        <div class="timeline-title">도구로서의 AI, 에이전트로서의 AI <span class="timeline-duration">30min</span></div>
+        <div class="timeline-desc">"만들어줘"가 아니라 "같이 만들자"의 차이를 체감합니다.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-time">18:50–19:25</div>
+        <div class="timeline-title">실습: 두 가지 방식으로 만들어보기 <span class="timeline-duration">35min</span></div>
+        <div class="timeline-desc">claude.ai와 Claude Code로 인터랙티브 자기소개 페이지를 만듭니다.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-time">19:25–19:40</div>
+        <div class="timeline-title">공유 <span class="timeline-duration">15min</span></div>
+        <div class="timeline-desc">만든 것을 보여주고, 과정을 나눕니다.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-time">19:40–20:00</div>
+        <div class="timeline-title">마무리 & 다음 주 예고 <span class="timeline-duration">20min</span></div>
+        <div class="timeline-desc">오늘을 돌아보고, 다음 주를 준비합니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pattern-strip"></div>
+
+  <!-- ═══════ ROUNDTABLE ═══════ -->
+  <section class="content-section" id="roundtable">
+    <div class="section-divider">
+      <span class="section-num">03</span>
+      <span class="section-line"></span>
+      <span class="section-label">Block 1</span>
+    </div>
+
+    <div class="section-title">라운드테이블 &mdash; 나와 AI</div>
+
+    <div class="info-panel-red info-panel">
+      <div class="info-panel-header">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v5M8 11v1"/></svg>
+        질문 세 가지
+      </div>
+      <div class="info-panel-body">
+        <ul>
+          <li>AI를 어떻게 쓰고 있나요?</li>
+          <li>자기 분야(작업)에서 어떻게 활용하고 있나요?</li>
+          <li>이 워크숍에서 무엇을 만들어보고 싶나요?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CLAUDE ECOSYSTEM ═══════ -->
+  <section class="content-section" id="claude">
+    <div class="section-divider">
+      <span class="section-num">04</span>
+      <span class="section-line"></span>
+      <span class="section-label">Block 2</span>
+    </div>
+
+    <div class="section-title">Claude 에코시스템</div>
+    <p class="section-desc">Anthropic이 만든 AI. 단순 챗봇이 아닌 <strong>다양한 형태</strong>로 존재합니다.</p>
+
+    <!-- claude.ai -->
+    <div class="expandable" style="margin-top: 1.5rem;">
+      <button class="expandable-trigger" onclick="toggleExpand(this)">
+        <span style="width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;"></span>
+        claude.ai &mdash; 대화창
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="expandable-content">
+        <div class="expandable-inner">
+          <ul style="list-style:none;padding:0;">
+            <li style="padding-left:1.25rem;position:relative;margin-bottom:0.5rem;"><span style="position:absolute;left:0;color:var(--blue);">&#9679;</span> 웹 브라우저에서 바로 사용</li>
+            <li style="padding-left:1.25rem;position:relative;margin-bottom:0.5rem;"><span style="position:absolute;left:0;color:var(--blue);">&#9679;</span> <strong>프로젝트 기능</strong>: 맥락을 유지하는 대화</li>
+            <li style="padding-left:1.25rem;position:relative;margin-bottom:0.5rem;"><span style="position:absolute;left:0;color:var(--blue);">&#9679;</span> <strong>Artifacts</strong>: 대화 중 만들어지는 결과물 (코드, 문서, 다이어그램 등)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 채팅, 그 이상 -->
+    <div class="expandable">
+      <button class="expandable-trigger" onclick="toggleExpand(this)">
+        <span style="width:8px;height:8px;background:var(--blue);border-radius:50%;flex-shrink:0;"></span>
+        채팅, 그 이상 &mdash; 말하는 방식만 바꿔보면
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="expandable-content">
+        <div class="expandable-inner">
+          <table class="compare-table" style="margin:0;">
+            <thead>
+              <tr>
+                <th>이렇게 해보세요</th>
+                <th>무슨 일이 일어나는지</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>"이 관계를 다이어그램으로 보여줘"</td>
+                <td>플로우차트/마인드맵이 만들어짐</td>
+              </tr>
+              <tr>
+                <td>이미지를 드래그해서 넣기</td>
+                <td>사진을 보고 분석하거나, 그걸 기반으로 만들어줌</td>
+              </tr>
+              <tr>
+                <td>"이걸 인터랙티브하게 만들어줘"</td>
+                <td>클릭/드래그 가능한 웹앱이 바로 실행됨</td>
+              </tr>
+              <tr>
+                <td>"내 응답 스타일을 이렇게 바꿔줘"</td>
+                <td>톤과 형식을 커스터마이즈</td>
+              </tr>
+              <tr>
+                <td>프로젝트에 파일 첨부</td>
+                <td>대화마다 반복 설명 안 해도 맥락 유지</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pullquote" style="margin-top:1rem;margin-bottom:0;">
+            <p style="font-size:1rem;">같은 대화창인데, <strong>어떻게 말하느냐</strong>에 따라 전혀 다른 결과가 나온다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Claude Code -->
+    <div class="expandable">
+      <button class="expandable-trigger" onclick="toggleExpand(this)">
+        <span style="width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;"></span>
+        Claude Code &mdash; 터미널에서 만나는 AI
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="expandable-content">
+        <div class="expandable-inner">
+          <ul style="list-style:none;padding:0;">
+            <li style="padding-left:1.25rem;position:relative;margin-bottom:0.5rem;"><span style="position:absolute;left:0;color:var(--red);">&#9679;</span> 터미널(명령줄)에서 동작하는 AI 에이전트</li>
+            <li style="padding-left:1.25rem;position:relative;margin-bottom:0.5rem;"><span style="position:absolute;left:0;color:var(--red);">&#9679;</span> 대화로 파일을 만들고, 수정하고, 실행한다</li>
+            <li style="padding-left:1.25rem;position:relative;margin-bottom:0.5rem;"><span style="position:absolute;left:0;color:var(--red);">&#9679;</span> "채팅"이 아니라 <strong>"함께 작업"</strong>하는 느낌</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan info -->
+    <h3 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin: 2rem 0 1rem;">구독 플랜</h3>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">무료</div>
+        <p class="plan-desc">일일 사용량 제한<br>기본 모델</p>
+      </div>
+      <div class="plan-card recommended">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$20<small>/월</small></div>
+        <p class="plan-desc">더 많은 사용량<br>최신 모델, 프로젝트 기능</p>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Max</div>
+        <div class="plan-price">$100<small>/월</small></div>
+        <p class="plan-desc">최대 사용량<br>Claude Code 포함</p>
+      </div>
+    </div>
+    <p style="font-size:0.8rem;color:var(--ink-dim);text-align:center;">워크숍 기간 동안 Pro 이상 권장</p>
+  </section>
+
+  <!-- ═══════ TERMINAL BASICS ═══════ -->
+  <section class="content-section" id="terminal">
+    <div class="section-divider">
+      <span class="section-num">05</span>
+      <span class="section-line"></span>
+      <span class="section-label">Terminal</span>
+    </div>
+
+    <div class="section-title">터미널 기초 &mdash; 이것만 알면 충분합니다</div>
+
+    <table class="compare-table" style="margin-bottom: 1.5rem;">
+      <thead>
+        <tr>
+          <th>명령어</th>
+          <th>하는 일</th>
+          <th>비유</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code style="font-family:var(--font-mono);background:var(--blue-wash);padding:0.15rem 0.4rem;border-radius:2px;">pwd</code></td>
+          <td>지금 내가 어디 있는지 보기</td>
+          <td>"여기가 어디지?"</td>
+        </tr>
+        <tr>
+          <td><code style="font-family:var(--font-mono);background:var(--blue-wash);padding:0.15rem 0.4rem;border-radius:2px;">ls</code></td>
+          <td>이 폴더에 뭐가 있는지 보기</td>
+          <td>폴더를 열어보는 것</td>
+        </tr>
+        <tr>
+          <td><code style="font-family:var(--font-mono);background:var(--blue-wash);padding:0.15rem 0.4rem;border-radius:2px;">cd 폴더이름</code></td>
+          <td>다른 폴더로 이동</td>
+          <td>폴더를 더블클릭하는 것</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-panel">
+      <div class="info-panel-header">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="1" y="1" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4 6l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        같이 해봅시다
+      </div>
+      <div class="info-panel-body">
+        <div class="code-block" style="margin:0;">
+<span class="highlight">pwd</span>                    <span class="comment">&larr; 지금 어디에 있나요?</span>
+<span class="highlight">ls</span>                     <span class="comment">&larr; 여기에 뭐가 있나요?</span>
+<span class="highlight">mkdir my-vibe</span>          <span class="comment">&larr; 새 폴더 만들기</span>
+<span class="highlight">cd my-vibe</span>             <span class="comment">&larr; 그 폴더로 들어가기</span>
+<span class="highlight">pwd</span>                    <span class="comment">&larr; 잘 이동했는지 확인</span>
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ SETUP ═══════ -->
+  <section class="content-section" id="setup">
+    <div class="section-divider">
+      <span class="section-num">06</span>
+      <span class="section-line"></span>
+      <span class="section-label">Install</span>
+    </div>
+
+    <div class="section-title">Claude Code 설치하기</div>
+
+    <!-- Node.js 설치 -->
+    <div class="expandable open" style="margin-bottom: 1rem;">
+      <button class="expandable-trigger" onclick="toggleExpand(this)">
+        <span style="width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;"></span>
+        Step 0 &mdash; Node.js 설치 (아직 없다면)
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="expandable-content">
+        <div class="expandable-inner">
+          <p style="margin-bottom:1rem;">Claude Code는 Node.js가 필요합니다. 터미널에서 아래 명령어로 설치 여부를 확인하세요.</p>
+          <div class="code-block" style="margin:0 0 1rem;">
+<span class="highlight">node --version</span>   <span class="comment">&larr; v18 이상이 나오면 OK</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <p style="margin-bottom:0.75rem;font-weight:600;color:var(--blue);">설치가 안 되어 있다면:</p>
+          <table class="compare-table" style="margin:0;">
+            <thead>
+              <tr>
+                <th>운영체제</th>
+                <th>설치 방법</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mac</td>
+                <td>
+                  <strong>방법 1)</strong> <a href="https://nodejs.org" target="_blank" style="color:var(--blue);text-decoration:underline;">nodejs.org</a>에서 LTS 다운로드 &amp; 설치<br>
+                  <strong>방법 2)</strong> Homebrew 사용:
+                  <div class="code-block" style="margin:0.5rem 0 0;font-size:0.75rem;">
+<span class="highlight">brew install node</span>
+                    <button class="copy-btn" onclick="copyCode(this)">복사</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Windows</td>
+                <td>
+                  <a href="https://nodejs.org" target="_blank" style="color:var(--blue);text-decoration:underline;">nodejs.org</a>에서 LTS 다운로드 &amp; 설치<br>
+                  <span style="font-size:0.8rem;color:var(--ink-dim);">설치 후 PowerShell을 다시 열어야 합니다</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">터미널 열기 (Mac: Terminal / Windows: PowerShell)</div>
+      <div class="step-item">Node.js 설치 확인: <code style="font-family:var(--font-mono);background:var(--blue-wash);padding:0.15rem 0.4rem;border-radius:2px;">node --version</code></div>
+      <div class="step-item">Claude Code 설치</div>
+      <div class="step-item">실행: <code style="font-family:var(--font-mono);background:var(--blue-wash);padding:0.15rem 0.4rem;border-radius:2px;">claude</code></div>
+      <div class="step-item">로그인 진행</div>
+    </div>
+
+    <div class="code-block" style="margin-top:1.5rem;">
+<span class="highlight">npm install -g @anthropic-ai/claude-code</span>   <span class="comment">&larr; 설치</span>
+<span class="highlight">claude</span>                                       <span class="comment">&larr; 실행</span>
+      <button class="copy-btn" onclick="copyCode(this)">복사</button>
+    </div>
+
+    <!-- Options -->
+    <div class="expandable" style="margin-top:1.5rem;">
+      <button class="expandable-trigger" onclick="toggleExpand(this)">
+        <span style="width:8px;height:8px;background:var(--blue);border-radius:50%;flex-shrink:0;"></span>
+        실행 옵션 알아보기
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="expandable-content">
+        <div class="expandable-inner">
+          <table class="compare-table" style="margin:0;">
+            <thead>
+              <tr>
+                <th>명령어</th>
+                <th>하는 일</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code style="font-family:var(--font-mono);">claude</code></td>
+                <td>기본 실행 &mdash; 파일 수정/명령 실행 전에 매번 허락을 물어봄</td>
+              </tr>
+              <tr>
+                <td><code style="font-family:var(--font-mono);font-size:0.75rem;">claude --dangerously-skip-permissions</code></td>
+                <td>허락 없이 바로바로 실행 (빠르지만 주의 필요)</td>
+              </tr>
+              <tr>
+                <td><code style="font-family:var(--font-mono);">claude --model sonnet</code></td>
+                <td>사용할 모델 지정</td>
+              </tr>
+              <tr>
+                <td><code style="font-family:var(--font-mono);">claude --resume</code></td>
+                <td>마지막 대화 이어서 하기</td>
+              </tr>
+              <tr>
+                <td><code style="font-family:var(--font-mono);">claude /help</code></td>
+                <td>Claude Code 안에서 도움말 보기</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pattern-strip"></div>
+
+  <!-- ═══════ AGENT vs TOOL ═══════ -->
+  <section class="content-section" id="agent">
+    <div class="section-divider">
+      <span class="section-num">07</span>
+      <span class="section-line"></span>
+      <span class="section-label">Block 3</span>
+    </div>
+
+    <div class="section-title">도구로서의 AI, 에이전트로서의 AI</div>
+
+    <p class="section-desc">대부분의 AI 사용: 질문 &rarr; 답변, 요청 &rarr; 결과물.<br>
+    그런데 AI와 <strong>함께 기획</strong>할 수 있다면?</p>
+
+    <!-- Interactive Toggle: Chat vs Code -->
+    <h3 style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin: 2rem 0 0.75rem;">같은 요청, 다른 경험</h3>
+    <p style="font-size:0.85rem;color:var(--ink-muted);margin-bottom:1rem;">요청: "간단한 자기소개 웹페이지를 만들어줘"</p>
+
+    <div class="toggle-compare">
+      <button class="toggle-btn active" onclick="switchToggle(this, 'panel-chat')">claude.ai</button>
+      <button class="toggle-btn" onclick="switchToggle(this, 'panel-code')">Claude Code</button>
+    </div>
+    <div class="toggle-panel active" id="panel-chat">
+      <h4>claude.ai로 만들면</h4>
+      <ul>
+        <li>Artifact로 코드가 나옴</li>
+        <li>복사해서 저장해야 함</li>
+        <li>대화 맥락 안에서 동작</li>
+      </ul>
+    </div>
+    <div class="toggle-panel" id="panel-code">
+      <h4>Claude Code로 만들면</h4>
+      <ul>
+        <li>내 컴퓨터에 파일이 생김</li>
+        <li>바로 브라우저에서 열 수 있음</li>
+        <li>내 프로젝트 폴더 안에서 동작</li>
+      </ul>
+    </div>
+
+    <!-- Extension structure -->
+    <div class="info-panel" style="margin-top: 2rem;">
+      <div class="info-panel-header">
+        Claude가 확장되는 구조
+      </div>
+      <div class="info-panel-body">
+        <ul>
+          <li><strong>CLAUDE.md</strong> &mdash; 프로젝트의 맥락을 Claude에게 알려주는 파일 &rarr; <em>2주차에서 직접 작성</em></li>
+          <li><strong>Skills</strong> &mdash; Claude에게 특정 능력을 가르칠 수 있다 &rarr; <em>4주차에서 만들어봄</em></li>
+          <li><strong>MCP</strong> &mdash; 외부 도구와 연결 (Figma, Notion 등) &rarr; <em>3주차에서 가능성 탐색</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pullquote-red pullquote" style="margin-top:1.5rem;">
+      <p>Claude는 고정된 도구가 아니라, 내가 설계하는 시스템의 일부가 될 수 있다.</p>
+    </div>
+
+    <div class="info-panel" style="margin-top: 1.5rem;">
+      <div class="info-panel-header">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 1l1.5 4.5H13l-3.5 2.5L11 12.5 7 9.5 3 12.5l1.5-4.5L1 5.5h4.5z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        작가에게 이것이 의미하는 것
+      </div>
+      <div class="info-panel-body">
+        <ul>
+          <li>나만의 창작 시스템을 설계할 수 있다</li>
+          <li>AI가 내 취향, 톤, 규칙을 기억하고 따르게 할 수 있다</li>
+          <li>코드를 모르더라도, <strong>시스템을 사고</strong>할 수 있다</li>
+          <li>4주 후: 다시 작업할 때 꺼내서 창작의 단초로 삼을 수 있는 <strong>나만의 창작 워크플로우</strong></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ PRACTICE ═══════ -->
+  <section class="content-section" id="practice">
+    <div class="section-divider">
+      <span class="section-num">08</span>
+      <span class="section-line"></span>
+      <span class="section-label">Block 4</span>
+    </div>
+
+    <div class="section-title">실습: 두 가지 방식으로 만들어보기</div>
+
+    <div class="hands-on">
+      <h3>나를 표현하는 인터랙티브 자기소개 페이지</h3>
+      <p>클릭하거나, 마우스를 움직이거나, 스크롤하면 반응하는 &mdash; <strong>인터랙티브한</strong> 자기소개 웹페이지를 만들어봅시다.</p>
+      <ul>
+        <li>이름을 클릭하면 소개가 펼쳐진다</li>
+        <li>마우스를 따라 배경 색이 바뀐다</li>
+        <li>좋아하는 것들을 카드로 만들고, 뒤집으면 이유가 나온다</li>
+        <li>스크롤하면 타임라인처럼 나의 이야기가 흘러간다</li>
+      </ul>
+      <p style="margin-top:0.75rem;font-weight:600;color:var(--blue);">정답 없음. 자유롭게. "인터랙티브"의 정의도 자유.</p>
+    </div>
+
+    <!-- Two-step practice -->
+    <div class="two-col">
+      <div class="info-panel-red info-panel">
+        <div class="info-panel-header">Step 1 &mdash; claude.ai (10분)</div>
+        <div class="info-panel-body">
+          <p style="margin-bottom:0.75rem;">대화로 만들어보기 &mdash; Artifact에서 바로 인터랙션 확인</p>
+          <div class="code-block" style="background:var(--ink);margin:0;font-size:0.75rem;">
+<span style="color:var(--red-light);">나를 표현하는 인터랙티브 웹페이지를 만들어줘.</span>
+<span style="color:var(--blue-pale);">나는 ___한 사람이야.</span>
+<span style="color:var(--blue-pale);">클릭하면 ___가 일어나게 해줘.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <div class="info-panel-header">Step 2 &mdash; Claude Code (25분)</div>
+        <div class="info-panel-body">
+          <p style="margin-bottom:0.75rem;">파일이 생기고, 수정하고, 브라우저에서 여는 경험</p>
+          <div class="code-block" style="margin:0;font-size:0.75rem;">
+<span class="highlight">mkdir my-vibe && cd my-vibe</span>
+<span class="highlight">claude --dangerously-skip-permissions</span>
+<span class="comment"># 같은 요청을 해보기</span>
+<span class="highlight">open index.html</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ WRAPUP ═══════ -->
+  <section class="content-section" id="wrapup">
+    <div class="section-divider">
+      <span class="section-num">09</span>
+      <span class="section-line"></span>
+      <span class="section-label">Wrap-up</span>
+    </div>
+
+    <div class="section-title">마무리</div>
+
+    <div class="info-panel" style="margin-bottom: 1.5rem;">
+      <div class="info-panel-header">오늘 우리가 한 것</div>
+      <div class="info-panel-body">
+        <ul>
+          <li>Claude를 만났다 (채팅 / 에이전트)</li>
+          <li>AI가 도구를 넘어 협업 파트너가 될 수 있다는 가능성을 봤다</li>
+          <li>처음으로 코드가 만들어지는 경험을 했다</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pullquote-red pullquote">
+      <p>"만들어줘"가 아니라 "같이 만들자"</p>
+    </div>
+
+    <!-- Next week & homework -->
+    <div class="two-col" style="margin-top: 2rem;">
+      <div class="info-panel">
+        <div class="info-panel-header">다음 주 예고</div>
+        <div class="info-panel-body">
+          <p><strong>나의 언어를 Claude에게 가르치기</strong></p>
+          <ul style="margin-top:0.5rem;">
+            <li>전지 + 포스트잇으로 프로젝트를 물리적으로 설계</li>
+            <li>그걸 그대로 터미널에서 만들고, CLAUDE.md를 작성</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-panel-red info-panel">
+        <div class="info-panel-header">이번 주 과제 (선택)</div>
+        <div class="info-panel-body">
+          <ul>
+            <li>Claude와 대화를 한 번 더 해보기 (아무 주제나)</li>
+            <li>자신의 창작에서 반복되는 패턴이나 취향을 생각해보기</li>
+          </ul>
+          <div style="margin-top:0.75rem;padding:0.75rem;background:var(--cream);border-radius:3px;font-size:0.85rem;color:var(--ink-muted);line-height:1.8;">
+            "나는 항상 ___한 것을 좋아한다"<br>
+            "내 작업에서 반복되는 요소는 ___이다"
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer class="doc-footer">
+    <p>
+      <strong style="color:var(--blue);">Vibe to Code</strong> &mdash; 바이브 코딩에서 실전 코딩으로<br>
+      <a href="/lecture-kit/courses/vibe-to-code/">코스 목록으로 돌아가기</a>
+    </p>
+  </footer>
+
+</div>
+
+<script>
+// ─── Scroll Reveal ───
+const sections = document.querySelectorAll('.content-section');
+const navLinks = document.querySelectorAll('.side-nav a');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Update nav
+      const id = entry.target.id;
+      if (id) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.side-nav a[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    }
+  });
+}, { threshold: 0.15, rootMargin: '-40px 0px -40px 0px' });
+
+sections.forEach(s => observer.observe(s));
+
+// ─── Timeline Expand ───
+document.querySelectorAll('.timeline-item').forEach(item => {
+  item.addEventListener('click', () => {
+    item.classList.toggle('expanded');
+  });
+});
+
+// ─── Expandable ───
+function toggleExpand(btn) {
+  const parent = btn.closest('.expandable');
+  parent.classList.toggle('open');
+}
+
+// ─── Toggle Compare ───
+function switchToggle(btn, panelId) {
+  const container = btn.closest('.toggle-compare') || btn.parentElement;
+  container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Find the panels (siblings after the toggle-compare)
+  const parent = container.parentElement;
+  parent.querySelectorAll('.toggle-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ─── Copy Code ───
+function copyCode(btn) {
+  const block = btn.closest('.code-block');
+  const text = block.textContent.replace('복사', '').replace('완료!', '').trim();
+  // Clean up: remove comment arrows and extra whitespace
+  const lines = text.split('\n').map(l => l.replace(/\s*←.*$/, '').replace(/\s*#.*$/, '').trimEnd()).filter(l => l);
+  navigator.clipboard.writeText(lines.join('\n'));
+  btn.textContent = '완료!';
+  setTimeout(() => btn.textContent = '복사', 1500);
+}
+</script>
+
+</body>
+</html>
