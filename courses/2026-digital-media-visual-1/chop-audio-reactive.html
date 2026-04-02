@@ -9,8 +9,51 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
     />
+    <style>
+      .lang-switcher {
+        position: fixed;
+        top: 1rem;
+        right: 4rem;
+        z-index: 60;
+        display: flex;
+        gap: 2px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 2px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      .lang-btn {
+        padding: 4px 10px;
+        font-size: 0.65rem;
+        font-family: var(--font-sans);
+        border: none;
+        background: transparent;
+        color: var(--color-text-dim);
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .lang-btn:hover {
+        color: var(--color-text-muted);
+        background: var(--color-surface-hover);
+      }
+      .lang-btn.active {
+        background: var(--color-accent-blue);
+        color: white;
+      }
+      @media print { .lang-switcher { display: none !important; } }
+    </style>
   </head>
   <body class="min-h-screen grid-bg-page">
+    <!-- Language Switcher -->
+    <div class="lang-switcher no-print">
+      <button class="lang-btn active" data-lang="ko">한국어</button>
+      <button class="lang-btn" data-lang="fa">فارسی</button>
+      <button class="lang-btn" data-lang="ru">Русский</button>
+    </div>
+
     <!-- Panel frame -->
     <div class="page-frame"></div>
     <div class="page-screw-bl"></div>
@@ -20,12 +63,12 @@
     <!-- Section Nav (right side dots)           -->
     <!-- ════════════════════════════════════════ -->
     <nav class="section-nav no-print" id="sectionNav">
-      <a href="#top-review" data-section="1"><span class="nav-label">Part 1 — TOP 복습</span></a>
-      <a href="#chop-intro" data-section="2"><span class="nav-label">Part 2 — CHOP 개념</span></a>
-      <a href="#chop-ref" data-section="3"><span class="nav-label">Part 3 — CHOP Reference</span></a>
-      <a href="#audio-reactive" data-section="4"><span class="nav-label">Part 4 — 오디오 리액티브</span></a>
-      <a href="#practice" data-section="5"><span class="nav-label">Part 5 — 실습</span></a>
-      <a href="#summary" data-section="6"><span class="nav-label">Part 6 — 정리</span></a>
+      <a href="#top-review" data-section="1"><span class="nav-label" data-ko="Part 1 — TOP 복습" data-fa="Part 1 — مرور TOP" data-ru="Part 1 — Повторение TOP">Part 1 — TOP 복습</span></a>
+      <a href="#chop-intro" data-section="2"><span class="nav-label" data-ko="Part 2 — CHOP 개념" data-fa="Part 2 — مفهوم CHOP" data-ru="Part 2 — Концепция CHOP">Part 2 — CHOP 개념</span></a>
+      <a href="#chop-ref" data-section="3"><span class="nav-label" data-ko="Part 3 — CHOP Reference" data-fa="Part 3 — CHOP Reference" data-ru="Part 3 — CHOP Reference">Part 3 — CHOP Reference</span></a>
+      <a href="#audio-reactive" data-section="4"><span class="nav-label" data-ko="Part 4 — 오디오 리액티브" data-fa="Part 4 — واکنش صوتی" data-ru="Part 4 — Аудиореактив">Part 4 — 오디오 리액티브</span></a>
+      <a href="#practice" data-section="5"><span class="nav-label" data-ko="Part 5 — 실습" data-fa="Part 5 — تمرین عملی" data-ru="Part 5 — Практика">Part 5 — 실습</span></a>
+      <a href="#summary" data-section="6"><span class="nav-label" data-ko="Part 6 — 정리" data-fa="Part 6 — جمع‌بندی" data-ru="Part 6 — Итоги">Part 6 — 정리</span></a>
     </nav>
 
     <div class="lecture-page">
@@ -39,11 +82,11 @@
           <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">Audio Reactive</span>
         </div>
         <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3" style="letter-spacing: -0.03em;">
-          CHOP / Audio Reactive 기초
+          <span data-ko="CHOP / Audio Reactive 기초" data-fa="مبانی CHOP / Audio Reactive" data-ru="Основы CHOP / Audio Reactive">CHOP / Audio Reactive 기초</span>
         </h1>
         <p style="color: var(--color-text-muted);" class="text-base leading-relaxed max-w-2xl">
-          TOP 복습 위에 "시간에 따라 변하는 숫자"라는 CHOP의 핵심 개념을 이해하고,
-          오디오 입력을 분석하여 소리에 반응하는 비주얼을 직접 만들어본다.
+          <span data-ko="TOP 복습 위에 &quot;시간에 따라 변하는 숫자&quot;라는 CHOP의 핵심 개념을 이해하고, 오디오 입력을 분석하여 소리에 반응하는 비주얼을 직접 만들어본다." data-fa="با مرور TOP و درک مفهوم اصلی CHOP یعنی &quot;اعدادی که در طول زمان تغییر می‌کنند&quot;، ورودی صوتی را تحلیل کرده و ویژوال‌هایی می‌سازیم که به صدا واکنش نشان می‌دهند." data-ru="Повторив TOP, разберём ключевую концепцию CHOP — &quot;числа, изменяющиеся во времени&quot; — и на практике создадим визуал, реагирующий на звук.">TOP 복습 위에 "시간에 따라 변하는 숫자"라는 CHOP의 핵심 개념을 이해하고,
+          오디오 입력을 분석하여 소리에 반응하는 비주얼을 직접 만들어본다.</span>
         </p>
 
         <!-- Decorative accent line -->
@@ -56,16 +99,16 @@
       <div class="module-card mb-8">
         <div class="module-card-header">
           <span class="module-dot" style="background: var(--color-accent-blue);"></span>
-          학습 목표
+          <span data-ko="학습 목표" data-fa="اهداف یادگیری" data-ru="Цели обучения">학습 목표</span>
         </div>
         <div class="module-card-body">
           <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
-            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> Feedback TOP과 Displace TOP의 원리를 이해하고 활용할 수 있다</li>
-            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> CHOP이 무엇인지 이해하고, TOP과의 차이를 설명할 수 있다</li>
-            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> CHOP Reference의 세 가지 방식(Export, Reference, Bind)을 이해한다</li>
-            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> <code style="font-family: var(--font-mono); font-size: 0.8rem;">입력 → 가공 → 출력</code> 이라는 인터랙션의 기본 구조를 체득한다</li>
-            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> Math CHOP을 활용해 값의 범위를 변환할 수 있다</li>
-            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> 오디오 입력으로 Feedback/Displace를 포함한 영상 파라미터를 실시간 제어할 수 있다</li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> <span data-ko="Feedback TOP과 Displace TOP의 원리를 이해하고 활용할 수 있다" data-fa="اصول Feedback TOP و Displace TOP را درک کرده و بتوانید از آن‌ها استفاده کنید" data-ru="Понять принципы работы Feedback TOP и Displace TOP и научиться их применять">Feedback TOP과 Displace TOP의 원리를 이해하고 활용할 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> <span data-ko="CHOP이 무엇인지 이해하고, TOP과의 차이를 설명할 수 있다" data-fa="بفهمید CHOP چیست و بتوانید تفاوت آن با TOP را توضیح دهید" data-ru="Понять, что такое CHOP, и уметь объяснить отличие от TOP">CHOP이 무엇인지 이해하고, TOP과의 차이를 설명할 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> <span data-ko="CHOP Reference의 세 가지 방식(Export, Reference, Bind)을 이해한다" data-fa="سه روش CHOP Reference (Export، Reference، Bind) را درک کنید" data-ru="Освоить три способа CHOP Reference (Export, Reference, Bind)">CHOP Reference의 세 가지 방식(Export, Reference, Bind)을 이해한다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> <span data-ko="<code style='font-family: var(--font-mono); font-size: 0.8rem;'>입력 → 가공 → 출력</code> 이라는 인터랙션의 기본 구조를 체득한다" data-fa="ساختار پایه تعامل یعنی <code style='font-family: var(--font-mono); font-size: 0.8rem;'>ورودی → پردازش → خروجی</code> را در خود نهادینه کنید" data-ru="Усвоить базовую структуру интерактивности: <code style='font-family: var(--font-mono); font-size: 0.8rem;'>ввод → обработка → вывод</code>"><code style="font-family: var(--font-mono); font-size: 0.8rem;">입력 → 가공 → 출력</code> 이라는 인터랙션의 기본 구조를 체득한다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> <span data-ko="Math CHOP을 활용해 값의 범위를 변환할 수 있다" data-fa="با استفاده از Math CHOP بتوانید محدوده مقادیر را تبدیل کنید" data-ru="Уметь преобразовывать диапазоны значений с помощью Math CHOP">Math CHOP을 활용해 값의 범위를 변환할 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> <span data-ko="오디오 입력으로 Feedback/Displace를 포함한 영상 파라미터를 실시간 제어할 수 있다" data-fa="با ورودی صوتی بتوانید پارامترهای تصویری از جمله Feedback/Displace را در لحظه کنترل کنید" data-ru="Управлять параметрами видео, включая Feedback/Displace, в реальном времени через аудиовход">오디오 입력으로 Feedback/Displace를 포함한 영상 파라미터를 실시간 제어할 수 있다</span></li>
           </ul>
         </div>
       </div>
@@ -74,37 +117,37 @@
       <!-- Table of Contents                       -->
       <!-- ════════════════════════════════════════ -->
       <div class="toc mb-16">
-        <div class="toc-header">목차</div>
+        <div class="toc-header" data-ko="목차" data-fa="فهرست مطالب" data-ru="Содержание">목차</div>
         <div class="toc-body">
           <a href="#top-review" class="toc-item">
             <span class="toc-dot" style="background: var(--color-accent-purple);"></span>
             <span class="toc-num">01</span>
-            TOP 복습 — Feedback과 Displacement
+            <span data-ko="TOP 복습 — Feedback과 Displacement" data-fa="مرور TOP — Feedback و Displacement" data-ru="Повторение TOP — Feedback и Displacement">TOP 복습 — Feedback과 Displacement</span>
           </a>
           <a href="#chop-intro" class="toc-item">
             <span class="toc-dot" style="background: var(--color-accent-green);"></span>
             <span class="toc-num">02</span>
-            CHOP — 시간에 따라 변하는 숫자
+            <span data-ko="CHOP — 시간에 따라 변하는 숫자" data-fa="CHOP — اعدادی که در طول زمان تغییر می‌کنند" data-ru="CHOP — числа, изменяющиеся во времени">CHOP — 시간에 따라 변하는 숫자</span>
           </a>
           <a href="#chop-ref" class="toc-item">
             <span class="toc-dot" style="background: var(--color-accent-blue);"></span>
             <span class="toc-num">03</span>
-            CHOP Reference — 값을 파라미터에 연결하는 법
+            <span data-ko="CHOP Reference — 값을 파라미터에 연결하는 법" data-fa="CHOP Reference — روش اتصال مقادیر به پارامترها" data-ru="CHOP Reference — как связать значения с параметрами">CHOP Reference — 값을 파라미터에 연결하는 법</span>
           </a>
           <a href="#audio-reactive" class="toc-item">
             <span class="toc-dot" style="background: var(--color-accent-orange);"></span>
             <span class="toc-num">04</span>
-            오디오 리액티브 비주얼
+            <span data-ko="오디오 리액티브 비주얼" data-fa="ویژوال واکنش‌پذیر به صدا" data-ru="Аудиореактивный визуал">오디오 리액티브 비주얼</span>
           </a>
           <a href="#practice" class="toc-item">
             <span class="toc-dot" style="background: var(--color-accent-red);"></span>
             <span class="toc-num">05</span>
-            실습 — 오디오 리액티브 비주얼 만들기
+            <span data-ko="실습 — 오디오 리액티브 비주얼 만들기" data-fa="تمرین عملی — ساخت ویژوال واکنش‌پذیر به صدا" data-ru="Практика — создание аудиореактивного визуала">실습 — 오디오 리액티브 비주얼 만들기</span>
           </a>
           <a href="#summary" class="toc-item">
             <span class="toc-dot" style="background: var(--color-text-dim);"></span>
             <span class="toc-num">06</span>
-            정리와 다음 단계
+            <span data-ko="정리와 다음 단계" data-fa="جمع‌بندی و مراحل بعدی" data-ru="Итоги и следующие шаги">정리와 다음 단계</span>
           </a>
         </div>
       </div>
@@ -118,105 +161,105 @@
             <span class="dot" style="background: var(--color-accent-purple);"></span>
             Part 01
           </div>
-          <h2 class="part-title">TOP 복습 — Feedback과 Displacement</h2>
-          <p class="part-subtitle">이전 수업에서 배운 TOP의 핵심 개념을 복습하고, 두 가지 강력한 이미지 처리 도구를 추가로 익힌다.</p>
+          <h2 class="part-title" data-ko="TOP 복습 — Feedback과 Displacement" data-fa="مرور TOP — Feedback و Displacement" data-ru="Повторение TOP — Feedback и Displacement">TOP 복습 — Feedback과 Displacement</h2>
+          <p class="part-subtitle" data-ko="이전 수업에서 배운 TOP의 핵심 개념을 복습하고, 두 가지 강력한 이미지 처리 도구를 추가로 익힌다." data-fa="مفاهیم اصلی TOP را که در جلسه قبل یاد گرفتیم مرور می‌کنیم و با دو ابزار قدرتمند پردازش تصویر بیشتر آشنا می‌شویم." data-ru="Повторим ключевые концепции TOP из прошлого занятия и освоим два мощных инструмента обработки изображений.">이전 수업에서 배운 TOP의 핵심 개념을 복습하고, 두 가지 강력한 이미지 처리 도구를 추가로 익힌다.</p>
         </div>
 
         <!-- 1-1. TOP 기본 복습 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">지난 수업 복습: TOP의 기본 개념</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="지난 수업 복습: TOP의 기본 개념" data-fa="مرور جلسه قبل: مفاهیم پایه TOP" data-ru="Повторение прошлого занятия: основы TOP">지난 수업 복습: TOP의 기본 개념</h3>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">핵심 개념</div>
-            TOP(Texture Operator)은 TouchDesigner에서 <strong>2D 이미지/영상</strong>을 다루는 오퍼레이터 패밀리다.
-            모든 TOP은 <strong>이미지를 입력받아 → 처리하고 → 이미지를 출력</strong>한다. 와이어로 연결하면 이미지가 흘러간다.
+            <div class="callout-label" data-ko="핵심 개념" data-fa="مفهوم کلیدی" data-ru="Ключевая концепция">핵심 개념</div>
+            <span data-ko="TOP(Texture Operator)은 TouchDesigner에서 <strong>2D 이미지/영상</strong>을 다루는 오퍼레이터 패밀리다. 모든 TOP은 <strong>이미지를 입력받아 → 처리하고 → 이미지를 출력</strong>한다. 와이어로 연결하면 이미지가 흘러간다." data-fa="TOP (Texture Operator) خانواده‌ای از اپراتورها در TouchDesigner است که با <strong>تصاویر/ویدیوهای دوبعدی</strong> کار می‌کند. هر TOP <strong>تصویر را دریافت → پردازش → و خروجی تصویر تولید</strong> می‌کند. با اتصال سیم‌ها، تصویر جریان می‌یابد." data-ru="TOP (Texture Operator) — семейство операторов в TouchDesigner для работы с <strong>2D-изображениями и видео</strong>. Каждый TOP <strong>получает изображение → обрабатывает → выводит изображение</strong>. При соединении проводами изображение течёт по цепочке.">TOP(Texture Operator)은 TouchDesigner에서 <strong>2D 이미지/영상</strong>을 다루는 오퍼레이터 패밀리다.
+            모든 TOP은 <strong>이미지를 입력받아 → 처리하고 → 이미지를 출력</strong>한다. 와이어로 연결하면 이미지가 흘러간다.</span>
           </div>
 
           <div class="module-card mb-6">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-purple);"></span>
-              지금까지 배운 TOP
+              <span data-ko="지금까지 배운 TOP" data-fa="TOP هایی که تا کنون یاد گرفتیم" data-ru="Изученные TOP">지금까지 배운 TOP</span>
             </div>
             <div class="module-card-body">
               <table class="data-table">
                 <thead>
-                  <tr><th>TOP</th><th>역할</th></tr>
+                  <tr><th>TOP</th><th data-ko="역할" data-fa="نقش" data-ru="Роль">역할</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Movie File In</td><td>영상/이미지 파일을 불러온다</td></tr>
-                  <tr><td>Noise</td><td>절차적(procedural) 노이즈 패턴을 생성한다</td></tr>
-                  <tr><td>Ramp</td><td>그라데이션(경사) 이미지를 생성한다</td></tr>
-                  <tr><td>Constant</td><td>단색 이미지를 만든다</td></tr>
-                  <tr><td>Transform</td><td>이동, 회전, 스케일을 적용한다</td></tr>
-                  <tr><td>Level</td><td>밝기, 감마, 불투명도를 조절한다</td></tr>
-                  <tr><td>Composite / Over</td><td>여러 이미지를 합성한다</td></tr>
-                  <tr><td>Switch</td><td>여러 입력 중 하나를 선택한다</td></tr>
-                  <tr><td>Null</td><td>네트워크 정리용 — 결과를 깔끔하게 정리한다</td></tr>
+                  <tr><td>Movie File In</td><td data-ko="영상/이미지 파일을 불러온다" data-fa="فایل ویدیو/تصویر را بارگذاری می‌کند" data-ru="Загружает видео/изображения из файла">영상/이미지 파일을 불러온다</td></tr>
+                  <tr><td>Noise</td><td data-ko="절차적(procedural) 노이즈 패턴을 생성한다" data-fa="الگوی نویز رویه‌ای (procedural) تولید می‌کند" data-ru="Генерирует процедурный шумовой паттерн">절차적(procedural) 노이즈 패턴을 생성한다</td></tr>
+                  <tr><td>Ramp</td><td data-ko="그라데이션(경사) 이미지를 생성한다" data-fa="تصویر گرادیان تولید می‌کند" data-ru="Создаёт градиентное изображение">그라데이션(경사) 이미지를 생성한다</td></tr>
+                  <tr><td>Constant</td><td data-ko="단색 이미지를 만든다" data-fa="تصویر تک‌رنگ می‌سازد" data-ru="Создаёт однотонное изображение">단색 이미지를 만든다</td></tr>
+                  <tr><td>Transform</td><td data-ko="이동, 회전, 스케일을 적용한다" data-fa="جابه‌جایی، چرخش و مقیاس اعمال می‌کند" data-ru="Применяет перемещение, вращение, масштаб">이동, 회전, 스케일을 적용한다</td></tr>
+                  <tr><td>Level</td><td data-ko="밝기, 감마, 불투명도를 조절한다" data-fa="روشنایی، گاما و شفافیت را تنظیم می‌کند" data-ru="Регулирует яркость, гамму, непрозрачность">밝기, 감마, 불투명도를 조절한다</td></tr>
+                  <tr><td>Composite / Over</td><td data-ko="여러 이미지를 합성한다" data-fa="چند تصویر را ترکیب می‌کند" data-ru="Объединяет несколько изображений">여러 이미지를 합성한다</td></tr>
+                  <tr><td>Switch</td><td data-ko="여러 입력 중 하나를 선택한다" data-fa="یکی از چند ورودی را انتخاب می‌کند" data-ru="Выбирает один из нескольких входов">여러 입력 중 하나를 선택한다</td></tr>
+                  <tr><td>Null</td><td data-ko="네트워크 정리용 — 결과를 깔끔하게 정리한다" data-fa="برای مرتب‌سازی شبکه — خروجی را منظم می‌کند" data-ru="Для организации сети — упорядочивает результат">네트워크 정리용 — 결과를 깔끔하게 정리한다</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <div class="node-diagram mb-6">
-            <span class="annotation">TOP 네트워크 읽는 법 —</span><br>
-            <span class="node node-top">소스</span>
+            <span class="annotation" data-ko="TOP 네트워크 읽는 법 —" data-fa="روش خواندن شبکه TOP —" data-ru="Как читать сеть TOP —">TOP 네트워크 읽는 법 —</span><br>
+            <span class="node node-top" data-ko="소스" data-fa="منبع" data-ru="Источник">소스</span>
             <span class="arrow">→</span>
-            <span class="node node-top">처리</span>
+            <span class="node node-top" data-ko="처리" data-fa="پردازش" data-ru="Обработка">처리</span>
             <span class="arrow">→</span>
-            <span class="node node-top">처리</span>
+            <span class="node node-top" data-ko="처리" data-fa="پردازش" data-ru="Обработка">처리</span>
             <span class="arrow">→</span>
-            <span class="node node-top">출력 / Null</span>
+            <span class="node node-top" data-ko="출력 / Null" data-fa="خروجی / Null" data-ru="Вывод / Null">출력 / Null</span>
             <br><br>
-            <span class="annotation">왼쪽에서 오른쪽으로 데이터가 흐른다. Null TOP으로 중간 결과를 정리하는 습관이 중요하다.</span>
+            <span class="annotation" data-ko="왼쪽에서 오른쪽으로 데이터가 흐른다. Null TOP으로 중간 결과를 정리하는 습관이 중요하다." data-fa="داده از چپ به راست جریان دارد. عادت به مرتب‌سازی نتایج میانی با Null TOP مهم است." data-ru="Данные текут слева направо. Важно привыкнуть упорядочивать промежуточные результаты через Null TOP.">왼쪽에서 오른쪽으로 데이터가 흐른다. Null TOP으로 중간 결과를 정리하는 습관이 중요하다.</span>
           </div>
         </div>
 
         <!-- 1-2. Feedback TOP -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">Feedback TOP — 이미지의 잔상과 누적</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="Feedback TOP — 이미지의 잔상과 누적" data-fa="Feedback TOP — پس‌تصویر و انباشت" data-ru="Feedback TOP — остаточное изображение и накопление">Feedback TOP — 이미지의 잔상과 누적</h3>
 
           <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
-            Feedback TOP은 <strong>네트워크의 하류(downstream)에 있는 TOP의 결과를 다시 상류(upstream)로 가져오는</strong> 특별한 오퍼레이터다. 일반적으로 TouchDesigner는 순환(loop) 연결을 허용하지 않지만, Feedback TOP은 이것을 안전하게 가능하게 한다. 쉽게 말하면: <strong>이전 프레임의 결과물 위에 현재 프레임을 덧쌓는 것</strong>이다.
+            <span data-ko="Feedback TOP은 <strong>네트워크의 하류(downstream)에 있는 TOP의 결과를 다시 상류(upstream)로 가져오는</strong> 특별한 오퍼레이터다. 일반적으로 TouchDesigner는 순환(loop) 연결을 허용하지 않지만, Feedback TOP은 이것을 안전하게 가능하게 한다. 쉽게 말하면: <strong>이전 프레임의 결과물 위에 현재 프레임을 덧쌓는 것</strong>이다." data-fa="Feedback TOP اپراتور ویژه‌ای است که <strong>نتیجه TOP پایین‌دستی (downstream) را به بالادست (upstream) برمی‌گرداند</strong>. معمولاً TouchDesigner اتصال حلقه‌ای (loop) را اجازه نمی‌دهد، اما Feedback TOP این کار را به‌صورت امن ممکن می‌سازد. به زبان ساده: <strong>فریم فعلی روی نتیجه فریم قبلی انباشته می‌شود</strong>." data-ru="Feedback TOP — особый оператор, который <strong>возвращает результат нижестоящего (downstream) TOP обратно вверх по цепочке (upstream)</strong>. Обычно TouchDesigner не допускает циклических соединений, но Feedback TOP делает это безопасно. Проще говоря: <strong>текущий кадр накладывается поверх результата предыдущего кадра</strong>.">Feedback TOP은 <strong>네트워크의 하류(downstream)에 있는 TOP의 결과를 다시 상류(upstream)로 가져오는</strong> 특별한 오퍼레이터다. 일반적으로 TouchDesigner는 순환(loop) 연결을 허용하지 않지만, Feedback TOP은 이것을 안전하게 가능하게 한다. 쉽게 말하면: <strong>이전 프레임의 결과물 위에 현재 프레임을 덧쌓는 것</strong>이다.</span>
           </p>
 
           <!-- Feedback 원리 다이어그램 -->
           <div class="node-diagram mb-6">
-            <span class="annotation">Feedback 루프 원리</span><br><br>
+            <span class="annotation" data-ko="Feedback 루프 원리" data-fa="اصل حلقه Feedback" data-ru="Принцип петли Feedback">Feedback 루프 원리</span><br><br>
             <span class="node node-top">Feedback TOP</span>
             <span class="arrow">──→</span>
-            <span class="node node-top">처리 체인</span>
+            <span class="node node-top" data-ko="처리 체인" data-fa="زنجیره پردازش" data-ru="Цепочка обработки">처리 체인</span>
             <span class="arrow">──→</span>
             <span class="node node-top">Target TOP</span>
             <br>
-            <span style="color: var(--color-accent-orange); margin-left: 2rem;">↑ ─────────── 이전 프레임 ─────────── ↲</span>
+            <span style="color: var(--color-accent-orange); margin-left: 2rem;" data-ko="↑ ─────────── 이전 프레임 ─────────── ↲" data-fa="↑ ─────────── فریم قبلی ─────────── ↲" data-ru="↑ ─────────── предыдущий кадр ─────────── ↲">↑ ─────────── 이전 프레임 ─────────── ↲</span>
           </div>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">시각적 비유</div>
-            TV 화면 앞에 카메라를 놓는 것과 같다. 카메라가 화면을 찍고 → 그 영상이 화면에 나오고 → 다시 카메라가 찍고... 반복될수록 이미지가 축소되고, 회전하고, 색이 변하면서 무한 터널 같은 효과가 나온다.
+            <div class="callout-label" data-ko="시각적 비유" data-fa="تشبیه بصری" data-ru="Визуальная аналогия">시각적 비유</div>
+            <span data-ko="TV 화면 앞에 카메라를 놓는 것과 같다. 카메라가 화면을 찍고 → 그 영상이 화면에 나오고 → 다시 카메라가 찍고... 반복될수록 이미지가 축소되고, 회전하고, 색이 변하면서 무한 터널 같은 효과가 나온다." data-fa="مثل قرار دادن دوربین جلوی صفحه تلویزیون است. دوربین صفحه را می‌گیرد → آن تصویر روی صفحه نمایش داده می‌شود → دوربین دوباره می‌گیرد... با هر تکرار تصویر کوچک‌تر، چرخیده و رنگش تغییر می‌کند و افکتی شبیه تونل بی‌نهایت ایجاد می‌شود." data-ru="Это как поставить камеру перед экраном телевизора. Камера снимает экран → изображение выводится на экран → камера снимает снова... С каждым повтором картинка уменьшается, поворачивается, меняет цвет — возникает эффект бесконечного туннеля.">TV 화면 앞에 카메라를 놓는 것과 같다. 카메라가 화면을 찍고 → 그 영상이 화면에 나오고 → 다시 카메라가 찍고... 반복될수록 이미지가 축소되고, 회전하고, 색이 변하면서 무한 터널 같은 효과가 나온다.</span>
           </div>
 
           <div class="module-card mb-6">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-purple);"></span>
-              핵심 파라미터
+              <span data-ko="핵심 파라미터" data-fa="پارامترهای کلیدی" data-ru="Ключевые параметры">핵심 파라미터</span>
             </div>
             <div class="module-card-body">
               <table class="data-table">
                 <thead>
-                  <tr><th>파라미터</th><th>설명</th></tr>
+                  <tr><th data-ko="파라미터" data-fa="پارامتر" data-ru="Параметр">파라미터</th><th data-ko="설명" data-fa="توضیحات" data-ru="Описание">설명</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Target TOP</td><td>피드백 루프의 끝점. 이 TOP의 출력이 다음 프레임에 Feedback TOP의 출력이 된다</td></tr>
-                  <tr><td>Reset</td><td>0이면 피드백 활성, 1이면 비활성(입력 이미지를 그대로 통과)</td></tr>
-                  <tr><td>Reset Pulse</td><td>클릭하면 한 프레임 동안 피드백을 리셋한다</td></tr>
+                  <tr><td>Target TOP</td><td data-ko="피드백 루프의 끝점. 이 TOP의 출력이 다음 프레임에 Feedback TOP의 출력이 된다" data-fa="نقطه پایانی حلقه Feedback. خروجی این TOP در فریم بعد به خروجی Feedback TOP تبدیل می‌شود" data-ru="Конечная точка петли Feedback. Выход этого TOP становится выходом Feedback TOP в следующем кадре">피드백 루프의 끝점. 이 TOP의 출력이 다음 프레임에 Feedback TOP의 출력이 된다</td></tr>
+                  <tr><td>Reset</td><td data-ko="0이면 피드백 활성, 1이면 비활성(입력 이미지를 그대로 통과)" data-fa="اگر 0 باشد Feedback فعال، اگر 1 باشد غیرفعال (تصویر ورودی بدون تغییر عبور می‌کند)" data-ru="0 — Feedback активен, 1 — отключён (входное изображение проходит без изменений)">0이면 피드백 활성, 1이면 비활성(입력 이미지를 그대로 통과)</td></tr>
+                  <tr><td>Reset Pulse</td><td data-ko="클릭하면 한 프레임 동안 피드백을 리셋한다" data-fa="با کلیک، Feedback را برای یک فریم ریست می‌کند" data-ru="По нажатию сбрасывает Feedback на один кадр">클릭하면 한 프레임 동안 피드백을 리셋한다</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <!-- 기본 잔상 만들기 -->
-          <h4 class="text-base font-semibold mb-3 mt-8">기본 사용법: 잔상 만들기</h4>
+          <h4 class="text-base font-semibold mb-3 mt-8" data-ko="기본 사용법: 잔상 만들기" data-fa="استفاده پایه: ایجاد پس‌تصویر" data-ru="Базовое применение: создание остаточного следа">기본 사용법: 잔상 만들기</h4>
 
           <div class="node-diagram mb-4">
             <span class="node node-top">Movie File In</span><br>
@@ -229,18 +272,18 @@
             <span class="arrow">→</span>
             <span class="node node-top">Null</span>
             <br>
-            <span style="margin-left: 12rem; color: var(--color-text-dim); font-size: 0.72rem;">↑ 원본 영상을 위에 합성&emsp;&emsp;&emsp;opacity 0.95 → 서서히 사라지는 잔상</span>
+            <span style="margin-left: 12rem; color: var(--color-text-dim); font-size: 0.72rem;" data-ko="↑ 원본 영상을 위에 합성&emsp;&emsp;&emsp;opacity 0.95 → 서서히 사라지는 잔상" data-fa="↑ ترکیب ویدیوی اصلی روی آن&emsp;&emsp;&emsp;opacity 0.95 → پس‌تصویر محوشونده" data-ru="↑ наложение исходного видео&emsp;&emsp;&emsp;opacity 0.95 → постепенно исчезающий след">↑ 원본 영상을 위에 합성&emsp;&emsp;&emsp;opacity 0.95 → 서서히 사라지는 잔상</span>
           </div>
 
           <div class="step-list mb-6">
-            <div class="step-item"><span><code>Feedback TOP</code>을 만들고, Target TOP을 하류의 <code>Level TOP</code>으로 지정한다</span></div>
-            <div class="step-item"><span><code>Composite TOP</code>의 첫 번째 입력에 Feedback TOP을, 두 번째 입력에 원본 영상을 연결한다</span></div>
-            <div class="step-item"><span><code>Level TOP</code>의 opacity를 <strong>0.95</strong> 정도로 낮춘다</span></div>
-            <div class="step-item"><span>결과: 이전 프레임이 살짝 투명해지면서 새 프레임이 위에 쌓인다 → <strong>잔상 효과</strong></span></div>
+            <div class="step-item"><span data-ko="<code>Feedback TOP</code>을 만들고, Target TOP을 하류의 <code>Level TOP</code>으로 지정한다" data-fa="<code>Feedback TOP</code> بسازید و Target TOP را به <code>Level TOP</code> پایین‌دستی تنظیم کنید" data-ru="Создайте <code>Feedback TOP</code> и укажите Target TOP на нижестоящий <code>Level TOP</code>"><code>Feedback TOP</code>을 만들고, Target TOP을 하류의 <code>Level TOP</code>으로 지정한다</span></div>
+            <div class="step-item"><span data-ko="<code>Composite TOP</code>의 첫 번째 입력에 Feedback TOP을, 두 번째 입력에 원본 영상을 연결한다" data-fa="ورودی اول <code>Composite TOP</code> را به Feedback TOP و ورودی دوم را به ویدیوی اصلی وصل کنید" data-ru="Подключите Feedback TOP к первому входу <code>Composite TOP</code>, а исходное видео — ко второму"><code>Composite TOP</code>의 첫 번째 입력에 Feedback TOP을, 두 번째 입력에 원본 영상을 연결한다</span></div>
+            <div class="step-item"><span data-ko="<code>Level TOP</code>의 opacity를 <strong>0.95</strong> 정도로 낮춘다" data-fa="opacity در <code>Level TOP</code> را به حدود <strong>0.95</strong> کاهش دهید" data-ru="Уменьшите opacity в <code>Level TOP</code> примерно до <strong>0.95</strong>"><code>Level TOP</code>의 opacity를 <strong>0.95</strong> 정도로 낮춘다</span></div>
+            <div class="step-item"><span data-ko="결과: 이전 프레임이 살짝 투명해지면서 새 프레임이 위에 쌓인다 → <strong>잔상 효과</strong>" data-fa="نتیجه: فریم قبلی کمی شفاف شده و فریم جدید روی آن قرار می‌گیرد → <strong>افکت پس‌تصویر</strong>" data-ru="Результат: предыдущий кадр слегка прозрачнеет, а новый накладывается сверху → <strong>эффект следа</strong>">결과: 이전 프레임이 살짝 투명해지면서 새 프레임이 위에 쌓인다 → <strong>잔상 효과</strong></span></div>
           </div>
 
           <!-- Feedback + Transform -->
-          <h4 class="text-base font-semibold mb-3 mt-8">Feedback + Transform: 무한 터널</h4>
+          <h4 class="text-base font-semibold mb-3 mt-8" data-ko="Feedback + Transform: 무한 터널" data-fa="Feedback + Transform: تونل بی‌نهایت" data-ru="Feedback + Transform: бесконечный туннель">Feedback + Transform: 무한 터널</h4>
 
           <div class="node-diagram mb-4">
             <span class="node node-top">Feedback TOP</span>
@@ -251,41 +294,41 @@
             <span class="arrow">→</span>
             <span class="node node-top">Null</span>
             <br>
-            <span style="margin-left: 9.5rem; color: var(--color-text-dim); font-size: 0.72rem;">scale: 0.98&emsp;&emsp;&emsp;↑ 원본 이미지</span><br>
+            <span style="margin-left: 9.5rem; color: var(--color-text-dim); font-size: 0.72rem;">scale: 0.98&emsp;&emsp;&emsp;<span data-ko="↑ 원본 이미지" data-fa="↑ تصویر اصلی" data-ru="↑ исходное изображение">↑ 원본 이미지</span></span><br>
             <span style="margin-left: 9.5rem; color: var(--color-text-dim); font-size: 0.72rem;">rotate: 1°</span>
           </div>
 
           <div class="callout callout-warning mb-6">
-            <div class="callout-label">주의</div>
-            Feedback 루프 안에서 <strong>Level TOP의 opacity</strong>를 반드시 1보다 낮게 설정해야 한다. 그렇지 않으면 이미지가 계속 쌓여서 화면이 완전히 하얗게(또는 까맣게) 된다.
+            <div class="callout-label" data-ko="주의" data-fa="هشدار" data-ru="Внимание">주의</div>
+            <span data-ko="Feedback 루프 안에서 <strong>Level TOP의 opacity</strong>를 반드시 1보다 낮게 설정해야 한다. 그렇지 않으면 이미지가 계속 쌓여서 화면이 완전히 하얗게(또는 까맣게) 된다." data-fa="در حلقه Feedback حتماً <strong>opacity در Level TOP</strong> را کمتر از 1 تنظیم کنید. در غیر این صورت تصاویر انباشته شده و صفحه کاملاً سفید (یا سیاه) می‌شود." data-ru="В петле Feedback обязательно установите <strong>opacity в Level TOP</strong> ниже 1. Иначе изображения будут накапливаться, и экран станет полностью белым (или чёрным).">Feedback 루프 안에서 <strong>Level TOP의 opacity</strong>를 반드시 1보다 낮게 설정해야 한다. 그렇지 않으면 이미지가 계속 쌓여서 화면이 완전히 하얗게(또는 까맣게) 된다.</span>
           </div>
 
         </div>
 
         <!-- 1-3. Displace TOP -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">Displace TOP — 이미지를 왜곡하는 힘</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="Displace TOP — 이미지를 왜곡하는 힘" data-fa="Displace TOP — نیروی تغییر شکل تصویر" data-ru="Displace TOP — сила искажения изображения">Displace TOP — 이미지를 왜곡하는 힘</h3>
 
           <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
-            Displace TOP은 <strong>하나의 이미지를 다른 이미지로 왜곡(warp)하는</strong> 오퍼레이터다.
-            두 개의 입력을 받는다: <strong>Source Image</strong>(왜곡될 원본)와 <strong>Displace Image</strong>(왜곡의 방향과 세기를 결정).
+            <span data-ko="Displace TOP은 <strong>하나의 이미지를 다른 이미지로 왜곡(warp)하는</strong> 오퍼레이터다. 두 개의 입력을 받는다: <strong>Source Image</strong>(왜곡될 원본)와 <strong>Displace Image</strong>(왜곡의 방향과 세기를 결정)." data-fa="Displace TOP اپراتوری است که <strong>یک تصویر را با تصویر دیگر تغییر شکل (warp) می‌دهد</strong>. دو ورودی دارد: <strong>Source Image</strong> (تصویر اصلی که تغییر شکل می‌یابد) و <strong>Displace Image</strong> (جهت و شدت تغییر شکل را تعیین می‌کند)." data-ru="Displace TOP — оператор, который <strong>искажает (warp) одно изображение с помощью другого</strong>. Принимает два входа: <strong>Source Image</strong> (исходник для искажения) и <strong>Displace Image</strong> (определяет направление и силу искажения).">Displace TOP은 <strong>하나의 이미지를 다른 이미지로 왜곡(warp)하는</strong> 오퍼레이터다.
+            두 개의 입력을 받는다: <strong>Source Image</strong>(왜곡될 원본)와 <strong>Displace Image</strong>(왜곡의 방향과 세기를 결정).</span>
           </p>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">원리</div>
-            Displace Image의 <strong>밝기 값</strong>이 Source Image의 픽셀을 이동시킨다.
+            <div class="callout-label" data-ko="원리" data-fa="اصل عملکرد" data-ru="Принцип">원리</div>
+            <span data-ko="Displace Image의 <strong>밝기 값</strong>이 Source Image의 픽셀을 이동시킨다. 50% 회색(0.5) = 이동 없음(기준점), 밝은 부분 = 한 방향으로 이동, 어두운 부분 = 반대 방향으로 이동. <strong>Red 채널</strong>이 X축, <strong>Green 채널</strong>이 Y축 방향 이동을 결정한다." data-fa="<strong>مقدار روشنایی</strong> Displace Image پیکسل‌های Source Image را جابه‌جا می‌کند. خاکستری 50% (0.5) = بدون جابه‌جایی (نقطه مرجع)، نواحی روشن = جابه‌جایی در یک جهت، نواحی تیره = جابه‌جایی در جهت مخالف. <strong>کانال Red</strong> جابه‌جایی محور X و <strong>کانال Green</strong> جابه‌جایی محور Y را تعیین می‌کند." data-ru="<strong>Значение яркости</strong> Displace Image сдвигает пиксели Source Image. 50%-й серый (0.5) = без сдвига (точка отсчёта), светлые области = сдвиг в одну сторону, тёмные = в противоположную. <strong>Канал Red</strong> задаёт сдвиг по оси X, <strong>канал Green</strong> — по Y.">Displace Image의 <strong>밝기 값</strong>이 Source Image의 픽셀을 이동시킨다.
             50% 회색(0.5) = 이동 없음(기준점), 밝은 부분 = 한 방향으로 이동, 어두운 부분 = 반대 방향으로 이동.
-            <strong>Red 채널</strong>이 X축, <strong>Green 채널</strong>이 Y축 방향 이동을 결정한다.
+            <strong>Red 채널</strong>이 X축, <strong>Green 채널</strong>이 Y축 방향 이동을 결정한다.</span>
           </div>
 
           <div class="callout callout-tip mb-6">
-            <div class="callout-label">시각적 비유</div>
-            물 위에 비친 풍경을 상상해보자 — 물결이 없으면 풍경이 그대로 보이고(Weight = 0),
+            <div class="callout-label" data-ko="시각적 비유" data-fa="تشبیه بصری" data-ru="Визуальная аналогия">시각적 비유</div>
+            <span data-ko="물 위에 비친 풍경을 상상해보자 — 물결이 없으면 풍경이 그대로 보이고(Weight = 0), 잔잔한 물결이면 살짝 일렁이고(작은 값), 거센 파도면 심하게 뒤틀린다(큰 값). <strong>물결의 패턴</strong>(Displace Image)이 왜곡의 모양을 결정한다." data-fa="منظره‌ای بازتاب‌شده در آب را تصور کنید — بدون موج منظره واضح دیده می‌شود (Weight = 0)، با موج ملایم کمی می‌لرزد (مقدار کم)، با امواج شدید به‌شدت پیچ و تاب می‌خورد (مقدار بزرگ). <strong>الگوی موج</strong> (Displace Image) شکل تغییر شکل را تعیین می‌کند." data-ru="Представьте пейзаж, отражённый в воде — без волн он виден чётко (Weight = 0), при лёгкой ряби слегка колышется (малое значение), при сильных волнах сильно искажается (большое значение). <strong>Рисунок волн</strong> (Displace Image) определяет форму искажения.">물 위에 비친 풍경을 상상해보자 — 물결이 없으면 풍경이 그대로 보이고(Weight = 0),
             잔잔한 물결이면 살짝 일렁이고(작은 값), 거센 파도면 심하게 뒤틀린다(큰 값).
-            <strong>물결의 패턴</strong>(Displace Image)이 왜곡의 모양을 결정한다.
+            <strong>물결의 패턴</strong>(Displace Image)이 왜곡의 모양을 결정한다.</span>
           </div>
 
-          <h4 class="text-base font-semibold mb-3">기본 사용법: Noise로 왜곡하기</h4>
+          <h4 class="text-base font-semibold mb-3" data-ko="기본 사용법: Noise로 왜곡하기" data-fa="استفاده پایه: تغییر شکل با Noise" data-ru="Базовое применение: искажение с помощью Noise">기본 사용법: Noise로 왜곡하기</h4>
 
           <div class="node-diagram mb-4">
             <span class="node node-top">Movie File In</span>
@@ -302,42 +345,42 @@
           <div class="module-card mb-6">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-purple);"></span>
-              Noise TOP 설정에 따른 왜곡 변화
+              <span data-ko="Noise TOP 설정에 따른 왜곡 변화" data-fa="تغییرات تغییر شکل بر اساس تنظیمات Noise TOP" data-ru="Изменение искажения в зависимости от настроек Noise TOP">Noise TOP 설정에 따른 왜곡 변화</span>
             </div>
             <div class="module-card-body">
               <table class="data-table">
                 <thead>
-                  <tr><th>Noise TOP 파라미터</th><th>효과</th></tr>
+                  <tr><th data-ko="Noise TOP 파라미터" data-fa="پارامتر Noise TOP" data-ru="Параметр Noise TOP">Noise TOP 파라미터</th><th data-ko="효과" data-fa="اثر" data-ru="Эффект">효과</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Period 크게</td><td>넓고 부드러운 왜곡 (물 위의 물결)</td></tr>
-                  <tr><td>Period 작게</td><td>좁고 날카로운 왜곡 (유리 깨짐)</td></tr>
-                  <tr><td>Translate 변화</td><td>왜곡 패턴이 움직인다 (흐르는 물)</td></tr>
-                  <tr><td>Amplitude</td><td>밝기 차이 → 왜곡 강도</td></tr>
-                  <tr><td>Type</td><td>Perlin, Simplex 등 — 왜곡의 질감이 달라진다</td></tr>
+                  <tr><td data-ko="Period 크게" data-fa="Period بزرگ" data-ru="Period большой">Period 크게</td><td data-ko="넓고 부드러운 왜곡 (물 위의 물결)" data-fa="تغییر شکل وسیع و نرم (موج روی آب)" data-ru="Широкое плавное искажение (рябь на воде)">넓고 부드러운 왜곡 (물 위의 물결)</td></tr>
+                  <tr><td data-ko="Period 작게" data-fa="Period کوچک" data-ru="Period маленький">Period 작게</td><td data-ko="좁고 날카로운 왜곡 (유리 깨짐)" data-fa="تغییر شکل تند و باریک (شکستن شیشه)" data-ru="Узкое резкое искажение (разбитое стекло)">좁고 날카로운 왜곡 (유리 깨짐)</td></tr>
+                  <tr><td data-ko="Translate 변화" data-fa="تغییر Translate" data-ru="Изменение Translate">Translate 변화</td><td data-ko="왜곡 패턴이 움직인다 (흐르는 물)" data-fa="الگوی تغییر شکل حرکت می‌کند (آب جاری)" data-ru="Паттерн искажения движется (текущая вода)">왜곡 패턴이 움직인다 (흐르는 물)</td></tr>
+                  <tr><td>Amplitude</td><td data-ko="밝기 차이 → 왜곡 강도" data-fa="تفاوت روشنایی → شدت تغییر شکل" data-ru="Разница яркости → сила искажения">밝기 차이 → 왜곡 강도</td></tr>
+                  <tr><td>Type</td><td data-ko="Perlin, Simplex 등 — 왜곡의 질감이 달라진다" data-fa="Perlin، Simplex و غیره — بافت تغییر شکل متفاوت می‌شود" data-ru="Perlin, Simplex и т.д. — меняется текстура искажения">Perlin, Simplex 등 — 왜곡의 질감이 달라진다</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <div class="callout callout-tip mb-6">
-            <div class="callout-label">팁</div>
-            Noise TOP의 Translate 파라미터에 <code style="font-family: var(--font-mono); font-size: 0.8rem;">absTime.seconds * 0.1</code>을 넣으면 시간에 따라 노이즈가 움직인다.
+            <div class="callout-label" data-ko="팁" data-fa="نکته" data-ru="Совет">팁</div>
+            <span data-ko="Noise TOP의 Translate 파라미터에 <code style='font-family: var(--font-mono); font-size: 0.8rem;'>absTime.seconds * 0.1</code>을 넣으면 시간에 따라 노이즈가 움직인다." data-fa="اگر در پارامتر Translate در Noise TOP عبارت <code style='font-family: var(--font-mono); font-size: 0.8rem;'>absTime.seconds * 0.1</code> را وارد کنید، نویز با گذشت زمان حرکت می‌کند." data-ru="Если в параметр Translate в Noise TOP ввести <code style='font-family: var(--font-mono); font-size: 0.8rem;'>absTime.seconds * 0.1</code>, шум будет двигаться со временем.">Noise TOP의 Translate 파라미터에 <code style="font-family: var(--font-mono); font-size: 0.8rem;">absTime.seconds * 0.1</code>을 넣으면 시간에 따라 노이즈가 움직인다.</span>
           </div>
 
         </div>
 
         <!-- 1-4. Feedback + Displace 결합 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">Feedback + Displace: 결합의 힘</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="Feedback + Displace: 결합의 힘" data-fa="Feedback + Displace: قدرت ترکیب" data-ru="Feedback + Displace: сила комбинации">Feedback + Displace: 결합의 힘</h3>
 
           <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
-            Feedback과 Displace를 결합하면 단순한 잔상이나 왜곡을 넘어서, <strong>살아 움직이는 듯한 유기적 비주얼</strong>을 만들 수 있다.
-            매 프레임마다 이전 결과가 살짝 왜곡되면서 다시 쌓인다 → 시간이 지나면서 이미지가 흘러가고, 녹아내리고, 퍼져나가는 효과.
+            <span data-ko="Feedback과 Displace를 결합하면 단순한 잔상이나 왜곡을 넘어서, <strong>살아 움직이는 듯한 유기적 비주얼</strong>을 만들 수 있다. 매 프레임마다 이전 결과가 살짝 왜곡되면서 다시 쌓인다 → 시간이 지나면서 이미지가 흘러가고, 녹아내리고, 퍼져나가는 효과." data-fa="با ترکیب Feedback و Displace، فراتر از پس‌تصویر یا تغییر شکل ساده، می‌توانید <strong>ویژوال‌های ارگانیک و زنده</strong> بسازید. هر فریم نتیجه قبلی کمی تغییر شکل یافته و دوباره انباشته می‌شود → با گذشت زمان تصویر جاری می‌شود، ذوب می‌شود و پخش می‌شود." data-ru="Комбинация Feedback и Displace позволяет создавать не просто след или искажение, а <strong>живые органические визуалы</strong>. Каждый кадр предыдущий результат слегка искажается и снова накладывается → со временем изображение течёт, плавится, растекается.">Feedback과 Displace를 결합하면 단순한 잔상이나 왜곡을 넘어서, <strong>살아 움직이는 듯한 유기적 비주얼</strong>을 만들 수 있다.
+            매 프레임마다 이전 결과가 살짝 왜곡되면서 다시 쌓인다 → 시간이 지나면서 이미지가 흘러가고, 녹아내리고, 퍼져나가는 효과.</span>
           </p>
 
           <div class="node-diagram mb-6">
-            <span class="annotation">Feedback + Displace 기본 구조</span><br><br>
+            <span class="annotation" data-ko="Feedback + Displace 기본 구조" data-fa="ساختار پایه Feedback + Displace" data-ru="Базовая структура Feedback + Displace">Feedback + Displace 기본 구조</span><br><br>
             <span class="node node-top">Feedback</span>
             <span class="arrow">→</span>
             <span class="node node-top">Level</span>
@@ -350,7 +393,7 @@
             <br>
             <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 7.5rem;">opacity: 0.95</span>
             <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 2.5rem;">↑</span>
-            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 4rem;">↑ 원본 이미지</span>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 4rem;" data-ko="↑ 원본 이미지" data-fa="↑ تصویر اصلی" data-ru="↑ исходное изображение">↑ 원본 이미지</span>
             <br>
             <span style="margin-left: 17rem;" class="node node-top">Noise</span>
           </div>
@@ -358,27 +401,27 @@
           <div class="module-card mb-6">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-orange);"></span>
-              파라미터 감각
+              <span data-ko="파라미터 감각" data-fa="حس پارامتر" data-ru="Чувство параметров">파라미터 감각</span>
             </div>
             <div class="module-card-body">
               <table class="data-table">
                 <thead>
-                  <tr><th>설정</th><th>낮은 값</th><th>높은 값</th></tr>
+                  <tr><th data-ko="설정" data-fa="تنظیم" data-ru="Настройка">설정</th><th data-ko="낮은 값" data-fa="مقدار کم" data-ru="Малое значение">낮은 값</th><th data-ko="높은 값" data-fa="مقدار زیاد" data-ru="Большое значение">높은 값</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Level opacity</td><td>잔상이 빨리 사라짐 (0.9)</td><td>잔상이 오래 남음 (0.99)</td></tr>
-                  <tr><td>Displace Weight</td><td>살짝 일렁임 (0.005)</td><td>심하게 뒤틀림 (0.1)</td></tr>
-                  <tr><td>Noise Period</td><td>날카로운 왜곡</td><td>부드러운 왜곡</td></tr>
-                  <tr><td>Noise Speed</td><td>느리게 변화</td><td>빠르게 변화</td></tr>
+                  <tr><td>Level opacity</td><td data-ko="잔상이 빨리 사라짐 (0.9)" data-fa="پس‌تصویر سریع محو می‌شود (0.9)" data-ru="След быстро исчезает (0.9)">잔상이 빨리 사라짐 (0.9)</td><td data-ko="잔상이 오래 남음 (0.99)" data-fa="پس‌تصویر مدت بیشتری می‌ماند (0.99)" data-ru="След держится долго (0.99)">잔상이 오래 남음 (0.99)</td></tr>
+                  <tr><td>Displace Weight</td><td data-ko="살짝 일렁임 (0.005)" data-fa="لرزش خفیف (0.005)" data-ru="Лёгкое колыхание (0.005)">살짝 일렁임 (0.005)</td><td data-ko="심하게 뒤틀림 (0.1)" data-fa="پیچ‌وتاب شدید (0.1)" data-ru="Сильное искажение (0.1)">심하게 뒤틀림 (0.1)</td></tr>
+                  <tr><td>Noise Period</td><td data-ko="날카로운 왜곡" data-fa="تغییر شکل تند" data-ru="Резкое искажение">날카로운 왜곡</td><td data-ko="부드러운 왜곡" data-fa="تغییر شکل نرم" data-ru="Плавное искажение">부드러운 왜곡</td></tr>
+                  <tr><td>Noise Speed</td><td data-ko="느리게 변화" data-fa="تغییر آهسته" data-ru="Медленное изменение">느리게 변화</td><td data-ko="빠르게 변화" data-fa="تغییر سریع" data-ru="Быстрое изменение">빠르게 변화</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">미리보기</div>
-            이 값들을 나중에 <strong>CHOP으로 제어</strong>하면 소리에 반응하는 비주얼이 된다.
-            예: 소리가 크면 Displace Weight가 올라가고, 조용하면 내려간다.
+            <div class="callout-label" data-ko="미리보기" data-fa="پیش‌نمایش" data-ru="Предпросмотр">미리보기</div>
+            <span data-ko="이 값들을 나중에 <strong>CHOP으로 제어</strong>하면 소리에 반응하는 비주얼이 된다. 예: 소리가 크면 Displace Weight가 올라가고, 조용하면 내려간다." data-fa="اگر این مقادیر را بعداً <strong>با CHOP کنترل کنید</strong>، ویژوالی واکنش‌پذیر به صدا خواهید داشت. مثلاً: صدا بلند → Displace Weight بالا می‌رود، ساکت → پایین می‌آید." data-ru="Если позже <strong>управлять этими значениями через CHOP</strong>, получится визуал, реагирующий на звук. Например: громко → Displace Weight повышается, тихо → понижается.">이 값들을 나중에 <strong>CHOP으로 제어</strong>하면 소리에 반응하는 비주얼이 된다.
+            예: 소리가 크면 Displace Weight가 올라가고, 조용하면 내려간다.</span>
           </div>
         </div>
       </section>
@@ -392,13 +435,13 @@
             <span class="dot" style="background: var(--color-accent-green);"></span>
             Part 02
           </div>
-          <h2 class="part-title">CHOP — 시간에 따라 변하는 숫자</h2>
-          <p class="part-subtitle">CHOP(Channel Operator)의 핵심 개념과 세 가지 역할(생성, 가공, 출력)을 이해한다.</p>
+          <h2 class="part-title" data-ko="CHOP — 시간에 따라 변하는 숫자" data-fa="CHOP — اعدادی که در طول زمان تغییر می‌کنند" data-ru="CHOP — числа, изменяющиеся во времени">CHOP — 시간에 따라 변하는 숫자</h2>
+          <p class="part-subtitle" data-ko="CHOP(Channel Operator)의 핵심 개념과 세 가지 역할(생성, 가공, 출력)을 이해한다." data-fa="مفهوم اصلی CHOP (Channel Operator) و سه نقش آن (تولید، پردازش، خروجی) را درک می‌کنیم." data-ru="Разберём ключевую концепцию CHOP (Channel Operator) и три его роли (генерация, обработка, вывод).">CHOP(Channel Operator)의 핵심 개념과 세 가지 역할(생성, 가공, 출력)을 이해한다.</p>
         </div>
 
         <!-- 2-1. CHOP이란 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">CHOP이란 무엇인가</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="CHOP이란 무엇인가" data-fa="CHOP چیست" data-ru="Что такое CHOP">CHOP이란 무엇인가</h3>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div class="module-card">
@@ -407,10 +450,10 @@
                 TOP
               </div>
               <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-                <p><strong style="color: var(--color-text);">다루는 것:</strong> 2D 이미지 (픽셀)</p>
-                <p><strong style="color: var(--color-text);">시각적 표현:</strong> 이미지 미리보기</p>
-                <p><strong style="color: var(--color-text);">와이어 색상:</strong> <span style="color: var(--color-accent-purple);">보라색</span></p>
-                <p><strong style="color: var(--color-text);">핵심 질문:</strong> "이 이미지를 어떻게 바꿀까?"</p>
+                <p><strong style="color: var(--color-text);"><span data-ko="다루는 것:" data-fa="موضوع کار:" data-ru="Работает с:">다루는 것:</span></strong> <span data-ko="2D 이미지 (픽셀)" data-fa="تصاویر دوبعدی (پیکسل)" data-ru="2D-изображения (пиксели)">2D 이미지 (픽셀)</span></p>
+                <p><strong style="color: var(--color-text);"><span data-ko="시각적 표현:" data-fa="نمایش بصری:" data-ru="Визуальное представление:">시각적 표현:</span></strong> <span data-ko="이미지 미리보기" data-fa="پیش‌نمایش تصویر" data-ru="Превью изображения">이미지 미리보기</span></p>
+                <p><strong style="color: var(--color-text);"><span data-ko="와이어 색상:" data-fa="رنگ سیم:" data-ru="Цвет провода:">와이어 색상:</span></strong> <span style="color: var(--color-accent-purple);" data-ko="보라색" data-fa="بنفش" data-ru="фиолетовый">보라색</span></p>
+                <p><strong style="color: var(--color-text);"><span data-ko="핵심 질문:" data-fa="پرسش کلیدی:" data-ru="Ключевой вопрос:">핵심 질문:</span></strong> <span data-ko="&quot;이 이미지를 어떻게 바꿀까?&quot;" data-fa="&quot;چطور این تصویر را تغییر دهم?&quot;" data-ru="&quot;Как изменить это изображение?&quot;">"이 이미지를 어떻게 바꿀까?"</span></p>
               </div>
             </div>
             <div class="module-card">
@@ -419,18 +462,18 @@
                 CHOP
               </div>
               <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-                <p><strong style="color: var(--color-text);">다루는 것:</strong> 숫자의 흐름 (채널)</p>
-                <p><strong style="color: var(--color-text);">시각적 표현:</strong> 그래프 (파형)</p>
-                <p><strong style="color: var(--color-text);">와이어 색상:</strong> <span style="color: var(--color-accent-green);">녹색</span></p>
-                <p><strong style="color: var(--color-text);">핵심 질문:</strong> "이 숫자를 어떻게 만들까?"</p>
+                <p><strong style="color: var(--color-text);"><span data-ko="다루는 것:" data-fa="موضوع کار:" data-ru="Работает с:">다루는 것:</span></strong> <span data-ko="숫자의 흐름 (채널)" data-fa="جریان اعداد (کانال)" data-ru="Поток чисел (каналы)">숫자의 흐름 (채널)</span></p>
+                <p><strong style="color: var(--color-text);"><span data-ko="시각적 표현:" data-fa="نمایش بصری:" data-ru="Визуальное представление:">시각적 표현:</span></strong> <span data-ko="그래프 (파형)" data-fa="نمودار (شکل موج)" data-ru="График (волна)">그래프 (파형)</span></p>
+                <p><strong style="color: var(--color-text);"><span data-ko="와이어 색상:" data-fa="رنگ سیم:" data-ru="Цвет провода:">와이어 색상:</span></strong> <span style="color: var(--color-accent-green);" data-ko="녹색" data-fa="سبز" data-ru="зелёный">녹색</span></p>
+                <p><strong style="color: var(--color-text);"><span data-ko="핵심 질문:" data-fa="پرسش کلیدی:" data-ru="Ключевой вопрос:">핵심 질문:</span></strong> <span data-ko="&quot;이 숫자를 어떻게 만들까?&quot;" data-fa="&quot;چطور این عدد را بسازم?&quot;" data-ru="&quot;Как создать это число?&quot;">"이 숫자를 어떻게 만들까?"</span></p>
               </div>
             </div>
           </div>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">핵심 정의</div>
-            CHOP = <strong>Ch</strong>annel <strong>Op</strong>erator = 시간에 따라 변하는 숫자를 만들고, 가공하고, 전달하는 도구.
-            TOP이 <strong>사진</strong>이라면, CHOP은 <strong>심전도 그래프</strong>다.
+            <div class="callout-label" data-ko="핵심 정의" data-fa="تعریف کلیدی" data-ru="Ключевое определение">핵심 정의</div>
+            <span data-ko="CHOP = <strong>Ch</strong>annel <strong>Op</strong>erator = 시간에 따라 변하는 숫자를 만들고, 가공하고, 전달하는 도구. TOP이 <strong>사진</strong>이라면, CHOP은 <strong>심전도 그래프</strong>다." data-fa="CHOP = <strong>Ch</strong>annel <strong>Op</strong>erator = ابزاری برای ساخت، پردازش و انتقال اعدادی که در طول زمان تغییر می‌کنند. اگر TOP <strong>عکس</strong> باشد، CHOP <strong>نوار قلب</strong> است." data-ru="CHOP = <strong>Ch</strong>annel <strong>Op</strong>erator = инструмент для создания, обработки и передачи чисел, меняющихся во времени. Если TOP — это <strong>фотография</strong>, то CHOP — это <strong>кардиограмма</strong>.">CHOP = <strong>Ch</strong>annel <strong>Op</strong>erator = 시간에 따라 변하는 숫자를 만들고, 가공하고, 전달하는 도구.
+            TOP이 <strong>사진</strong>이라면, CHOP은 <strong>심전도 그래프</strong>다.</span>
           </div>
 
           <!-- Channel, Sample, Sample Rate -->
@@ -438,19 +481,19 @@
             <div class="panel">
               <div class="panel-header">
                 <span class="indicator" style="background: var(--color-accent-green);"></span>
-                Channel (채널)
+                <span data-ko="Channel (채널)" data-fa="Channel (کانال)" data-ru="Channel (канал)">Channel (채널)</span>
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
-                하나의 데이터 흐름. 마우스 x좌표 = 1개 채널, 오디오 L/R = 2개 채널.
+                <span data-ko="하나의 데이터 흐름. 마우스 x좌표 = 1개 채널, 오디오 L/R = 2개 채널." data-fa="یک جریان داده. مختصات x ماوس = ۱ کانال، صدای L/R = ۲ کانال." data-ru="Один поток данных. Координата x мыши = 1 канал, аудио L/R = 2 канала.">하나의 데이터 흐름. 마우스 x좌표 = 1개 채널, 오디오 L/R = 2개 채널.</span>
               </p>
             </div>
             <div class="panel">
               <div class="panel-header">
                 <span class="indicator" style="background: var(--color-accent-blue);"></span>
-                Sample (샘플)
+                <span data-ko="Sample (샘플)" data-fa="Sample (نمونه)" data-ru="Sample (сэмпл)">Sample (샘플)</span>
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
-                매 순간 기록되는 하나의 값. 그래프의 한 점 = 하나의 샘플.
+                <span data-ko="매 순간 기록되는 하나의 값. 그래프의 한 점 = 하나의 샘플." data-fa="یک مقدار ثبت‌شده در هر لحظه. یک نقطه روی نمودار = یک نمونه." data-ru="Одно значение, записанное в каждый момент. Одна точка на графике = один сэмпл.">매 순간 기록되는 하나의 값. 그래프의 한 점 = 하나의 샘플.</span>
               </p>
             </div>
             <div class="panel">
@@ -459,61 +502,61 @@
                 Sample Rate
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
-                1초에 몇 번 값을 기록하는가. 컨트롤: 60Hz, 오디오: 44100Hz.
+                <span data-ko="1초에 몇 번 값을 기록하는가. 컨트롤: 60Hz, 오디오: 44100Hz." data-fa="چند بار در ثانیه مقدار ثبت می‌شود. کنترل: 60Hz، صدا: 44100Hz." data-ru="Сколько раз в секунду записывается значение. Управление: 60 Гц, аудио: 44100 Гц.">1초에 몇 번 값을 기록하는가. 컨트롤: 60Hz, 오디오: 44100Hz.</span>
               </p>
             </div>
           </div>
 
           <div class="callout callout-tip mb-6">
-            <div class="callout-label">CHOP Viewer 습관</div>
-            CHOP을 처음 배울 때 가장 중요한 습관: <strong>항상 Viewer를 열어두고 값이 어떻게 움직이는지 관찰한다.</strong>
-            가로축 = 시간, 세로축 = 값, 각 선 = 하나의 채널.
+            <div class="callout-label" data-ko="CHOP Viewer 습관" data-fa="عادت CHOP Viewer" data-ru="Привычка CHOP Viewer">CHOP Viewer 습관</div>
+            <span data-ko="CHOP을 처음 배울 때 가장 중요한 습관: <strong>항상 Viewer를 열어두고 값이 어떻게 움직이는지 관찰한다.</strong> 가로축 = 시간, 세로축 = 값, 각 선 = 하나의 채널." data-fa="مهم‌ترین عادت هنگام یادگیری CHOP: <strong>همیشه Viewer را باز بگذارید و ببینید مقادیر چگونه حرکت می‌کنند.</strong> محور افقی = زمان، محور عمودی = مقدار، هر خط = یک کانال." data-ru="Главная привычка при изучении CHOP: <strong>всегда держите открытым Viewer и наблюдайте, как меняются значения.</strong> Горизонтальная ось = время, вертикальная = значение, каждая линия = один канал.">CHOP을 처음 배울 때 가장 중요한 습관: <strong>항상 Viewer를 열어두고 값이 어떻게 움직이는지 관찰한다.</strong>
+            가로축 = 시간, 세로축 = 값, 각 선 = 하나의 채널.</span>
           </div>
         </div>
 
         <!-- 2-2. 세 가지 역할 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">CHOP의 세 가지 역할: 생성, 가공, 출력</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="CHOP의 세 가지 역할: 생성, 가공, 출력" data-fa="سه نقش CHOP: تولید، پردازش، خروجی" data-ru="Три роли CHOP: генерация, обработка, вывод">CHOP의 세 가지 역할: 생성, 가공, 출력</h3>
 
           <div class="node-diagram mb-6">
-            <span class="node node-chop">생성 Generator</span>
+            <span class="node node-chop" data-ko="생성 Generator" data-fa="تولید Generator" data-ru="Генератор Generator">생성 Generator</span>
             <span class="arrow">→</span>
-            <span class="node node-chop">가공 Filter</span>
+            <span class="node node-chop" data-ko="가공 Filter" data-fa="پردازش Filter" data-ru="Фильтр Filter">가공 Filter</span>
             <span class="arrow">→</span>
-            <span class="node node-chop">출력 Output/Export</span>
+            <span class="node node-chop" data-ko="출력 Output/Export" data-fa="خروجی Output/Export" data-ru="Вывод Output/Export">출력 Output/Export</span>
           </div>
 
           <div class="module-card mb-6">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-green);"></span>
-              CHOP 오퍼레이터 분류
+              <span data-ko="CHOP 오퍼레이터 분류" data-fa="دسته‌بندی اپراتورهای CHOP" data-ru="Классификация операторов CHOP">CHOP 오퍼레이터 분류</span>
             </div>
             <div class="module-card-body">
               <table class="data-table">
                 <thead>
-                  <tr><th>역할</th><th>하는 일</th><th>대표 CHOP</th></tr>
+                  <tr><th data-ko="역할" data-fa="نقش" data-ru="Роль">역할</th><th data-ko="하는 일" data-fa="عملکرد" data-ru="Действие">하는 일</th><th data-ko="대표 CHOP" data-fa="CHOP نمونه" data-ru="Примеры CHOP">대표 CHOP</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>생성</td><td>값을 만들어낸다</td><td>LFO, Noise, Constant, Pattern</td></tr>
-                  <tr><td>입력</td><td>외부 데이터를 가져온다</td><td>Mouse In, Keyboard In, Audio Device In</td></tr>
-                  <tr><td>가공</td><td>값을 변환/처리한다</td><td>Math, Filter, Lag, Limit, Logic, Analyze</td></tr>
-                  <tr><td>출력</td><td>가공된 값을 전달한다</td><td>Null (+ Export/Reference)</td></tr>
+                  <tr><td data-ko="생성" data-fa="تولید" data-ru="Генерация">생성</td><td data-ko="값을 만들어낸다" data-fa="مقادیر تولید می‌کند" data-ru="Создаёт значения">값을 만들어낸다</td><td>LFO, Noise, Constant, Pattern</td></tr>
+                  <tr><td data-ko="입력" data-fa="ورودی" data-ru="Ввод">입력</td><td data-ko="외부 데이터를 가져온다" data-fa="داده خارجی را دریافت می‌کند" data-ru="Получает внешние данные">외부 데이터를 가져온다</td><td>Mouse In, Keyboard In, Audio Device In</td></tr>
+                  <tr><td data-ko="가공" data-fa="پردازش" data-ru="Обработка">가공</td><td data-ko="값을 변환/처리한다" data-fa="مقادیر را تبدیل/پردازش می‌کند" data-ru="Преобразует / обрабатывает значения">값을 변환/처리한다</td><td>Math, Filter, Lag, Limit, Logic, Analyze</td></tr>
+                  <tr><td data-ko="출력" data-fa="خروجی" data-ru="Вывод">출력</td><td data-ko="가공된 값을 전달한다" data-fa="مقادیر پردازش‌شده را ارسال می‌کند" data-ru="Передаёт обработанные значения">가공된 값을 전달한다</td><td>Null (+ Export/Reference)</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">인터랙션의 기본 구조</div>
-            모든 인터랙티브 작업은 하나의 구조로 요약된다:<br>
+            <div class="callout-label" data-ko="인터랙션의 기본 구조" data-fa="ساختار پایه تعامل" data-ru="Базовая структура интерактивности">인터랙션의 기본 구조</div>
+            <span data-ko="모든 인터랙티브 작업은 하나의 구조로 요약된다:<br><strong style='font-family: var(--font-mono); font-size: 0.85rem;'>입력(Input) → 변환(Process) → 출력(Output)</strong><br><br>이 구조를 몸에 익히면 나중에 입력 장치가 바뀌어도(마우스 → 센서 → 카메라 → MIDI) 같은 방식으로 응용할 수 있다." data-fa="همه کارهای تعاملی در یک ساختار خلاصه می‌شوند:<br><strong style='font-family: var(--font-mono); font-size: 0.85rem;'>ورودی (Input) → پردازش (Process) → خروجی (Output)</strong><br><br>اگر این ساختار را در خود نهادینه کنید، حتی وقتی دستگاه ورودی عوض شود (ماوس → سنسور → دوربین → MIDI) به همان شیوه می‌توانید کار کنید." data-ru="Любая интерактивная работа сводится к одной структуре:<br><strong style='font-family: var(--font-mono); font-size: 0.85rem;'>Ввод (Input) → Обработка (Process) → Вывод (Output)</strong><br><br>Усвоив эту структуру, вы сможете применять её даже при смене устройства ввода (мышь → сенсор → камера → MIDI).">모든 인터랙티브 작업은 하나의 구조로 요약된다:<br>
             <strong style="font-family: var(--font-mono); font-size: 0.85rem;">입력(Input) → 변환(Process) → 출력(Output)</strong><br><br>
-            이 구조를 몸에 익히면 나중에 입력 장치가 바뀌어도(마우스 → 센서 → 카메라 → MIDI) 같은 방식으로 응용할 수 있다.
+            이 구조를 몸에 익히면 나중에 입력 장치가 바뀌어도(마우스 → 센서 → 카메라 → MIDI) 같은 방식으로 응용할 수 있다.</span>
           </div>
         </div>
 
         <!-- 2-3. 생성 계열 CHOP -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">생성 계열 CHOP — 값을 만든다</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="생성 계열 CHOP — 값을 만든다" data-fa="CHOP تولیدکننده — مقادیر می‌سازد" data-ru="Генераторные CHOP — создают значения">생성 계열 CHOP — 값을 만든다</h3>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <!-- LFO -->
@@ -523,12 +566,12 @@
                 LFO CHOP
               </div>
               <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-                <p class="mb-3">Low Frequency Oscillator = 일정한 주기로 반복되는 값을 만든다.</p>
+                <p class="mb-3" data-ko="Low Frequency Oscillator = 일정한 주기로 반복되는 값을 만든다." data-fa="Low Frequency Oscillator = مقادیری تکرارشونده با دوره منظم تولید می‌کند." data-ru="Low Frequency Oscillator = создаёт значения, повторяющиеся с постоянным периодом.">Low Frequency Oscillator = 일정한 주기로 반복되는 값을 만든다.</p>
                 <table class="data-table">
                   <tbody>
-                    <tr><td>Frequency</td><td>1초에 몇 번 반복 (Hz)</td></tr>
-                    <tr><td>Amplitude</td><td>파형의 크기</td></tr>
-                    <tr><td>Offset</td><td>파형의 중심값 이동</td></tr>
+                    <tr><td>Frequency</td><td data-ko="1초에 몇 번 반복 (Hz)" data-fa="چند بار در ثانیه تکرار (Hz)" data-ru="Сколько раз в секунду повторяется (Гц)">1초에 몇 번 반복 (Hz)</td></tr>
+                    <tr><td>Amplitude</td><td data-ko="파형의 크기" data-fa="اندازه شکل موج" data-ru="Амплитуда волны">파형의 크기</td></tr>
+                    <tr><td>Offset</td><td data-ko="파형의 중심값 이동" data-fa="جابه‌جایی مرکز شکل موج" data-ru="Смещение центра волны">파형의 중심값 이동</td></tr>
                     <tr><td>Type</td><td>Sin, Square, Triangle, Ramp</td></tr>
                   </tbody>
                 </table>
@@ -541,12 +584,12 @@
                 Noise CHOP
               </div>
               <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-                <p class="mb-3">유기적이고 불규칙한 변화. LFO가 "기계적 반복"이라면 Noise는 "자연스러운 흔들림".</p>
+                <p class="mb-3" data-ko="유기적이고 불규칙한 변화. LFO가 &quot;기계적 반복&quot;이라면 Noise는 &quot;자연스러운 흔들림&quot;." data-fa="تغییرات ارگانیک و نامنظم. اگر LFO &quot;تکرار مکانیکی&quot; باشد، Noise &quot;لرزش طبیعی&quot; است." data-ru="Органичные нерегулярные изменения. Если LFO — &quot;механическое повторение&quot;, то Noise — &quot;естественное колебание&quot;.">유기적이고 불규칙한 변화. LFO가 "기계적 반복"이라면 Noise는 "자연스러운 흔들림".</p>
                 <table class="data-table">
                   <tbody>
-                    <tr><td>Period</td><td>노이즈의 주기. 클수록 변화가 느리다</td></tr>
-                    <tr><td>Amplitude</td><td>출력값의 범위</td></tr>
-                    <tr><td>Seed</td><td>같은 설정이라도 다른 패턴</td></tr>
+                    <tr><td>Period</td><td data-ko="노이즈의 주기. 클수록 변화가 느리다" data-fa="دوره نویز. هرچه بزرگ‌تر، تغییرات آهسته‌تر" data-ru="Период шума. Чем больше, тем медленнее изменения">노이즈의 주기. 클수록 변화가 느리다</td></tr>
+                    <tr><td>Amplitude</td><td data-ko="출력값의 범위" data-fa="محدوده مقدار خروجی" data-ru="Диапазон выходных значений">출력값의 범위</td></tr>
+                    <tr><td>Seed</td><td data-ko="같은 설정이라도 다른 패턴" data-fa="حتی با تنظیمات یکسان، الگوی متفاوت" data-ru="Разный паттерн при тех же настройках">같은 설정이라도 다른 패턴</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -555,17 +598,17 @@
 
           <!-- 파형 ASCII art -->
           <div class="node-diagram mb-6">
-            <span class="annotation">파형 종류와 느낌</span><br><br>
-            <span style="color: var(--color-accent-blue);">Sin (사인파):</span>&emsp;&emsp;&emsp;～～～～～&emsp;→ 부드럽고 자연스러운. 호흡, 물결<br>
-            <span style="color: var(--color-accent-orange);">Square (사각파):</span>&emsp;▔▁▔▁▔▁&emsp;→ 깜빡임, ON/OFF, 스트로보<br>
-            <span style="color: var(--color-accent-green);">Triangle (삼각파):</span> /\/\/\/\&emsp;→ 일정한 속도로 왕복. 기계적<br>
-            <span style="color: var(--color-accent-purple);">Ramp (톱니파):</span>&emsp;&emsp;/|/|/|/|&emsp;→ 한 방향으로 올라갔다 순간 돌아옴
+            <span class="annotation" data-ko="파형 종류와 느낌" data-fa="انواع شکل موج و حس آن‌ها" data-ru="Типы волн и их характер">파형 종류와 느낌</span><br><br>
+            <span style="color: var(--color-accent-blue);">Sin (<span data-ko="사인파" data-fa="موج سینوسی" data-ru="синусоида">사인파</span>):</span>&emsp;&emsp;&emsp;～～～～～&emsp;→ <span data-ko="부드럽고 자연스러운. 호흡, 물결" data-fa="نرم و طبیعی. نَفَس، موج" data-ru="Плавная, естественная. Дыхание, волны">부드럽고 자연스러운. 호흡, 물결</span><br>
+            <span style="color: var(--color-accent-orange);">Square (<span data-ko="사각파" data-fa="موج مربعی" data-ru="прямоугольная">사각파</span>):</span>&emsp;▔▁▔▁▔▁&emsp;→ <span data-ko="깜빡임, ON/OFF, 스트로보" data-fa="چشمک‌زنی، ON/OFF، استروب" data-ru="Мигание, ON/OFF, стробоскоп">깜빡임, ON/OFF, 스트로보</span><br>
+            <span style="color: var(--color-accent-green);">Triangle (<span data-ko="삼각파" data-fa="موج مثلثی" data-ru="треугольная">삼각파</span>):</span> /\/\/\/\&emsp;→ <span data-ko="일정한 속도로 왕복. 기계적" data-fa="رفت‌وبرگشت با سرعت ثابت. مکانیکی" data-ru="Равномерное движение туда-обратно. Механическая">일정한 속도로 왕복. 기계적</span><br>
+            <span style="color: var(--color-accent-purple);">Ramp (<span data-ko="톱니파" data-fa="موج اره‌ای" data-ru="пилообразная">톱니파</span>):</span>&emsp;&emsp;/|/|/|/|&emsp;→ <span data-ko="한 방향으로 올라갔다 순간 돌아옴" data-fa="در یک جهت بالا می‌رود و ناگهان برمی‌گردد" data-ru="Поднимается в одну сторону и мгновенно возвращается">한 방향으로 올라갔다 순간 돌아옴</span>
           </div>
         </div>
 
         <!-- 2-4. 입력 계열 CHOP -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">입력 계열 CHOP — 외부 데이터를 가져온다</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="입력 계열 CHOP — 외부 데이터를 가져온다" data-fa="CHOP ورودی — داده‌های خارجی را دریافت می‌کند" data-ru="Входные CHOP — получают внешние данные">입력 계열 CHOP — 외부 데이터를 가져온다</h3>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             <div class="panel">
@@ -575,7 +618,7 @@
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
                 <code>tx</code> <code>ty</code> <code>lselect</code> <code>mselect</code> <code>rselect</code><br>
-                별도 장비 없이 바로 실습 가능한 가장 기본적인 입력.
+                <span data-ko="별도 장비 없이 바로 실습 가능한 가장 기본적인 입력." data-fa="ساده‌ترین ورودی که بدون تجهیزات اضافی قابل تمرین است." data-ru="Самый базовый вход, который можно использовать без дополнительного оборудования.">별도 장비 없이 바로 실습 가능한 가장 기본적인 입력.</span>
               </p>
             </div>
             <div class="panel">
@@ -584,8 +627,8 @@
                 Audio Device In
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
-                마이크나 시스템 오디오를 가져온다. 오디오 리액티브의 시작점.<br>
-                <span style="font-size: 0.75rem;">Mac: BlackHole 등 가상 드라이버 필요할 수 있음</span>
+                <span data-ko="마이크나 시스템 오디오를 가져온다. 오디오 리액티브의 시작점." data-fa="میکروفون یا صدای سیستم را دریافت می‌کند. نقطه شروع واکنش صوتی." data-ru="Получает звук с микрофона или системное аудио. Начальная точка аудиореактива.">마이크나 시스템 오디오를 가져온다. 오디오 리액티브의 시작점.</span><br>
+                <span style="font-size: 0.75rem;" data-ko="Mac: BlackHole 등 가상 드라이버 필요할 수 있음" data-fa="Mac: ممکن است به درایور مجازی مثل BlackHole نیاز باشد" data-ru="Mac: может потребоваться виртуальный драйвер, например BlackHole">Mac: BlackHole 등 가상 드라이버 필요할 수 있음</span>
               </p>
             </div>
             <div class="panel">
@@ -594,50 +637,50 @@
                 Audio Spectrum
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
-                FFT 기반 주파수 대역별 분리. 저음(bass), 중음(mid), 고음(high)을 각각 다른 파라미터에 연결.
+                <span data-ko="FFT 기반 주파수 대역별 분리. 저음(bass), 중음(mid), 고음(high)을 각각 다른 파라미터에 연결." data-fa="جداسازی بر اساس باند فرکانسی مبتنی بر FFT. بیس (bass)، میانه (mid) و بالا (high) را به پارامترهای مختلف متصل کنید." data-ru="Разделение по частотным диапазонам на основе FFT. Бас (bass), середина (mid), высокие (high) подключаются к разным параметрам.">FFT 기반 주파수 대역별 분리. 저음(bass), 중음(mid), 고음(high)을 각각 다른 파라미터에 연결.</span>
               </p>
             </div>
           </div>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">FFT란</div>
-            Fast Fourier Transform — 복잡한 파형을 주파수별 성분으로 분해하는 수학적 방법. 합주를 들으면서 "베이스 기타가 얼마나 크게 나오는가", "심벌즈가 얼마나 크게 나오는가"를 각각 추출하는 것과 같다.
+            <div class="callout-label" data-ko="FFT란" data-fa="FFT چیست" data-ru="Что такое FFT">FFT란</div>
+            <span data-ko="Fast Fourier Transform — 복잡한 파형을 주파수별 성분으로 분해하는 수학적 방법. 합주를 들으면서 &quot;베이스 기타가 얼마나 크게 나오는가&quot;, &quot;심벌즈가 얼마나 크게 나오는가&quot;를 각각 추출하는 것과 같다." data-fa="Fast Fourier Transform — روش ریاضی برای تجزیه شکل موج پیچیده به اجزای فرکانسی. مانند گوش دادن به یک ارکستر و استخراج جداگانه &quot;گیتار بیس چقدر بلند است&quot; و &quot;سنج چقدر بلند است&quot;." data-ru="Fast Fourier Transform — математический метод разложения сложной волны на частотные составляющие. Как если бы, слушая ансамбль, вы отдельно извлекали &quot;насколько громкий бас-гитара&quot; и &quot;насколько громкие тарелки&quot;.">Fast Fourier Transform — 복잡한 파형을 주파수별 성분으로 분해하는 수학적 방법. 합주를 들으면서 "베이스 기타가 얼마나 크게 나오는가", "심벌즈가 얼마나 크게 나오는가"를 각각 추출하는 것과 같다.</span>
           </div>
         </div>
 
         <!-- 2-5. 가공 계열 CHOP -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">가공 계열 CHOP — 값을 다듬는다</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="가공 계열 CHOP — 값을 다듬는다" data-fa="CHOP پردازشی — مقادیر را اصلاح می‌کند" data-ru="Обрабатывающие CHOP — шлифуют значения">가공 계열 CHOP — 값을 다듬는다</h3>
 
           <!-- Math CHOP -->
           <div class="module-card mb-6" style="border-color: var(--color-accent-yellow);">
             <div class="module-card-header" style="border-color: var(--color-accent-yellow);">
               <span class="module-dot" style="background: var(--color-accent-yellow);"></span>
-              Math CHOP ⭐ 가장 중요
+              <span data-ko="Math CHOP ⭐ 가장 중요" data-fa="Math CHOP ⭐ مهم‌ترین" data-ru="Math CHOP ⭐ самый важный">Math CHOP ⭐ 가장 중요</span>
             </div>
             <div class="module-card-body">
               <p class="text-sm mb-4" style="color: var(--color-text-muted);">
-                <strong>범위 변환, 반전, 오프셋, 배율 조정</strong> — 거의 모든 인터랙션에서 필요하다.
+                <span data-ko="<strong>범위 변환, 반전, 오프셋, 배율 조정</strong> — 거의 모든 인터랙션에서 필요하다." data-fa="<strong>تبدیل محدوده، معکوس‌سازی، آفست، تنظیم مقیاس</strong> — تقریباً در هر تعاملی لازم است." data-ru="<strong>Преобразование диапазона, инверсия, смещение, масштабирование</strong> — нужно практически в любой интерактивной работе."><strong>범위 변환, 반전, 오프셋, 배율 조정</strong> — 거의 모든 인터랙션에서 필요하다.</span>
               </p>
 
               <div class="callout callout-warning mb-4">
-                <div class="callout-label">핵심 인사이트</div>
-                인터랙션이 안 되는 대부분의 경우는 값을 못 받는 게 아니라, <strong>받은 값을 적절한 범위로 못 바꾸는 것</strong>이다.
+                <div class="callout-label" data-ko="핵심 인사이트" data-fa="بینش کلیدی" data-ru="Ключевой инсайт">핵심 인사이트</div>
+                <span data-ko="인터랙션이 안 되는 대부분의 경우는 값을 못 받는 게 아니라, <strong>받은 값을 적절한 범위로 못 바꾸는 것</strong>이다." data-fa="در بیشتر مواردی که تعامل کار نمی‌کند، مشکل دریافت مقدار نیست بلکه <strong>تبدیل مقدار دریافتی به محدوده مناسب</strong> است." data-ru="В большинстве случаев, когда интерактивность не работает, проблема не в получении значений, а в том, что <strong>полученные значения не приведены к нужному диапазону</strong>.">인터랙션이 안 되는 대부분의 경우는 값을 못 받는 게 아니라, <strong>받은 값을 적절한 범위로 못 바꾸는 것</strong>이다.</span>
               </div>
 
               <table class="data-table mb-4">
                 <thead>
-                  <tr><th>입력</th><th>실제 범위</th><th>필요한 범위</th></tr>
+                  <tr><th data-ko="입력" data-fa="ورودی" data-ru="Вход">입력</th><th data-ko="실제 범위" data-fa="محدوده واقعی" data-ru="Реальный диапазон">실제 범위</th><th data-ko="필요한 범위" data-fa="محدوده موردنیاز" data-ru="Нужный диапазон">필요한 범위</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>마우스 X</td><td>0 ~ 1920</td><td>-1 ~ 1 (Transform tx)</td></tr>
-                  <tr><td>오디오 RMS</td><td>0 ~ 0.01</td><td>0 ~ 2 (Level brightness)</td></tr>
-                  <tr><td>센서값</td><td>300 ~ 700</td><td>0 ~ 1 (opacity)</td></tr>
+                  <tr><td data-ko="마우스 X" data-fa="ماوس X" data-ru="Мышь X">마우스 X</td><td>0 ~ 1920</td><td>-1 ~ 1 (Transform tx)</td></tr>
+                  <tr><td data-ko="오디오 RMS" data-fa="RMS صوتی" data-ru="Аудио RMS">오디오 RMS</td><td>0 ~ 0.01</td><td>0 ~ 2 (Level brightness)</td></tr>
+                  <tr><td data-ko="센서값" data-fa="مقدار سنسور" data-ru="Значение сенсора">센서값</td><td>300 ~ 700</td><td>0 ~ 1 (opacity)</td></tr>
                 </tbody>
               </table>
 
               <p class="text-sm" style="color: var(--color-text-muted);">
-                <strong>Range 탭</strong>: From Range(입력값 범위) → To Range(출력값 범위). 이것만 알면 대부분의 범위 변환 문제를 해결할 수 있다.
+                <span data-ko="<strong>Range 탭</strong>: From Range(입력값 범위) → To Range(출력값 범위). 이것만 알면 대부분의 범위 변환 문제를 해결할 수 있다." data-fa="<strong>تب Range</strong>: From Range (محدوده ورودی) → To Range (محدوده خروجی). فقط با دانستن همین مورد، بیشتر مشکلات تبدیل محدوده حل می‌شود." data-ru="<strong>Вкладка Range</strong>: From Range (диапазон входа) → To Range (диапазон выхода). Зная только это, можно решить большинство задач преобразования диапазонов."><strong>Range 탭</strong>: From Range(입력값 범위) → To Range(출력값 범위). 이것만 알면 대부분의 범위 변환 문제를 해결할 수 있다.</span>
               </p>
             </div>
           </div>
@@ -650,10 +693,10 @@
                 Analyze CHOP
               </div>
               <p class="text-sm mb-2" style="color: var(--color-text-muted);">
-                복잡한 신호를 <strong>하나의 제어값으로 요약</strong>한다.
+                <span data-ko="복잡한 신호를 <strong>하나의 제어값으로 요약</strong>한다." data-fa="سیگنال پیچیده را به <strong>یک مقدار کنترلی خلاصه</strong> می‌کند." data-ru="Сводит сложный сигнал к <strong>одному управляющему значению</strong>.">복잡한 신호를 <strong>하나의 제어값으로 요약</strong>한다.</span>
               </p>
               <p class="text-xs" style="color: var(--color-text-dim);">
-                RMS Power(에너지), Maximum(피크), Average(평균). 오디오 리액티브에서 가장 많이 쓰는 건 <strong>RMS Power</strong>.
+                <span data-ko="RMS Power(에너지), Maximum(피크), Average(평균). 오디오 리액티브에서 가장 많이 쓰는 건 <strong>RMS Power</strong>." data-fa="RMS Power (انرژی)، Maximum (اوج)، Average (میانگین). پرکاربردترین در واکنش صوتی <strong>RMS Power</strong> است." data-ru="RMS Power (энергия), Maximum (пик), Average (среднее). Самый используемый в аудиореактиве — <strong>RMS Power</strong>.">RMS Power(에너지), Maximum(피크), Average(평균). 오디오 리액티브에서 가장 많이 쓰는 건 <strong>RMS Power</strong>.</span>
               </p>
             </div>
             <div class="panel">
@@ -662,10 +705,10 @@
                 Lag CHOP
               </div>
               <p class="text-sm mb-2" style="color: var(--color-text-muted);">
-                거친 값을 <strong>부드럽게</strong> 만든다 (스무딩).
+                <span data-ko="거친 값을 <strong>부드럽게</strong> 만든다 (스무딩)." data-fa="مقادیر خشن را <strong>نرم</strong> می‌کند (هموارسازی)." data-ru="Сглаживает грубые значения (<strong>smoothing</strong>).">거친 값을 <strong>부드럽게</strong> 만든다 (스무딩).</span>
               </p>
-              <pre class="mt-2" style="font-size: 0.75rem; padding: 0.5rem 0.75rem;"><code>스무딩 전: ╱╲╱╲╱╲╱╲  (들쭉날쭉)
-스무딩 후: ～～～～～  (부드러움)</code></pre>
+              <pre class="mt-2" style="font-size: 0.75rem; padding: 0.5rem 0.75rem;"><code><span data-ko="스무딩 전" data-fa="قبل از هموارسازی" data-ru="До сглаживания">스무딩 전</span>: ╱╲╱╲╱╲╱╲  (<span data-ko="들쭉날쭉" data-fa="ناهموار" data-ru="зубчатый">들쭉날쭉</span>)
+<span data-ko="스무딩 후" data-fa="بعد از هموارسازی" data-ru="После сглаживания">스무딩 후</span>: ～～～～～  (<span data-ko="부드러움" data-fa="نرم" data-ru="плавный">부드러움</span>)</code></pre>
             </div>
             <div class="panel">
               <div class="panel-header">
@@ -673,11 +716,11 @@
                 Logic CHOP
               </div>
               <p class="text-sm mb-2" style="color: var(--color-text-muted);">
-                임계값(threshold) 기준으로 <strong>ON/OFF</strong>를 만든다.
+                <span data-ko="임계값(threshold) 기준으로 <strong>ON/OFF</strong>를 만든다." data-fa="بر اساس آستانه (threshold) سیگنال <strong>ON/OFF</strong> تولید می‌کند." data-ru="Создаёт <strong>ON/OFF</strong> по пороговому значению (threshold).">임계값(threshold) 기준으로 <strong>ON/OFF</strong>를 만든다.</span>
               </p>
-              <pre class="mt-2" style="font-size: 0.75rem; padding: 0.5rem 0.75rem;"><code>입력: 0.2 0.5 0.8 0.3 0.9
-임계:     ── 0.6 ──
-출력: 0   0   1   0   1</code></pre>
+              <pre class="mt-2" style="font-size: 0.75rem; padding: 0.5rem 0.75rem;"><code><span data-ko="입력" data-fa="ورودی" data-ru="Вход">입력</span>: 0.2 0.5 0.8 0.3 0.9
+<span data-ko="임계" data-fa="آستانه" data-ru="Порог">임계</span>:     ── 0.6 ──
+<span data-ko="출력" data-fa="خروجی" data-ru="Выход">출력</span>: 0   0   1   0   1</code></pre>
             </div>
             <div class="panel">
               <div class="panel-header">
@@ -685,8 +728,8 @@
                 Trigger / Count
               </div>
               <p class="text-sm" style="color: var(--color-text-muted);">
-                <strong>Trigger:</strong> 신호가 임계값을 넘는 순간 한 번만 반응(펄스).<br>
-                <strong>Count:</strong> 입력 신호가 올라갈 때마다 카운트 증가 → Switch의 인덱스로 쓰면 컷 전환.
+                <span data-ko="<strong>Trigger:</strong> 신호가 임계값을 넘는 순간 한 번만 반응(펄스).<br><strong>Count:</strong> 입력 신호가 올라갈 때마다 카운트 증가 → Switch의 인덱스로 쓰면 컷 전환." data-fa="<strong>Trigger:</strong> لحظه‌ای که سیگنال از آستانه عبور می‌کند، فقط یک بار واکنش نشان می‌دهد (پالس).<br><strong>Count:</strong> هر بار سیگنال ورودی بالا برود شمارنده افزایش می‌یابد → اگر به‌عنوان index در Switch استفاده شود، تصاویر عوض می‌شوند." data-ru="<strong>Trigger:</strong> в момент превышения порога реагирует однократно (импульс).<br><strong>Count:</strong> при каждом нарастании входного сигнала счётчик увеличивается → при подключении к индексу Switch происходит смена кадров."><strong>Trigger:</strong> 신호가 임계값을 넘는 순간 한 번만 반응(펄스).<br>
+                <strong>Count:</strong> 입력 신호가 올라갈 때마다 카운트 증가 → Switch의 인덱스로 쓰면 컷 전환.</span>
               </p>
             </div>
           </div>
@@ -694,36 +737,36 @@
 
         <!-- 2-6. 연속값과 사건 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">연속값과 사건(Event)의 구분</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="연속값과 사건(Event)의 구분" data-fa="تفاوت مقدار پیوسته و رویداد (Event)" data-ru="Различие непрерывных значений и событий (Event)">연속값과 사건(Event)의 구분</h3>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div class="module-card" style="border-color: color-mix(in srgb, var(--color-accent-blue) 40%, var(--color-border));">
               <div class="module-card-header">
                 <span class="module-dot" style="background: var(--color-accent-blue);"></span>
-                연속값 (Continuous)
+                <span data-ko="연속값 (Continuous)" data-fa="مقدار پیوسته (Continuous)" data-ru="Непрерывное значение (Continuous)">연속값 (Continuous)</span>
               </div>
               <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-                <p class="mb-2">매 순간 변하는 값. 부드럽게 변화한다.</p>
-                <p>마우스 위치, 센서 거리, 오디오 레벨</p>
-                <p class="mt-2"><strong style="color: var(--color-text);">→</strong> 밝기, 위치, 크기, 색상 제어에 적합</p>
+                <p class="mb-2" data-ko="매 순간 변하는 값. 부드럽게 변화한다." data-fa="مقداری که هر لحظه تغییر می‌کند. به‌نرمی تغییر می‌کند." data-ru="Значение, меняющееся каждый момент. Изменяется плавно.">매 순간 변하는 값. 부드럽게 변화한다.</p>
+                <p data-ko="마우스 위치, 센서 거리, 오디오 레벨" data-fa="موقعیت ماوس، فاصله سنسور، سطح صدا" data-ru="Позиция мыши, расстояние сенсора, уровень аудио">마우스 위치, 센서 거리, 오디오 레벨</p>
+                <p class="mt-2"><strong style="color: var(--color-text);">→</strong> <span data-ko="밝기, 위치, 크기, 색상 제어에 적합" data-fa="مناسب برای کنترل روشنایی، موقعیت، اندازه، رنگ" data-ru="Подходит для управления яркостью, положением, размером, цветом">밝기, 위치, 크기, 색상 제어에 적합</span></p>
               </div>
             </div>
             <div class="module-card" style="border-color: color-mix(in srgb, var(--color-accent-orange) 40%, var(--color-border));">
               <div class="module-card-header">
                 <span class="module-dot" style="background: var(--color-accent-orange);"></span>
-                사건 (Event / Trigger)
+                <span data-ko="사건 (Event / Trigger)" data-fa="رویداد (Event / Trigger)" data-ru="Событие (Event / Trigger)">사건 (Event / Trigger)</span>
               </div>
               <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-                <p class="mb-2">특정 순간에 발생하는 신호. 0 또는 1.</p>
-                <p>키를 눌렀다, 임계값을 넘었다, 장면을 바꾼다</p>
-                <p class="mt-2"><strong style="color: var(--color-text);">→</strong> Switch, 재생 시작, 이펙트 발동에 적합</p>
+                <p class="mb-2" data-ko="특정 순간에 발생하는 신호. 0 또는 1." data-fa="سیگنالی که در لحظه خاصی رخ می‌دهد. ۰ یا ۱." data-ru="Сигнал, возникающий в определённый момент. 0 или 1.">특정 순간에 발생하는 신호. 0 또는 1.</p>
+                <p data-ko="키를 눌렀다, 임계값을 넘었다, 장면을 바꾼다" data-fa="کلید فشرده شد، از آستانه عبور کرد، صحنه عوض شد" data-ru="Нажата клавиша, превышен порог, сменилась сцена">키를 눌렀다, 임계값을 넘었다, 장면을 바꾼다</p>
+                <p class="mt-2"><strong style="color: var(--color-text);">→</strong> <span data-ko="Switch, 재생 시작, 이펙트 발동에 적합" data-fa="مناسب برای Switch، شروع پخش، فعال‌سازی افکت" data-ru="Подходит для Switch, запуска воспроизведения, активации эффектов">Switch, 재생 시작, 이펙트 발동에 적합</span></p>
               </div>
             </div>
           </div>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">핵심</div>
-            "입력값이 있다"와 "사건이 발생했다"는 다른 문제다. 이 구분이 명확해야 인터랙션 설계가 깔끔해진다.
+            <div class="callout-label" data-ko="핵심" data-fa="نکته کلیدی" data-ru="Ключевой момент">핵심</div>
+            <span data-ko="&quot;입력값이 있다&quot;와 &quot;사건이 발생했다&quot;는 다른 문제다. 이 구분이 명확해야 인터랙션 설계가 깔끔해진다." data-fa="&quot;مقدار ورودی وجود دارد&quot; و &quot;رویدادی رخ داده&quot; دو مسئله متفاوت هستند. وقتی این تفاوت واضح باشد، طراحی تعامل تمیزتر می‌شود." data-ru="&quot;Есть входное значение&quot; и &quot;произошло событие&quot; — разные вещи. Когда это различие чётко понято, проектирование интерактивности становится аккуратнее.">"입력값이 있다"와 "사건이 발생했다"는 다른 문제다. 이 구분이 명확해야 인터랙션 설계가 깔끔해진다.</span>
           </div>
         </div>
       </section>
@@ -737,8 +780,8 @@
             <span class="dot" style="background: var(--color-accent-blue);"></span>
             Part 03
           </div>
-          <h2 class="part-title">CHOP Reference — 값을 파라미터에 연결하는 법</h2>
-          <p class="part-subtitle">CHOP에서 만든 값을 TOP의 파라미터에 연결하는 세 가지 방법을 배운다.</p>
+          <h2 class="part-title" data-ko="CHOP Reference — 값을 파라미터에 연결하는 법" data-fa="CHOP Reference — روش اتصال مقادیر به پارامترها" data-ru="CHOP Reference — как связать значения с параметрами">CHOP Reference — 값을 파라미터에 연결하는 법</h2>
+          <p class="part-subtitle" data-ko="CHOP에서 만든 값을 TOP의 파라미터에 연결하는 세 가지 방법을 배운다." data-fa="سه روش اتصال مقادیر ساخته‌شده در CHOP به پارامترهای TOP را یاد می‌گیریم." data-ru="Изучим три способа подключения значений из CHOP к параметрам TOP.">CHOP에서 만든 값을 TOP의 파라미터에 연결하는 세 가지 방법을 배운다.</p>
         </div>
 
         <!-- 3가지 방법 카드 -->
@@ -747,77 +790,77 @@
           <div class="module-card">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-green);"></span>
-              1. Export (드래그)
+              <span data-ko="1. Export (드래그)" data-fa="1. Export (کشیدن و رها کردن)" data-ru="1. Export (перетаскивание)">1. Export (드래그)</span>
             </div>
             <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-              <p class="mb-2">가장 직관적이고 빠른 방법.</p>
-              <p class="mb-3">CHOP 노드 우측 하단의 <code>+</code>를 드래그해서 파라미터 위에 놓는다.</p>
+              <p class="mb-2" data-ko="가장 직관적이고 빠른 방법." data-fa="مستقیم‌ترین و سریع‌ترین روش." data-ru="Самый интуитивный и быстрый способ.">가장 직관적이고 빠른 방법.</p>
+              <p class="mb-3" data-ko="CHOP 노드 우측 하단의 <code>+</code>를 드래그해서 파라미터 위에 놓는다." data-fa="<code>+</code> در گوشه پایین سمت راست نود CHOP را بکشید و روی پارامتر رها کنید." data-ru="Перетащите <code>+</code> из правого нижнего угла ноды CHOP на параметр.">CHOP 노드 우측 하단의 <code>+</code>를 드래그해서 파라미터 위에 놓는다.</p>
               <div class="flex items-center gap-2 mb-2">
                 <span style="width: 12px; height: 12px; background: var(--color-accent-green); border-radius: 3px; display: inline-block;"></span>
-                <span style="font-size: 0.75rem;">녹색 배경 = Export 활성</span>
+                <span style="font-size: 0.75rem;" data-ko="녹색 배경 = Export 활성" data-fa="پس‌زمینه سبز = Export فعال" data-ru="Зелёный фон = Export активен">녹색 배경 = Export 활성</span>
               </div>
-              <p style="font-size: 0.75rem; color: var(--color-text-dim);">수식 불가. 파라미터가 CHOP에 의해 잠긴다.</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-dim);" data-ko="수식 불가. 파라미터가 CHOP에 의해 잠긴다." data-fa="امکان نوشتن عبارت نیست. پارامتر توسط CHOP قفل می‌شود." data-ru="Формулы недоступны. Параметр блокируется CHOP.">수식 불가. 파라미터가 CHOP에 의해 잠긴다.</p>
             </div>
           </div>
           <!-- Reference -->
           <div class="module-card">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-blue);"></span>
-              2. Reference (표현식)
+              <span data-ko="2. Reference (표현식)" data-fa="2. Reference (عبارت)" data-ru="2. Reference (выражение)">2. Reference (표현식)</span>
             </div>
             <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-              <p class="mb-2">파라미터 필드에 Python 표현식을 직접 입력.</p>
+              <p class="mb-2" data-ko="파라미터 필드에 Python 표현식을 직접 입력." data-fa="عبارت Python را مستقیم در فیلد پارامتر وارد کنید." data-ru="Вводите Python-выражение прямо в поле параметра.">파라미터 필드에 Python 표현식을 직접 입력.</p>
               <pre style="font-size: 0.75rem; padding: 0.5rem; margin-bottom: 0.5rem;"><code>op('chop이름')['채널이름']</code></pre>
               <div class="flex items-center gap-2 mb-2">
                 <span style="width: 12px; height: 12px; background: var(--color-accent-blue); border-radius: 3px; display: inline-block;"></span>
-                <span style="font-size: 0.75rem;">파란색 배경 = Reference 활성</span>
+                <span style="font-size: 0.75rem;" data-ko="파란색 배경 = Reference 활성" data-fa="پس‌زمینه آبی = Reference فعال" data-ru="Синий фон = Reference активен">파란색 배경 = Reference 활성</span>
               </div>
-              <p style="font-size: 0.75rem; color: var(--color-text-dim);">수식 가능! 가장 유연하다.</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-dim);" data-ko="수식 가능! 가장 유연하다." data-fa="نوشتن عبارت ممکن است! انعطاف‌پذیرترین روش." data-ru="Формулы доступны! Самый гибкий способ.">수식 가능! 가장 유연하다.</p>
             </div>
           </div>
           <!-- Bind -->
           <div class="module-card">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-orange);"></span>
-              3. Bind (양방향)
+              <span data-ko="3. Bind (양방향)" data-fa="3. Bind (دوطرفه)" data-ru="3. Bind (двусторонний)">3. Bind (양방향)</span>
             </div>
             <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
-              <p class="mb-2">CHOP과 파라미터를 양방향으로 연결.</p>
-              <p class="mb-3">파라미터를 바꾸면 CHOP도 바뀐다.</p>
+              <p class="mb-2" data-ko="CHOP과 파라미터를 양방향으로 연결." data-fa="CHOP و پارامتر را به‌صورت دوطرفه متصل می‌کند." data-ru="Связывает CHOP и параметр в обоих направлениях.">CHOP과 파라미터를 양방향으로 연결.</p>
+              <p class="mb-3" data-ko="파라미터를 바꾸면 CHOP도 바뀐다." data-fa="تغییر پارامتر باعث تغییر CHOP نیز می‌شود." data-ru="При изменении параметра CHOP тоже меняется.">파라미터를 바꾸면 CHOP도 바뀐다.</p>
               <div class="flex items-center gap-2 mb-2">
                 <span style="width: 12px; height: 12px; background: var(--color-accent-green); border-radius: 3px; display: inline-block;"></span>
-                <span style="font-size: 0.75rem;">녹색 배경 (양방향)</span>
+                <span style="font-size: 0.75rem;" data-ko="녹색 배경 (양방향)" data-fa="پس‌زمینه سبز (دوطرفه)" data-ru="Зелёный фон (двусторонний)">녹색 배경 (양방향)</span>
               </div>
-              <p style="font-size: 0.75rem; color: var(--color-text-dim);">고급 기능. 이번 수업에서는 소개만.</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-dim);" data-ko="고급 기능. 이번 수업에서는 소개만." data-fa="قابلیت پیشرفته. در این جلسه فقط معرفی." data-ru="Продвинутая функция. В этом уроке только обзор.">고급 기능. 이번 수업에서는 소개만.</p>
             </div>
           </div>
         </div>
 
         <!-- Reference 예시 -->
-        <h4 class="text-base font-semibold mb-3">Reference 표현식 예시</h4>
+        <h4 class="text-base font-semibold mb-3" data-ko="Reference 표현식 예시" data-fa="نمونه عبارت Reference" data-ru="Примеры выражений Reference">Reference 표현식 예시</h4>
 
         <div class="module-card mb-6">
           <div class="module-card-body">
             <table class="data-table">
               <thead>
-                <tr><th>표현식</th><th>의미</th></tr>
+                <tr><th data-ko="표현식" data-fa="عبارت" data-ru="Выражение">표현식</th><th data-ko="의미" data-fa="معنی" data-ru="Значение">의미</th></tr>
               </thead>
               <tbody>
-                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('lfo1')['chan1']</td><td>lfo1의 chan1 채널 값</td></tr>
-                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('mouse1')['tx']</td><td>마우스 X 위치</td></tr>
-                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('analyze1')['chan1']</td><td>오디오 분석값</td></tr>
-                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('lfo1')['chan1'] * 2</td><td>값을 2배로</td></tr>
-                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('audio1')['chan1'] * 10 + 1</td><td>10배 하고 1 더하기</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('lfo1')['chan1']</td><td data-ko="lfo1의 chan1 채널 값" data-fa="مقدار کانال chan1 از lfo1" data-ru="Значение канала chan1 из lfo1">lfo1의 chan1 채널 값</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('mouse1')['tx']</td><td data-ko="마우스 X 위치" data-fa="موقعیت X ماوس" data-ru="Позиция мыши X">마우스 X 위치</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('analyze1')['chan1']</td><td data-ko="오디오 분석값" data-fa="مقدار تحلیل صوتی" data-ru="Значение аудиоанализа">오디오 분석값</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('lfo1')['chan1'] * 2</td><td data-ko="값을 2배로" data-fa="مقدار ضرب در ۲" data-ru="Значение x2">값을 2배로</td></tr>
+                <tr><td style="font-family: var(--font-mono); font-size: 0.8rem;">op('audio1')['chan1'] * 10 + 1</td><td data-ko="10배 하고 1 더하기" data-fa="ضرب در ۱۰ و افزودن ۱" data-ru="Умножить на 10 и прибавить 1">10배 하고 1 더하기</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <div class="callout callout-tip mb-6">
-          <div class="callout-label">언제 뭘 쓸까</div>
-          처음 배울 때 → <strong>Export</strong> (드래그)<br>
+          <div class="callout-label" data-ko="언제 뭘 쓸까" data-fa="کدام روش و کِی" data-ru="Когда что использовать">언제 뭘 쓸까</div>
+          <span data-ko="처음 배울 때 → <strong>Export</strong> (드래그)<br>간단한 계산이 필요하면 → <strong>Reference</strong> (표현식)<br>양방향 제어가 필요하면 → <strong>Bind</strong>" data-fa="هنگام شروع یادگیری → <strong>Export</strong> (کشیدن و رها کردن)<br>وقتی محاسبه ساده لازم است → <strong>Reference</strong> (عبارت)<br>وقتی کنترل دوطرفه لازم است → <strong>Bind</strong>" data-ru="Для начинающих → <strong>Export</strong> (перетаскивание)<br>Нужны простые вычисления → <strong>Reference</strong> (выражение)<br>Нужно двустороннее управление → <strong>Bind</strong>">처음 배울 때 → <strong>Export</strong> (드래그)<br>
           간단한 계산이 필요하면 → <strong>Reference</strong> (표현식)<br>
-          양방향 제어가 필요하면 → <strong>Bind</strong>
+          양방향 제어가 필요하면 → <strong>Bind</strong></span>
         </div>
 
       </section>
@@ -831,50 +874,50 @@
             <span class="dot" style="background: var(--color-accent-orange);"></span>
             Part 04
           </div>
-          <h2 class="part-title">오디오 리액티브 비주얼</h2>
-          <p class="part-subtitle">소리 데이터를 실시간으로 분석하여 영상 파라미터를 제어하는 오디오 리액티브 비주얼의 기초.</p>
+          <h2 class="part-title" data-ko="오디오 리액티브 비주얼" data-fa="ویژوال واکنش‌پذیر به صدا" data-ru="Аудиореактивный визуал">오디오 리액티브 비주얼</h2>
+          <p class="part-subtitle" data-ko="소리 데이터를 실시간으로 분석하여 영상 파라미터를 제어하는 오디오 리액티브 비주얼의 기초." data-fa="مبانی ویژوال واکنش‌پذیر به صدا: تحلیل داده صوتی در لحظه و کنترل پارامترهای تصویری." data-ru="Основы аудиореактивного визуала: анализ звуковых данных в реальном времени и управление параметрами видео.">소리 데이터를 실시간으로 분석하여 영상 파라미터를 제어하는 오디오 리액티브 비주얼의 기초.</p>
         </div>
 
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">오디오 리액티브란</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="오디오 리액티브란" data-fa="واکنش صوتی چیست" data-ru="Что такое аудиореактив">오디오 리액티브란</h3>
 
           <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
-            소리가 크면 밝아지고, 베이스가 강하면 화면이 흔들리고, 킥 드럼이 울릴 때마다 장면이 전환되는 — 이런 비주얼이 오디오 리액티브다.
+            <span data-ko="소리가 크면 밝아지고, 베이스가 강하면 화면이 흔들리고, 킥 드럼이 울릴 때마다 장면이 전환되는 — 이런 비주얼이 오디오 리액티브다." data-fa="صدا بلندتر → تصویر روشن‌تر، بیس قوی‌تر → صفحه می‌لرزد، هر بار کیک درام ضربه می‌زند → صحنه عوض می‌شود — این ویژوال واکنش‌پذیر به صداست." data-ru="Громче звук — ярче картинка, сильнее бас — экран трясётся, каждый удар бочки — сцена переключается — это и есть аудиореактив.">소리가 크면 밝아지고, 베이스가 강하면 화면이 흔들리고, 킥 드럼이 울릴 때마다 장면이 전환되는 — 이런 비주얼이 오디오 리액티브다.</span>
           </p>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             <div class="panel text-center" style="padding: 1rem;">
-              <div class="text-xs mb-1" style="color: var(--color-accent-orange);">라이브</div>
+              <div class="text-xs mb-1" style="color: var(--color-accent-orange);" data-ko="라이브" data-fa="زنده" data-ru="Лайв">라이브</div>
               <div class="text-xs" style="color: var(--color-text-muted);">VJing</div>
             </div>
             <div class="panel text-center" style="padding: 1rem;">
-              <div class="text-xs mb-1" style="color: var(--color-accent-blue);">뮤직비디오</div>
-              <div class="text-xs" style="color: var(--color-text-muted);">동기화 영상</div>
+              <div class="text-xs mb-1" style="color: var(--color-accent-blue);" data-ko="뮤직비디오" data-fa="موزیک ویدیو" data-ru="Музыкальное видео">뮤직비디오</div>
+              <div class="text-xs" style="color: var(--color-text-muted);" data-ko="동기화 영상" data-fa="ویدیوی همگام‌شده" data-ru="Синхронизированное видео">동기화 영상</div>
             </div>
             <div class="panel text-center" style="padding: 1rem;">
-              <div class="text-xs mb-1" style="color: var(--color-accent-green);">설치 미술</div>
-              <div class="text-xs" style="color: var(--color-text-muted);">반응하는 작품</div>
+              <div class="text-xs mb-1" style="color: var(--color-accent-green);" data-ko="설치 미술" data-fa="هنر چیدمان" data-ru="Инсталляция">설치 미술</div>
+              <div class="text-xs" style="color: var(--color-text-muted);" data-ko="반응하는 작품" data-fa="اثر واکنش‌پذیر" data-ru="Реагирующее произведение">반응하는 작품</div>
             </div>
             <div class="panel text-center" style="padding: 1rem;">
-              <div class="text-xs mb-1" style="color: var(--color-accent-purple);">제너레이티브</div>
-              <div class="text-xs" style="color: var(--color-text-muted);">알고리즘 패턴</div>
+              <div class="text-xs mb-1" style="color: var(--color-accent-purple);" data-ko="제너레이티브" data-fa="مولد" data-ru="Генеративное">제너레이티브</div>
+              <div class="text-xs" style="color: var(--color-text-muted);" data-ko="알고리즘 패턴" data-fa="الگوی الگوریتمی" data-ru="Алгоритмический паттерн">알고리즘 패턴</div>
             </div>
           </div>
         </div>
 
         <!-- 오디오 분석 파이프라인 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">오디오 분석의 기초 — 5단계 파이프라인</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="오디오 분석의 기초 — 5단계 파이프라인" data-fa="مبانی تحلیل صوتی — خط لوله ۵ مرحله‌ای" data-ru="Основы аудиоанализа — 5-шаговый пайплайн">오디오 분석의 기초 — 5단계 파이프라인</h3>
 
           <div class="node-diagram mb-6">
-            <span class="annotation">오디오 리액티브 기본 뼈대</span><br><br>
+            <span class="annotation" data-ko="오디오 리액티브 기본 뼈대" data-fa="اسکلت پایه واکنش صوتی" data-ru="Базовый каркас аудиореактива">오디오 리액티브 기본 뼈대</span><br><br>
             <span class="node node-chop">Audio Device In</span>
             <span class="arrow">→</span>
             <span class="node node-chop">Analyze (RMS)</span>
             <span class="arrow">→</span>
-            <span class="node node-chop">Math (범위변환)</span>
+            <span class="node node-chop">Math (<span data-ko="범위변환" data-fa="تبدیل محدوده" data-ru="преобразование">범위변환</span>)</span>
             <span class="arrow">→</span>
-            <span class="node node-chop">Lag (스무딩)</span>
+            <span class="node node-chop">Lag (<span data-ko="스무딩" data-fa="هموارسازی" data-ru="сглаживание">스무딩</span>)</span>
             <span class="arrow">→</span>
             <span class="node node-chop">Null</span>
             <span class="arrow">→</span>
@@ -885,36 +928,36 @@
             <div class="panel flex gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">1</div>
               <div>
-                <div class="font-semibold text-sm mb-1">오디오 입력받기</div>
-                <p class="text-sm" style="color: var(--color-text-muted);"><code>Audio Device In CHOP</code> — Device에서 마이크/시스템 오디오 선택. Viewer에서 파형 확인.</p>
+                <div class="font-semibold text-sm mb-1" data-ko="오디오 입력받기" data-fa="دریافت ورودی صوتی" data-ru="Получение аудиовхода">오디오 입력받기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><span data-ko="<code>Audio Device In CHOP</code> — Device에서 마이크/시스템 오디오 선택. Viewer에서 파형 확인." data-fa="<code>Audio Device In CHOP</code> — میکروفون/صدای سیستم را در Device انتخاب کنید. شکل موج را در Viewer بررسی کنید." data-ru="<code>Audio Device In CHOP</code> — выберите микрофон/системное аудио в Device. Проверьте волну в Viewer."><code>Audio Device In CHOP</code> — Device에서 마이크/시스템 오디오 선택. Viewer에서 파형 확인.</span></p>
               </div>
             </div>
             <div class="panel flex gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">2</div>
               <div>
-                <div class="font-semibold text-sm mb-1">에너지 추출하기</div>
-                <p class="text-sm" style="color: var(--color-text-muted);"><code>Analyze CHOP (RMS Power)</code> — 빠르게 진동하는 오디오 파형 → <strong>하나의 숫자</strong>(현재 볼륨)</p>
+                <div class="font-semibold text-sm mb-1" data-ko="에너지 추출하기" data-fa="استخراج انرژی" data-ru="Извлечение энергии">에너지 추출하기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><span data-ko="<code>Analyze CHOP (RMS Power)</code> — 빠르게 진동하는 오디오 파형 → <strong>하나의 숫자</strong>(현재 볼륨)" data-fa="<code>Analyze CHOP (RMS Power)</code> — شکل موج صوتی با نوسان سریع → <strong>یک عدد</strong> (حجم صدای فعلی)" data-ru="<code>Analyze CHOP (RMS Power)</code> — быстро колеблющаяся аудиоволна → <strong>одно число</strong> (текущая громкость)"><code>Analyze CHOP (RMS Power)</code> — 빠르게 진동하는 오디오 파형 → <strong>하나의 숫자</strong>(현재 볼륨)</span></p>
               </div>
             </div>
             <div class="panel flex gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">3</div>
               <div>
-                <div class="font-semibold text-sm mb-1">범위 맞추기</div>
-                <p class="text-sm" style="color: var(--color-text-muted);"><code>Math CHOP (Range)</code> — RMS 출력(0~0.01)을 원하는 범위(0~2)로 변환</p>
+                <div class="font-semibold text-sm mb-1" data-ko="범위 맞추기" data-fa="تنظیم محدوده" data-ru="Подгонка диапазона">범위 맞추기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><span data-ko="<code>Math CHOP (Range)</code> — RMS 출력(0~0.01)을 원하는 범위(0~2)로 변환" data-fa="<code>Math CHOP (Range)</code> — خروجی RMS (۰~۰.۰۱) را به محدوده دلخواه (۰~۲) تبدیل می‌کند" data-ru="<code>Math CHOP (Range)</code> — преобразует выход RMS (0~0.01) в нужный диапазон (0~2)"><code>Math CHOP (Range)</code> — RMS 출력(0~0.01)을 원하는 범위(0~2)로 변환</span></p>
               </div>
             </div>
             <div class="panel flex gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">4</div>
               <div>
-                <div class="font-semibold text-sm mb-1">부드럽게 만들기</div>
-                <p class="text-sm" style="color: var(--color-text-muted);"><code>Lag CHOP</code> — Lag Up: 0.05, Lag Down: 0.3 → "빠르게 반응하고 천천히 사라지는" 느낌</p>
+                <div class="font-semibold text-sm mb-1" data-ko="부드럽게 만들기" data-fa="نرم‌سازی" data-ru="Сглаживание">부드럽게 만들기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><span data-ko="<code>Lag CHOP</code> — Lag Up: 0.05, Lag Down: 0.3 → &quot;빠르게 반응하고 천천히 사라지는&quot; 느낌" data-fa="<code>Lag CHOP</code> — Lag Up: 0.05، Lag Down: 0.3 → حس &quot;واکنش سریع و محو شدن آهسته&quot;" data-ru="<code>Lag CHOP</code> — Lag Up: 0.05, Lag Down: 0.3 → ощущение &quot;быстрая реакция и медленное затухание&quot;"><code>Lag CHOP</code> — Lag Up: 0.05, Lag Down: 0.3 → "빠르게 반응하고 천천히 사라지는" 느낌</span></p>
               </div>
             </div>
             <div class="panel flex gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background: var(--color-surface-alt); border: 1px solid var(--color-border); color: var(--color-accent-green);">5</div>
               <div>
-                <div class="font-semibold text-sm mb-1">파라미터에 연결하기</div>
-                <p class="text-sm" style="color: var(--color-text-muted);"><code>Null CHOP → Export</code> — 이제 소리가 크면 밝아지고, 소리가 작으면 어두워진다.</p>
+                <div class="font-semibold text-sm mb-1" data-ko="파라미터에 연결하기" data-fa="اتصال به پارامتر" data-ru="Подключение к параметру">파라미터에 연결하기</div>
+                <p class="text-sm" style="color: var(--color-text-muted);"><span data-ko="<code>Null CHOP → Export</code> — 이제 소리가 크면 밝아지고, 소리가 작으면 어두워진다." data-fa="<code>Null CHOP → Export</code> — حالا صدای بلند = روشن‌تر، صدای آرام = تاریک‌تر." data-ru="<code>Null CHOP → Export</code> — теперь громкий звук = ярче, тихий = темнее."><code>Null CHOP → Export</code> — 이제 소리가 크면 밝아지고, 소리가 작으면 어두워진다.</span></p>
               </div>
             </div>
           </div>
@@ -922,38 +965,38 @@
 
         <!-- 인터랙션의 미감 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">인터랙션의 미감 — "어떻게 반응하는가?"</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="인터랙션의 미감 — &quot;어떻게 반응하는가?&quot;" data-fa="زیبایی‌شناسی تعامل — &quot;چگونه واکنش نشان می‌دهد?&quot;" data-ru="Эстетика интерактивности — &quot;как именно реагирует?&quot;">인터랙션의 미감 — "어떻게 반응하는가?"</h3>
 
           <div class="callout callout-concept mb-6">
-            <div class="callout-label">핵심 원칙</div>
-            인터랙티브 작업에서는 기술적으로 "작동하는 것"과 미적으로 "좋은 것"이 다르다.<br><br>
+            <div class="callout-label" data-ko="핵심 원칙" data-fa="اصل کلیدی" data-ru="Ключевой принцип">핵심 원칙</div>
+            <span data-ko="인터랙티브 작업에서는 기술적으로 &quot;작동하는 것&quot;과 미적으로 &quot;좋은 것&quot;이 다르다.<br><br><span style='color: var(--color-accent-red);'>나쁜 예:</span> 소리 → 즉시 밝기 100% → 거칠고 불쾌하다<br><span style='color: var(--color-accent-green);'>좋은 예:</span> 소리 → 0.1초에 밝기 상승 → 0.5초에 천천히 하강 → 호흡감이 있다" data-fa="در کار تعاملی &quot;کار کردن&quot; از نظر فنی با &quot;خوب بودن&quot; از نظر زیبایی‌شناسی متفاوت است.<br><br><span style='color: var(--color-accent-red);'>مثال بد:</span> صدا → فوراً روشنایی ۱۰۰٪ → خشن و ناخوشایند<br><span style='color: var(--color-accent-green);'>مثال خوب:</span> صدا → در ۰.۱ ثانیه روشنایی بالا می‌رود → در ۰.۵ ثانیه آهسته پایین می‌آید → حس تنفس دارد" data-ru="В интерактивной работе &quot;работает&quot; технически и &quot;хорошо&quot; эстетически — разные вещи.<br><br><span style='color: var(--color-accent-red);'>Плохой пример:</span> звук → мгновенно яркость 100% → грубо и неприятно<br><span style='color: var(--color-accent-green);'>Хороший пример:</span> звук → за 0.1 с яркость нарастает → за 0.5 с плавно угасает → есть ощущение дыхания">인터랙티브 작업에서는 기술적으로 "작동하는 것"과 미적으로 "좋은 것"이 다르다.<br><br>
             <span style="color: var(--color-accent-red);">나쁜 예:</span> 소리 → 즉시 밝기 100% → 거칠고 불쾌하다<br>
-            <span style="color: var(--color-accent-green);">좋은 예:</span> 소리 → 0.1초에 밝기 상승 → 0.5초에 천천히 하강 → 호흡감이 있다
+            <span style="color: var(--color-accent-green);">좋은 예:</span> 소리 → 0.1초에 밝기 상승 → 0.5초에 천천히 하강 → 호흡감이 있다</span>
           </div>
 
           <div class="module-card mb-6">
             <div class="module-card-header">
               <span class="module-dot" style="background: var(--color-accent-orange);"></span>
-              Lag CHOP 비대칭 설정
+              <span data-ko="Lag CHOP 비대칭 설정" data-fa="تنظیم نامتقارن Lag CHOP" data-ru="Асимметричная настройка Lag CHOP">Lag CHOP 비대칭 설정</span>
             </div>
             <div class="module-card-body">
               <table class="data-table">
                 <thead>
-                  <tr><th>설정</th><th>효과</th></tr>
+                  <tr><th data-ko="설정" data-fa="تنظیم" data-ru="Настройка">설정</th><th data-ko="효과" data-fa="اثر" data-ru="Эффект">효과</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Up: 0.05, Down: 0.3</td><td>빠르게 반응하고 천천히 사라짐 → <strong>펀치감 + 여운</strong></td></tr>
-                  <tr><td>Up: 0.3, Down: 0.05</td><td>천천히 반응하고 빠르게 사라짐 → <strong>몽환적</strong></td></tr>
-                  <tr><td>Up: 0.1, Down: 0.1</td><td>대칭적 반응 → <strong>중립적</strong></td></tr>
+                  <tr><td>Up: 0.05, Down: 0.3</td><td data-ko="빠르게 반응하고 천천히 사라짐 → <strong>펀치감 + 여운</strong>" data-fa="واکنش سریع و محو شدن آهسته → <strong>ضربه + طنین</strong>" data-ru="Быстрая реакция и медленное затухание → <strong>удар + послевкусие</strong>">빠르게 반응하고 천천히 사라짐 → <strong>펀치감 + 여운</strong></td></tr>
+                  <tr><td>Up: 0.3, Down: 0.05</td><td data-ko="천천히 반응하고 빠르게 사라짐 → <strong>몽환적</strong>" data-fa="واکنش آهسته و محو شدن سریع → <strong>رؤیایی</strong>" data-ru="Медленная реакция и быстрое затухание → <strong>мечтательный</strong>">천천히 반응하고 빠르게 사라짐 → <strong>몽환적</strong></td></tr>
+                  <tr><td>Up: 0.1, Down: 0.1</td><td data-ko="대칭적 반응 → <strong>중립적</strong>" data-fa="واکنش متقارن → <strong>خنثی</strong>" data-ru="Симметричная реакция → <strong>нейтральный</strong>">대칭적 반응 → <strong>중립적</strong></td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
           <div class="callout callout-tip mb-6">
-            <div class="callout-label">인사이트</div>
-            인터랙션은 "편집과 리듬의 문제"이기도 하다.
-            값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다.
+            <div class="callout-label" data-ko="인사이트" data-fa="بینش" data-ru="Инсайт">인사이트</div>
+            <span data-ko="인터랙션은 &quot;편집과 리듬의 문제&quot;이기도 하다. 값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다." data-fa="تعامل &quot;مسئله تدوین و ریتم&quot; هم هست. با یک مقدار چه چیزی و چقدر تغییر کند، کِی واکنش نشان دهد و کِی ندهد — این انتخاب تأثیر و احساس تصویر را تعیین می‌کند." data-ru="Интерактивность — это ещё и &quot;вопрос монтажа и ритма&quot;. Что и насколько менять одним значением, когда реагировать, а когда нет — этот выбор определяет впечатление и настроение видео.">인터랙션은 "편집과 리듬의 문제"이기도 하다.
+            값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다.</span>
           </div>
         </div>
 
@@ -968,39 +1011,39 @@
             <span class="dot" style="background: var(--color-accent-red);"></span>
             Part 05
           </div>
-          <h2 class="part-title">실습 — 오디오 리액티브 비주얼 만들기</h2>
-          <p class="part-subtitle">단계별 실습으로 소리에 반응하는 비주얼을 직접 만든다.</p>
+          <h2 class="part-title" data-ko="실습 — 오디오 리액티브 비주얼 만들기" data-fa="تمرین عملی — ساخت ویژوال واکنش‌پذیر به صدا" data-ru="Практика — создание аудиореактивного визуала">실습 — 오디오 리액티브 비주얼 만들기</h2>
+          <p class="part-subtitle" data-ko="단계별 실습으로 소리에 반응하는 비주얼을 직접 만든다." data-fa="با تمرین مرحله‌به‌مرحله، ویژوالی واکنش‌پذیر به صدا بسازید." data-ru="Шаг за шагом создадим визуал, реагирующий на звук.">단계별 실습으로 소리에 반응하는 비주얼을 직접 만든다.</p>
         </div>
 
         <!-- 실습 A: Feedback + Displace 체험 -->
         <div class="mb-12">
           <div class="flex items-center gap-3 mb-4">
-            <span class="badge badge-practice">실습 A</span>
-            <h3 class="text-lg font-semibold">Feedback + Displace 체험</h3>
+            <span class="badge badge-practice" data-ko="실습 A" data-fa="تمرین A" data-ru="Практика A">실습 A</span>
+            <h3 class="text-lg font-semibold" data-ko="Feedback + Displace 체험" data-fa="تجربه Feedback + Displace" data-ru="Опыт с Feedback + Displace">Feedback + Displace 체험</h3>
           </div>
 
           <!-- A-1 -->
           <details class="mb-4" open>
             <summary>
               <span class="badge badge-top" style="margin-right: 0.5rem;">A-1</span>
-              기본 잔상 만들기
+              <span data-ko="기본 잔상 만들기" data-fa="ایجاد پس‌تصویر پایه" data-ru="Создание базового остаточного следа">기본 잔상 만들기</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
               <p class="text-sm mb-3" style="color: var(--color-text-muted);">
-                <strong>목표:</strong> Feedback TOP의 동작 원리를 체감한다
+                <strong><span data-ko="목표:" data-fa="هدف:" data-ru="Цель:">목표:</span></strong> <span data-ko="Feedback TOP의 동작 원리를 체감한다" data-fa="اصل عملکرد Feedback TOP را حس کنید" data-ru="Прочувствовать принцип работы Feedback TOP">Feedback TOP의 동작 원리를 체감한다</span>
               </p>
               <div class="step-list mb-4">
-                <div class="step-item"><span><code>Movie File In TOP</code>으로 영상을 불러온다</span></div>
-                <div class="step-item"><span><code>Feedback TOP</code>을 만든다</span></div>
-                <div class="step-item"><span><code>Composite TOP</code> (Operation: Over)를 만들고: 입력 1에 Feedback, 입력 2에 원본 영상</span></div>
-                <div class="step-item"><span><code>Level TOP</code>을 연결하고 opacity를 <strong>0.95</strong>로 설정</span></div>
-                <div class="step-item"><span><code>Null TOP</code>을 끝에 연결</span></div>
-                <div class="step-item"><span>Feedback TOP의 Target TOP을 <code>Level TOP</code>으로 설정</span></div>
+                <div class="step-item"><span data-ko="<code>Movie File In TOP</code>으로 영상을 불러온다" data-fa="با <code>Movie File In TOP</code> ویدیو را بارگذاری کنید" data-ru="Загрузите видео через <code>Movie File In TOP</code>"><code>Movie File In TOP</code>으로 영상을 불러온다</span></div>
+                <div class="step-item"><span data-ko="<code>Feedback TOP</code>을 만든다" data-fa="<code>Feedback TOP</code> بسازید" data-ru="Создайте <code>Feedback TOP</code>"><code>Feedback TOP</code>을 만든다</span></div>
+                <div class="step-item"><span data-ko="<code>Composite TOP</code> (Operation: Over)를 만들고: 입력 1에 Feedback, 입력 2에 원본 영상" data-fa="<code>Composite TOP</code> (عملیات: Over) بسازید: ورودی ۱ = Feedback، ورودی ۲ = ویدیوی اصلی" data-ru="Создайте <code>Composite TOP</code> (Operation: Over): вход 1 = Feedback, вход 2 = исходное видео"><code>Composite TOP</code> (Operation: Over)를 만들고: 입력 1에 Feedback, 입력 2에 원본 영상</span></div>
+                <div class="step-item"><span data-ko="<code>Level TOP</code>을 연결하고 opacity를 <strong>0.95</strong>로 설정" data-fa="<code>Level TOP</code> را وصل کرده و opacity را <strong>0.95</strong> تنظیم کنید" data-ru="Подключите <code>Level TOP</code> и установите opacity на <strong>0.95</strong>"><code>Level TOP</code>을 연결하고 opacity를 <strong>0.95</strong>로 설정</span></div>
+                <div class="step-item"><span data-ko="<code>Null TOP</code>을 끝에 연결" data-fa="<code>Null TOP</code> را به انتها وصل کنید" data-ru="Подключите <code>Null TOP</code> в конец"><code>Null TOP</code>을 끝에 연결</span></div>
+                <div class="step-item"><span data-ko="Feedback TOP의 Target TOP을 <code>Level TOP</code>으로 설정" data-fa="Target TOP در Feedback TOP را به <code>Level TOP</code> تنظیم کنید" data-ru="Установите Target TOP в Feedback TOP на <code>Level TOP</code>">Feedback TOP의 Target TOP을 <code>Level TOP</code>으로 설정</span></div>
               </div>
               <div class="callout callout-tip">
-                <div class="callout-label">확인 포인트</div>
-                opacity를 <strong>0.8 / 0.95 / 0.99</strong>로 바꿔보면서 차이를 느껴본다. Reset Pulse로 초기화해본다.
+                <div class="callout-label" data-ko="확인 포인트" data-fa="نکته بررسی" data-ru="Контрольная точка">확인 포인트</div>
+                <span data-ko="opacity를 <strong>0.8 / 0.95 / 0.99</strong>로 바꿔보면서 차이를 느껴본다. Reset Pulse로 초기화해본다." data-fa="opacity را به <strong>0.8 / 0.95 / 0.99</strong> تغییر داده و تفاوت را حس کنید. با Reset Pulse ریست کنید." data-ru="Попробуйте менять opacity на <strong>0.8 / 0.95 / 0.99</strong> и почувствуйте разницу. Сбросьте через Reset Pulse.">opacity를 <strong>0.8 / 0.95 / 0.99</strong>로 바꿔보면서 차이를 느껴본다. Reset Pulse로 초기화해본다.</span>
               </div>
             </div>
           </details>
@@ -1014,17 +1057,17 @@
             </summary>
             <div class="details-body">
               <p class="text-sm mb-3" style="color: var(--color-text-muted);">
-                <strong>목표:</strong> Displace TOP으로 이미지를 왜곡하고, 패턴의 변화를 관찰한다
+                <strong><span data-ko="목표:" data-fa="هدف:" data-ru="Цель:">목표:</span></strong> <span data-ko="Displace TOP으로 이미지를 왜곡하고, 패턴의 변화를 관찰한다" data-fa="با Displace TOP تصویر را تغییر شکل داده و تغییرات الگو را مشاهده کنید" data-ru="Исказить изображение с помощью Displace TOP и наблюдать изменения паттерна">Displace TOP으로 이미지를 왜곡하고, 패턴의 변화를 관찰한다</span>
               </p>
               <div class="step-list mb-4">
-                <div class="step-item"><span>영상을 <code>Displace TOP</code>의 첫 번째 입력에 연결</span></div>
-                <div class="step-item"><span><code>Noise TOP</code>을 두 번째 입력에 연결</span></div>
-                <div class="step-item"><span>Displace Weight를 <strong>0.02</strong>에서 시작</span></div>
-                <div class="step-item"><span>Noise TOP의 Transform → Translate X에 <code>absTime.seconds * 0.1</code> 입력</span></div>
+                <div class="step-item"><span data-ko="영상을 <code>Displace TOP</code>의 첫 번째 입력에 연결" data-fa="ویدیو را به ورودی اول <code>Displace TOP</code> وصل کنید" data-ru="Подключите видео к первому входу <code>Displace TOP</code>">영상을 <code>Displace TOP</code>의 첫 번째 입력에 연결</span></div>
+                <div class="step-item"><span data-ko="<code>Noise TOP</code>을 두 번째 입력에 연결" data-fa="<code>Noise TOP</code> را به ورودی دوم وصل کنید" data-ru="Подключите <code>Noise TOP</code> ко второму входу"><code>Noise TOP</code>을 두 번째 입력에 연결</span></div>
+                <div class="step-item"><span data-ko="Displace Weight를 <strong>0.02</strong>에서 시작" data-fa="Displace Weight را از <strong>0.02</strong> شروع کنید" data-ru="Начните с Displace Weight = <strong>0.02</strong>">Displace Weight를 <strong>0.02</strong>에서 시작</span></div>
+                <div class="step-item"><span data-ko="Noise TOP의 Transform → Translate X에 <code>absTime.seconds * 0.1</code> 입력" data-fa="در Noise TOP → Transform → Translate X عبارت <code>absTime.seconds * 0.1</code> وارد کنید" data-ru="В Noise TOP → Transform → Translate X введите <code>absTime.seconds * 0.1</code>">Noise TOP의 Transform → Translate X에 <code>absTime.seconds * 0.1</code> 입력</span></div>
               </div>
               <div class="callout callout-tip">
-                <div class="callout-label">확인 포인트</div>
-                Displace Weight를 <strong>0.01 / 0.05 / 0.2</strong>로 비교. Noise의 Period, Type을 바꿔보면서 질감 차이를 관찰.
+                <div class="callout-label" data-ko="확인 포인트" data-fa="نکته بررسی" data-ru="Контрольная точка">확인 포인트</div>
+                <span data-ko="Displace Weight를 <strong>0.01 / 0.05 / 0.2</strong>로 비교. Noise의 Period, Type을 바꿔보면서 질감 차이를 관찰." data-fa="Displace Weight را با <strong>0.01 / 0.05 / 0.2</strong> مقایسه کنید. Period و Type نویز را تغییر داده و تفاوت بافت را مشاهده کنید." data-ru="Сравните Displace Weight = <strong>0.01 / 0.05 / 0.2</strong>. Меняйте Period и Type в Noise и наблюдайте разницу текстуры.">Displace Weight를 <strong>0.01 / 0.05 / 0.2</strong>로 비교. Noise의 Period, Type을 바꿔보면서 질감 차이를 관찰.</span>
               </div>
             </div>
           </details>
@@ -1033,19 +1076,19 @@
           <details class="mb-4">
             <summary>
               <span class="badge badge-top" style="margin-right: 0.5rem;">A-3</span>
-              Feedback + Displace 결합
+              <span data-ko="Feedback + Displace 결합" data-fa="ترکیب Feedback + Displace" data-ru="Комбинация Feedback + Displace">Feedback + Displace 결합</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
               <p class="text-sm mb-3" style="color: var(--color-text-muted);">
-                <strong>목표:</strong> 두 효과를 결합하여 유기적으로 움직이는 비주얼을 만든다
+                <strong><span data-ko="목표:" data-fa="هدف:" data-ru="Цель:">목표:</span></strong> <span data-ko="두 효과를 결합하여 유기적으로 움직이는 비주얼을 만든다" data-fa="دو افکت را ترکیب کرده و ویژوالی ارگانیک و متحرک بسازید" data-ru="Объединить два эффекта и создать органично движущийся визуал">두 효과를 결합하여 유기적으로 움직이는 비주얼을 만든다</span>
               </p>
               <div class="step-list mb-4">
-                <div class="step-item"><span>실습 A-1의 Feedback 구조를 만든다</span></div>
-                <div class="step-item"><span>Level TOP과 Composite TOP 사이에 <code>Displace TOP</code>을 삽입</span></div>
-                <div class="step-item"><span>Displace의 두 번째 입력에 <code>Noise TOP</code> 연결</span></div>
-                <div class="step-item"><span>Displace Weight: <strong>0.01</strong>, Level opacity: <strong>0.96</strong>으로 시작</span></div>
-                <div class="step-item"><span>여러 파라미터를 바꿔가며 "마음에 드는 움직임"을 찾아본다</span></div>
+                <div class="step-item"><span data-ko="실습 A-1의 Feedback 구조를 만든다" data-fa="ساختار Feedback تمرین A-1 را بسازید" data-ru="Постройте структуру Feedback из практики A-1">실습 A-1의 Feedback 구조를 만든다</span></div>
+                <div class="step-item"><span data-ko="Level TOP과 Composite TOP 사이에 <code>Displace TOP</code>을 삽입" data-fa="<code>Displace TOP</code> را بین Level TOP و Composite TOP قرار دهید" data-ru="Вставьте <code>Displace TOP</code> между Level TOP и Composite TOP">Level TOP과 Composite TOP 사이에 <code>Displace TOP</code>을 삽입</span></div>
+                <div class="step-item"><span data-ko="Displace의 두 번째 입력에 <code>Noise TOP</code> 연결" data-fa="<code>Noise TOP</code> را به ورودی دوم Displace وصل کنید" data-ru="Подключите <code>Noise TOP</code> ко второму входу Displace">Displace의 두 번째 입력에 <code>Noise TOP</code> 연결</span></div>
+                <div class="step-item"><span data-ko="Displace Weight: <strong>0.01</strong>, Level opacity: <strong>0.96</strong>으로 시작" data-fa="Displace Weight: <strong>0.01</strong>، Level opacity: <strong>0.96</strong> شروع کنید" data-ru="Начните с Displace Weight: <strong>0.01</strong>, Level opacity: <strong>0.96</strong>">Displace Weight: <strong>0.01</strong>, Level opacity: <strong>0.96</strong>으로 시작</span></div>
+                <div class="step-item"><span data-ko="여러 파라미터를 바꿔가며 &quot;마음에 드는 움직임&quot;을 찾아본다" data-fa="پارامترهای مختلف را تغییر داده و &quot;حرکت دلخواه&quot; خود را پیدا کنید" data-ru="Меняйте разные параметры и найдите &quot;движение, которое нравится&quot;">여러 파라미터를 바꿔가며 "마음에 드는 움직임"을 찾아본다</span></div>
               </div>
             </div>
           </details>
@@ -1054,14 +1097,14 @@
         <!-- 실습 B: CHOP 기본 -->
         <div class="mb-12">
           <div class="flex items-center gap-3 mb-4">
-            <span class="badge badge-practice">실습 B</span>
-            <h3 class="text-lg font-semibold">CHOP 기본과 Reference 연습</h3>
+            <span class="badge badge-practice" data-ko="실습 B" data-fa="تمرین B" data-ru="Практика B">실습 B</span>
+            <h3 class="text-lg font-semibold" data-ko="CHOP 기본과 Reference 연습" data-fa="مبانی CHOP و تمرین Reference" data-ru="Основы CHOP и практика Reference">CHOP 기본과 Reference 연습</h3>
           </div>
 
           <details class="mb-4">
             <summary>
               <span class="badge badge-chop" style="margin-right: 0.5rem;">B-1</span>
-              LFO로 영상 자동 움직이기
+              <span data-ko="LFO로 영상 자동 움직이기" data-fa="حرکت خودکار تصویر با LFO" data-ru="Автоматическое движение видео с LFO">LFO로 영상 자동 움직이기</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
@@ -1075,9 +1118,9 @@
                 <span class="node node-top">Transform TOP (tx)</span>
               </div>
               <div class="step-list mb-4">
-                <div class="step-item"><span><code>LFO CHOP</code>을 만든다 (Type: Sin, Frequency: 0.3)</span></div>
+                <div class="step-item"><span data-ko="<code>LFO CHOP</code>을 만든다 (Type: Sin, Frequency: 0.3)" data-fa="<code>LFO CHOP</code> بسازید (Type: Sin، Frequency: 0.3)" data-ru="Создайте <code>LFO CHOP</code> (Type: Sin, Frequency: 0.3)"><code>LFO CHOP</code>을 만든다 (Type: Sin, Frequency: 0.3)</span></div>
                 <div class="step-item"><span><code>Math CHOP</code> Range: From -1~1, To -0.5~0.5</span></div>
-                <div class="step-item"><span>Math CHOP의 <code>+</code>를 드래그해서 Transform TOP의 tx에 Export</span></div>
+                <div class="step-item"><span data-ko="Math CHOP의 <code>+</code>를 드래그해서 Transform TOP의 tx에 Export" data-fa="<code>+</code> در Math CHOP را بکشید و روی tx در Transform TOP رها کنید (Export)" data-ru="Перетащите <code>+</code> из Math CHOP на tx в Transform TOP (Export)">Math CHOP의 <code>+</code>를 드래그해서 Transform TOP의 tx에 Export</span></div>
               </div>
             </div>
           </details>
@@ -1085,18 +1128,18 @@
           <details class="mb-4">
             <summary>
               <span class="badge badge-chop" style="margin-right: 0.5rem;">B-2</span>
-              Reference 표현식 연습
+              <span data-ko="Reference 표현식 연습" data-fa="تمرین عبارت Reference" data-ru="Практика выражений Reference">Reference 표현식 연습</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
               <div class="step-list mb-4">
-                <div class="step-item"><span>Level TOP의 <strong>Opacity</strong> 파라미터를 우클릭 → Expression Mode</span></div>
-                <div class="step-item"><span>다음 표현식을 입력한다:</span></div>
+                <div class="step-item"><span data-ko="Level TOP의 <strong>Opacity</strong> 파라미터를 우클릭 → Expression Mode" data-fa="روی پارامتر <strong>Opacity</strong> در Level TOP راست‌کلیک → Expression Mode" data-ru="Щёлкните правой кнопкой на параметре <strong>Opacity</strong> в Level TOP → Expression Mode">Level TOP의 <strong>Opacity</strong> 파라미터를 우클릭 → Expression Mode</span></div>
+                <div class="step-item"><span data-ko="다음 표현식을 입력한다:" data-fa="عبارت زیر را وارد کنید:" data-ru="Введите следующее выражение:">다음 표현식을 입력한다:</span></div>
               </div>
               <pre class="mb-4"><code>op('math1')['chan1'] * 0.5 + 0.5</code></pre>
               <div class="callout callout-tip">
-                <div class="callout-label">확인</div>
-                Export(녹색)와 Reference(파란색)의 파라미터 색 차이를 확인한다.
+                <div class="callout-label" data-ko="확인" data-fa="بررسی" data-ru="Проверка">확인</div>
+                <span data-ko="Export(녹색)와 Reference(파란색)의 파라미터 색 차이를 확인한다." data-fa="تفاوت رنگ پارامتر بین Export (سبز) و Reference (آبی) را بررسی کنید." data-ru="Проверьте разницу цвета параметров между Export (зелёный) и Reference (синий).">Export(녹색)와 Reference(파란색)의 파라미터 색 차이를 확인한다.</span>
               </div>
             </div>
           </details>
@@ -1104,7 +1147,7 @@
           <details class="mb-4">
             <summary>
               <span class="badge badge-chop" style="margin-right: 0.5rem;">B-3</span>
-              마우스로 영상 제어 + 스무딩
+              <span data-ko="마우스로 영상 제어 + 스무딩" data-fa="کنترل تصویر با ماوس + هموارسازی" data-ru="Управление видео мышью + сглаживание">마우스로 영상 제어 + 스무딩</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
@@ -1123,12 +1166,12 @@
               </div>
               <div class="step-list mb-4">
                 <div class="step-item"><span>Math CHOP Range: From 0~1920, To -1~1</span></div>
-                <div class="step-item"><span><code>Lag CHOP</code> 연결, Lag: <strong>0.2</strong>로 설정</span></div>
-                <div class="step-item"><span>Transform TOP의 tx에 Export</span></div>
+                <div class="step-item"><span data-ko="<code>Lag CHOP</code> 연결, Lag: <strong>0.2</strong>로 설정" data-fa="<code>Lag CHOP</code> وصل کنید، Lag: <strong>0.2</strong> تنظیم کنید" data-ru="Подключите <code>Lag CHOP</code>, установите Lag: <strong>0.2</strong>"><code>Lag CHOP</code> 연결, Lag: <strong>0.2</strong>로 설정</span></div>
+                <div class="step-item"><span data-ko="Transform TOP의 tx에 Export" data-fa="به tx در Transform TOP اکسپورت کنید" data-ru="Экспортируйте в tx Transform TOP">Transform TOP의 tx에 Export</span></div>
               </div>
               <div class="callout callout-tip">
-                <div class="callout-label">확인</div>
-                Lag 값을 <strong>0.05 / 0.2 / 1.0</strong>으로 바꿔보면서 차이를 느낀다. Lag가 없을 때 vs 있을 때를 비교.
+                <div class="callout-label" data-ko="확인" data-fa="بررسی" data-ru="Проверка">확인</div>
+                <span data-ko="Lag 값을 <strong>0.05 / 0.2 / 1.0</strong>으로 바꿔보면서 차이를 느낀다. Lag가 없을 때 vs 있을 때를 비교." data-fa="مقدار Lag را به <strong>0.05 / 0.2 / 1.0</strong> تغییر داده و تفاوت را حس کنید. بدون Lag در مقابل با Lag مقایسه کنید." data-ru="Попробуйте менять Lag на <strong>0.05 / 0.2 / 1.0</strong> и почувствуйте разницу. Сравните без Lag и с Lag.">Lag 값을 <strong>0.05 / 0.2 / 1.0</strong>으로 바꿔보면서 차이를 느낀다. Lag가 없을 때 vs 있을 때를 비교.</span>
               </div>
             </div>
           </details>
@@ -1137,14 +1180,14 @@
         <!-- 실습 C~F: 오디오 리액티브 -->
         <div class="mb-12">
           <div class="flex items-center gap-3 mb-4">
-            <span class="badge badge-practice">실습 C–F</span>
-            <h3 class="text-lg font-semibold">오디오 리액티브 비주얼</h3>
+            <span class="badge badge-practice" data-ko="실습 C–F" data-fa="تمرین C–F" data-ru="Практика C–F">실습 C–F</span>
+            <h3 class="text-lg font-semibold" data-ko="오디오 리액티브 비주얼" data-fa="ویژوال واکنش‌پذیر به صدا" data-ru="Аудиореактивный визуал">오디오 리액티브 비주얼</h3>
           </div>
 
           <details class="mb-4">
             <summary>
               <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">C</span>
-              소리에 반응하는 밝기
+              <span data-ko="소리에 반응하는 밝기" data-fa="روشنایی واکنش‌پذیر به صدا" data-ru="Яркость, реагирующая на звук">소리에 반응하는 밝기</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
@@ -1164,12 +1207,12 @@
                 <span class="node node-top">Level (brightness)</span>
               </div>
               <div class="step-list mb-4">
-                <div class="step-item"><span>Audio Device In → Device에서 마이크/시스템 오디오 선택</span></div>
-                <div class="step-item"><span>Analyze CHOP: Function을 <strong>RMS Power</strong>로</span></div>
+                <div class="step-item"><span data-ko="Audio Device In → Device에서 마이크/시스템 오디오 선택" data-fa="Audio Device In → در Device میکروفون/صدای سیستم را انتخاب کنید" data-ru="Audio Device In → выберите микрофон/системное аудио в Device">Audio Device In → Device에서 마이크/시스템 오디오 선택</span></div>
+                <div class="step-item"><span data-ko="Analyze CHOP: Function을 <strong>RMS Power</strong>로" data-fa="Analyze CHOP: Function را روی <strong>RMS Power</strong> تنظیم کنید" data-ru="Analyze CHOP: установите Function на <strong>RMS Power</strong>">Analyze CHOP: Function을 <strong>RMS Power</strong>로</span></div>
                 <div class="step-item"><span>Math CHOP Range: From 0~0.01, To 0~2</span></div>
                 <div class="step-item"><span>Lag: Up <strong>0.05</strong>, Down <strong>0.3</strong></span></div>
-                <div class="step-item"><span>Null CHOP 이름을 <code>audio_level</code>로 변경</span></div>
-                <div class="step-item"><span>Level TOP의 Brightness에 Export</span></div>
+                <div class="step-item"><span data-ko="Null CHOP 이름을 <code>audio_level</code>로 변경" data-fa="نام Null CHOP را به <code>audio_level</code> تغییر دهید" data-ru="Переименуйте Null CHOP в <code>audio_level</code>">Null CHOP 이름을 <code>audio_level</code>로 변경</span></div>
+                <div class="step-item"><span data-ko="Level TOP의 Brightness에 Export" data-fa="به Brightness در Level TOP اکسپورت کنید" data-ru="Экспортируйте в Brightness Level TOP">Level TOP의 Brightness에 Export</span></div>
               </div>
             </div>
           </details>
@@ -1177,17 +1220,17 @@
           <details class="mb-4">
             <summary>
               <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">D</span>
-              소리에 반응하는 왜곡 (Displace)
+              <span data-ko="소리에 반응하는 왜곡 (Displace)" data-fa="تغییر شکل واکنش‌پذیر به صدا (Displace)" data-ru="Искажение, реагирующее на звук (Displace)">소리에 반응하는 왜곡 (Displace)</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
               <p class="text-sm mb-3" style="color: var(--color-text-muted);">
-                실습 C의 CHOP 네트워크를 그대로 사용. Displace TOP의 Weight에 Reference 표현식으로 연결한다.
+                <span data-ko="실습 C의 CHOP 네트워크를 그대로 사용. Displace TOP의 Weight에 Reference 표현식으로 연결한다." data-fa="از شبکه CHOP تمرین C همان‌طور استفاده کنید. با عبارت Reference به Weight در Displace TOP متصل شوید." data-ru="Используйте ту же сеть CHOP из практики C. Подключите к Weight в Displace TOP через выражение Reference.">실습 C의 CHOP 네트워크를 그대로 사용. Displace TOP의 Weight에 Reference 표현식으로 연결한다.</span>
               </p>
               <pre class="mb-4"><code>op('audio_level')['chan1'] * 0.05</code></pre>
               <div class="callout callout-tip">
-                <div class="callout-label">확인</div>
-                <code>* 0.05</code> 부분을 <strong>* 0.1</strong>, <strong>* 0.2</strong>로 바꿔보면서 감도를 조절한다.
+                <div class="callout-label" data-ko="확인" data-fa="بررسی" data-ru="Проверка">확인</div>
+                <span data-ko="<code>* 0.05</code> 부분을 <strong>* 0.1</strong>, <strong>* 0.2</strong>로 바꿔보면서 감도를 조절한다." data-fa="قسمت <code>* 0.05</code> را به <strong>* 0.1</strong> و <strong>* 0.2</strong> تغییر داده و حساسیت را تنظیم کنید." data-ru="Попробуйте менять <code>* 0.05</code> на <strong>* 0.1</strong>, <strong>* 0.2</strong> и регулируйте чувствительность."><code>* 0.05</code> 부분을 <strong>* 0.1</strong>, <strong>* 0.2</strong>로 바꿔보면서 감도를 조절한다.</span>
               </div>
             </div>
           </details>
@@ -1195,19 +1238,19 @@
           <details class="mb-4">
             <summary>
               <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">E</span>
-              소리에 반응하는 Feedback
+              <span data-ko="소리에 반응하는 Feedback" data-fa="Feedback واکنش‌پذیر به صدا" data-ru="Feedback, реагирующий на звук">소리에 반응하는 Feedback</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
               <p class="text-sm mb-3" style="color: var(--color-text-muted);">
-                Feedback 루프 안의 파라미터에 오디오를 연결한다.
+                <span data-ko="Feedback 루프 안의 파라미터에 오디오를 연결한다." data-fa="صدا را به پارامترهای درون حلقه Feedback متصل کنید." data-ru="Подключите аудио к параметрам внутри петли Feedback.">Feedback 루프 안의 파라미터에 오디오를 연결한다.</span>
               </p>
-              <p class="text-sm mb-2" style="color: var(--color-text-muted);"><strong>Level TOP Opacity에 Reference:</strong></p>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);"><strong><span data-ko="Level TOP Opacity에 Reference:" data-fa="Reference به Opacity در Level TOP:" data-ru="Reference на Opacity в Level TOP:">Level TOP Opacity에 Reference:</span></strong></p>
               <pre class="mb-3"><code>0.9 + op('audio_level')['chan1'] * 0.08</code></pre>
-              <p class="text-sm mb-2" style="color: var(--color-text-muted);"><strong>Displace Weight에 Reference:</strong></p>
+              <p class="text-sm mb-2" style="color: var(--color-text-muted);"><strong><span data-ko="Displace Weight에 Reference:" data-fa="Reference به Displace Weight:" data-ru="Reference на Displace Weight:">Displace Weight에 Reference:</span></strong></p>
               <pre class="mb-4"><code>op('audio_level')['chan1'] * 0.03</code></pre>
               <p class="text-xs" style="color: var(--color-text-dim);">
-                소리가 클 때 잔상이 더 오래 남고(opacity↑), 동시에 왜곡이 강해진다(weight↑). 조용하면 거의 원본만 보인다.
+                <span data-ko="소리가 클 때 잔상이 더 오래 남고(opacity↑), 동시에 왜곡이 강해진다(weight↑). 조용하면 거의 원본만 보인다." data-fa="وقتی صدا بلند است پس‌تصویر بیشتر می‌ماند (opacity↑) و همزمان تغییر شکل قوی‌تر می‌شود (weight↑). در سکوت تقریباً فقط تصویر اصلی دیده می‌شود." data-ru="При громком звуке след держится дольше (opacity повышается) и одновременно усиливается искажение (weight повышается). В тишине видно почти только оригинал.">소리가 클 때 잔상이 더 오래 남고(opacity↑), 동시에 왜곡이 강해진다(weight↑). 조용하면 거의 원본만 보인다.</span>
               </p>
             </div>
           </details>
@@ -1215,15 +1258,15 @@
           <details class="mb-4">
             <summary>
               <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange); margin-right: 0.5rem;">F</span>
-              임계값 기반 장면 전환
+              <span data-ko="임계값 기반 장면 전환" data-fa="تغییر صحنه بر اساس آستانه" data-ru="Переключение сцен по порогу">임계값 기반 장면 전환</span>
               <span class="chevron">▸</span>
             </summary>
             <div class="details-body">
               <div class="node-diagram mb-4">
-                <span class="annotation">연속값 + 사건 복합 구조</span><br><br>
+                <span class="annotation" data-ko="연속값 + 사건 복합 구조" data-fa="ساختار ترکیبی مقدار پیوسته + رویداد" data-ru="Комбинированная структура: непрерывное значение + событие">연속값 + 사건 복합 구조</span><br><br>
                 <span class="node node-chop">audio_level</span>
                 <span class="arrow">→</span>
-                <span style="color: var(--color-accent-blue);">[연속값]</span>
+                <span style="color: var(--color-accent-blue);">[<span data-ko="연속값" data-fa="مقدار پیوسته" data-ru="непрерывное">연속값</span>]</span>
                 <span class="arrow">→</span>
                 <span class="node node-top">Level / Displace</span><br><br>
                 <span class="node node-chop">audio_level</span>
@@ -1236,8 +1279,8 @@
               </div>
               <div class="step-list">
                 <div class="step-item"><span><code>Logic CHOP</code>: Off When 0.4, On When 0.6</span></div>
-                <div class="step-item"><span><code>Count CHOP</code>: Limit Loop, Min 0, Max 영상 개수-1</span></div>
-                <div class="step-item"><span>Count → Switch TOP의 Index에 Export</span></div>
+                <div class="step-item"><span data-ko="<code>Count CHOP</code>: Limit Loop, Min 0, Max 영상 개수-1" data-fa="<code>Count CHOP</code>: Limit Loop، Min 0، Max تعداد ویدیوها-۱" data-ru="<code>Count CHOP</code>: Limit Loop, Min 0, Max количество видео-1"><code>Count CHOP</code>: Limit Loop, Min 0, Max 영상 개수-1</span></div>
+                <div class="step-item"><span data-ko="Count → Switch TOP의 Index에 Export" data-fa="Count → به Index در Switch TOP اکسپورت کنید" data-ru="Count → экспортируйте в Index Switch TOP">Count → Switch TOP의 Index에 Export</span></div>
               </div>
             </div>
           </details>
@@ -1254,36 +1297,36 @@
             <span class="dot" style="background: var(--color-text-muted);"></span>
             Part 06
           </div>
-          <h2 class="part-title">정리와 다음 단계</h2>
+          <h2 class="part-title" data-ko="정리와 다음 단계" data-fa="جمع‌بندی و مراحل بعدی" data-ru="Итоги и следующие шаги">정리와 다음 단계</h2>
         </div>
 
         <!-- 핵심 원칙 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">핵심 원칙</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="핵심 원칙" data-fa="اصول کلیدی" data-ru="Ключевые принципы">핵심 원칙</h3>
 
           <div class="space-y-3 mb-6">
             <div class="panel" style="border-left: 3px solid var(--color-accent-blue);">
-              <div class="font-semibold text-sm mb-1">1. 인터랙션은 "값을 설계하는 것"이다</div>
-              <p class="text-sm" style="color: var(--color-text-muted);">영상을 직접 건드리는 것보다 영상을 움직이는 값을 설계하는 것이 인터랙션이다.</p>
+              <div class="font-semibold text-sm mb-1" data-ko="1. 인터랙션은 &quot;값을 설계하는 것&quot;이다" data-fa="1. تعامل یعنی &quot;طراحی مقادیر&quot;" data-ru="1. Интерактивность — это &quot;проектирование значений&quot;">1. 인터랙션은 "값을 설계하는 것"이다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);" data-ko="영상을 직접 건드리는 것보다 영상을 움직이는 값을 설계하는 것이 인터랙션이다." data-fa="تعامل به جای دستکاری مستقیم تصویر، طراحی مقادیری است که تصویر را حرکت می‌دهند." data-ru="Интерактивность — это не прямое изменение видео, а проектирование значений, которые им управляют.">영상을 직접 건드리는 것보다 영상을 움직이는 값을 설계하는 것이 인터랙션이다.</p>
             </div>
             <div class="panel" style="border-left: 3px solid var(--color-accent-green);">
-              <div class="font-semibold text-sm mb-1">2. 좋은 인터랙션은 가공 방식에서 나온다</div>
-              <p class="text-sm" style="color: var(--color-text-muted);">마우스를 받는 것은 쉽다. 그 값을 적당한 속도, 범위, 감도, 리듬으로 가공하는 것이 어렵고 중요하다.</p>
+              <div class="font-semibold text-sm mb-1" data-ko="2. 좋은 인터랙션은 가공 방식에서 나온다" data-fa="2. تعامل خوب از نحوه پردازش ناشی می‌شود" data-ru="2. Хорошая интерактивность определяется способом обработки">2. 좋은 인터랙션은 가공 방식에서 나온다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);" data-ko="마우스를 받는 것은 쉽다. 그 값을 적당한 속도, 범위, 감도, 리듬으로 가공하는 것이 어렵고 중요하다." data-fa="دریافت ماوس آسان است. پردازش آن مقدار با سرعت، محدوده، حساسیت و ریتم مناسب دشوار و مهم است." data-ru="Получить данные мыши легко. Обработать их с правильной скоростью, диапазоном, чувствительностью и ритмом — трудно и важно.">마우스를 받는 것은 쉽다. 그 값을 적당한 속도, 범위, 감도, 리듬으로 가공하는 것이 어렵고 중요하다.</p>
             </div>
             <div class="panel" style="border-left: 3px solid var(--color-accent-orange);">
-              <div class="font-semibold text-sm mb-1">3. 센서 데이터는 대부분 더럽고 불안정하다</div>
-              <p class="text-sm" style="color: var(--color-text-muted);">"센서가 이상하다"라고 할 때 사실은 데이터 가공 문제인 경우가 많다.</p>
+              <div class="font-semibold text-sm mb-1" data-ko="3. 센서 데이터는 대부분 더럽고 불안정하다" data-fa="3. داده‌های سنسور معمولاً نویزی و ناپایدار هستند" data-ru="3. Данные сенсоров обычно шумные и нестабильные">3. 센서 데이터는 대부분 더럽고 불안정하다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);" data-ko="&quot;센서가 이상하다&quot;라고 할 때 사실은 데이터 가공 문제인 경우가 많다." data-fa="وقتی می‌گوییم &quot;سنسور مشکل دارد&quot; در واقع اغلب مشکل پردازش داده است." data-ru="Когда говорят &quot;сенсор глючит&quot;, на самом деле чаще всего это проблема обработки данных.">"센서가 이상하다"라고 할 때 사실은 데이터 가공 문제인 경우가 많다.</p>
             </div>
             <div class="panel" style="border-left: 3px solid var(--color-accent-purple);">
-              <div class="font-semibold text-sm mb-1">4. 인터랙션은 서사와 편집의 문제이기도 하다</div>
-              <p class="text-sm" style="color: var(--color-text-muted);">값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다.</p>
+              <div class="font-semibold text-sm mb-1" data-ko="4. 인터랙션은 서사와 편집의 문제이기도 하다" data-fa="4. تعامل مسئله روایت و تدوین هم هست" data-ru="4. Интерактивность — это ещё и вопрос нарратива и монтажа">4. 인터랙션은 서사와 편집의 문제이기도 하다</div>
+              <p class="text-sm" style="color: var(--color-text-muted);" data-ko="값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다." data-fa="با یک مقدار چه چیزی و چقدر تغییر کند، کِی واکنش نشان دهد و کِی ندهد — این انتخاب تأثیر و احساس تصویر را تعیین می‌کند." data-ru="Что и насколько менять одним значением, когда реагировать, а когда нет — этот выбор определяет впечатление и настроение видео.">값 하나로 무엇을 얼마나 바꿀 것인가, 언제 반응하고 언제 하지 않을 것인가 — 이 선택이 영상의 인상과 감정을 결정한다.</p>
             </div>
           </div>
         </div>
 
         <!-- 오퍼레이터 치트시트 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">최소 필수 오퍼레이터</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="최소 필수 오퍼레이터" data-fa="حداقل اپراتورهای ضروری" data-ru="Минимально необходимые операторы">최소 필수 오퍼레이터</h3>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div class="module-card">
@@ -1294,15 +1337,15 @@
               <div class="module-card-body">
                 <table class="data-table">
                   <tbody>
-                    <tr><td>Movie File In</td><td>영상 불러오기</td></tr>
-                    <tr><td>Transform</td><td>이동, 회전, 스케일</td></tr>
-                    <tr><td>Level</td><td>밝기, 불투명도</td></tr>
-                    <tr><td>Composite</td><td>합성</td></tr>
-                    <tr><td>Switch</td><td>입력 선택</td></tr>
-                    <tr><td style="color: var(--color-accent-purple);">Feedback</td><td>이전 프레임 피드백</td></tr>
-                    <tr><td style="color: var(--color-accent-purple);">Displace</td><td>이미지 왜곡</td></tr>
-                    <tr><td>Noise</td><td>절차적 노이즈</td></tr>
-                    <tr><td>Null</td><td>네트워크 정리</td></tr>
+                    <tr><td>Movie File In</td><td data-ko="영상 불러오기" data-fa="بارگذاری ویدیو" data-ru="Загрузка видео">영상 불러오기</td></tr>
+                    <tr><td>Transform</td><td data-ko="이동, 회전, 스케일" data-fa="جابه‌جایی، چرخش، مقیاس" data-ru="Перемещение, вращение, масштаб">이동, 회전, 스케일</td></tr>
+                    <tr><td>Level</td><td data-ko="밝기, 불투명도" data-fa="روشنایی، شفافیت" data-ru="Яркость, непрозрачность">밝기, 불투명도</td></tr>
+                    <tr><td>Composite</td><td data-ko="합성" data-fa="ترکیب" data-ru="Композитинг">합성</td></tr>
+                    <tr><td>Switch</td><td data-ko="입력 선택" data-fa="انتخاب ورودی" data-ru="Выбор входа">입력 선택</td></tr>
+                    <tr><td style="color: var(--color-accent-purple);">Feedback</td><td data-ko="이전 프레임 피드백" data-fa="بازخورد فریم قبلی" data-ru="Обратная связь предыдущего кадра">이전 프레임 피드백</td></tr>
+                    <tr><td style="color: var(--color-accent-purple);">Displace</td><td data-ko="이미지 왜곡" data-fa="تغییر شکل تصویر" data-ru="Искажение изображения">이미지 왜곡</td></tr>
+                    <tr><td>Noise</td><td data-ko="절차적 노이즈" data-fa="نویز رویه‌ای" data-ru="Процедурный шум">절차적 노이즈</td></tr>
+                    <tr><td>Null</td><td data-ko="네트워크 정리" data-fa="مرتب‌سازی شبکه" data-ru="Организация сети">네트워크 정리</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1315,15 +1358,15 @@
               <div class="module-card-body">
                 <table class="data-table">
                   <tbody>
-                    <tr><td>Mouse In</td><td>마우스 입력</td></tr>
-                    <tr><td style="color: var(--color-accent-green);">Audio Device In</td><td>오디오 입력</td></tr>
-                    <tr><td>LFO / Noise</td><td>값 생성</td></tr>
-                    <tr><td style="color: var(--color-accent-yellow);">Math ⭐</td><td>범위 변환</td></tr>
-                    <tr><td style="color: var(--color-accent-green);">Analyze</td><td>신호 요약 (RMS)</td></tr>
-                    <tr><td>Filter / Lag</td><td>스무딩</td></tr>
-                    <tr><td>Limit</td><td>범위 제한</td></tr>
-                    <tr><td>Logic / Trigger</td><td>사건 생성</td></tr>
-                    <tr><td>Null</td><td>네트워크 정리</td></tr>
+                    <tr><td>Mouse In</td><td data-ko="마우스 입력" data-fa="ورودی ماوس" data-ru="Ввод мыши">마우스 입력</td></tr>
+                    <tr><td style="color: var(--color-accent-green);">Audio Device In</td><td data-ko="오디오 입력" data-fa="ورودی صوتی" data-ru="Аудиовход">오디오 입력</td></tr>
+                    <tr><td>LFO / Noise</td><td data-ko="값 생성" data-fa="تولید مقدار" data-ru="Генерация значений">값 생성</td></tr>
+                    <tr><td style="color: var(--color-accent-yellow);">Math ⭐</td><td data-ko="범위 변환" data-fa="تبدیل محدوده" data-ru="Преобразование диапазона">범위 변환</td></tr>
+                    <tr><td style="color: var(--color-accent-green);">Analyze</td><td data-ko="신호 요약 (RMS)" data-fa="خلاصه سیگنال (RMS)" data-ru="Суммирование сигнала (RMS)">신호 요약 (RMS)</td></tr>
+                    <tr><td>Filter / Lag</td><td data-ko="스무딩" data-fa="هموارسازی" data-ru="Сглаживание">스무딩</td></tr>
+                    <tr><td>Limit</td><td data-ko="범위 제한" data-fa="محدودسازی محدوده" data-ru="Ограничение диапазона">범위 제한</td></tr>
+                    <tr><td>Logic / Trigger</td><td data-ko="사건 생성" data-fa="تولید رویداد" data-ru="Генерация событий">사건 생성</td></tr>
+                    <tr><td>Null</td><td data-ko="네트워크 정리" data-fa="مرتب‌سازی شبکه" data-ru="Организация сети">네트워크 정리</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1336,7 +1379,7 @@
           <div class="module-card" style="border-color: var(--color-accent-orange);">
             <div class="module-card-header" style="border-color: var(--color-accent-orange);">
               <span class="module-dot" style="background: var(--color-accent-orange);"></span>
-              오디오 리액티브 파이프라인 (암기)
+              <span data-ko="오디오 리액티브 파이프라인 (암기)" data-fa="خط لوله واکنش صوتی (حفظ کنید)" data-ru="Аудиореактивный пайплайн (запомнить)">오디오 리액티브 파이프라인 (암기)</span>
             </div>
             <div class="module-card-body">
               <div class="node-diagram">
@@ -1358,19 +1401,19 @@
 
         <!-- 디버깅 순서 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">디버깅 순서</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="디버깅 순서" data-fa="ترتیب اشکال‌زدایی" data-ru="Порядок отладки">디버깅 순서</h3>
 
           <div class="step-list mb-6">
-            <div class="step-item"><span><strong>"값이 들어오고 있는가?"</strong> — CHOP Viewer에서 입력 확인</span></div>
-            <div class="step-item"><span><strong>"범위가 맞는가?"</strong> — Math CHOP의 From/To Range 확인</span></div>
-            <div class="step-item"><span><strong>"값이 너무 튀는가?"</strong> — Filter/Lag/Limit 추가</span></div>
-            <div class="step-item"><span><strong>"연결이 되어 있는가?"</strong> — Export/Reference 상태 확인</span></div>
+            <div class="step-item"><span data-ko="<strong>&quot;값이 들어오고 있는가?&quot;</strong> — CHOP Viewer에서 입력 확인" data-fa="<strong>&quot;آیا مقدار دریافت می‌شود?&quot;</strong> — ورودی را در CHOP Viewer بررسی کنید" data-ru="<strong>&quot;Поступают ли значения?&quot;</strong> — проверьте вход в CHOP Viewer"><strong>"값이 들어오고 있는가?"</strong> — CHOP Viewer에서 입력 확인</span></div>
+            <div class="step-item"><span data-ko="<strong>&quot;범위가 맞는가?&quot;</strong> — Math CHOP의 From/To Range 확인" data-fa="<strong>&quot;آیا محدوده درست است?&quot;</strong> — From/To Range در Math CHOP را بررسی کنید" data-ru="<strong>&quot;Правильный ли диапазон?&quot;</strong> — проверьте From/To Range в Math CHOP"><strong>"범위가 맞는가?"</strong> — Math CHOP의 From/To Range 확인</span></div>
+            <div class="step-item"><span data-ko="<strong>&quot;값이 너무 튀는가?&quot;</strong> — Filter/Lag/Limit 추가" data-fa="<strong>&quot;آیا مقدار بیش از حد نوسان دارد?&quot;</strong> — Filter/Lag/Limit اضافه کنید" data-ru="<strong>&quot;Значения скачут?&quot;</strong> — добавьте Filter/Lag/Limit"><strong>"값이 너무 튀는가?"</strong> — Filter/Lag/Limit 추가</span></div>
+            <div class="step-item"><span data-ko="<strong>&quot;연결이 되어 있는가?&quot;</strong> — Export/Reference 상태 확인" data-fa="<strong>&quot;آیا اتصال برقرار است?&quot;</strong> — وضعیت Export/Reference را بررسی کنید" data-ru="<strong>&quot;Подключено ли?&quot;</strong> — проверьте состояние Export/Reference"><strong>"연결이 되어 있는가?"</strong> — Export/Reference 상태 확인</span></div>
           </div>
         </div>
 
         <!-- 키워드 -->
         <div class="mb-10">
-          <h3 class="text-lg font-semibold mb-4">핵심 키워드</h3>
+          <h3 class="text-lg font-semibold mb-4" data-ko="핵심 키워드" data-fa="کلیدواژه‌های اصلی" data-ru="Ключевые термины">핵심 키워드</h3>
           <div class="flex flex-wrap gap-2">
             <span class="badge badge-chop">channel</span>
             <span class="badge badge-chop">sample</span>
@@ -1395,14 +1438,14 @@
         <div class="module-card" style="border-color: var(--color-border-light);">
           <div class="module-card-header" style="border-color: var(--color-border-light);">
             <span class="module-dot" style="background: var(--color-text-dim);"></span>
-            다음 수업 예고
+            <span data-ko="다음 수업 예고" data-fa="پیش‌نمایش جلسه بعد" data-ru="Анонс следующего занятия">다음 수업 예고</span>
           </div>
           <div class="module-card-body text-sm" style="color: var(--color-text-muted);">
             <ul class="space-y-1" style="list-style: none; padding: 0;">
-              <li>&#8226; Audio Spectrum CHOP을 활용한 주파수 대역별 분리와 정밀 매핑</li>
-              <li>&#8226; SOP(3D)와 CHOP의 결합 — 소리에 반응하는 3D 지오메트리</li>
-              <li>&#8226; MIDI / OSC 입력 — 외부 컨트롤러와의 연동</li>
-              <li>&#8226; 여러 입력을 결합한 복합 인터랙션 설계</li>
+              <li>&#8226; <span data-ko="Audio Spectrum CHOP을 활용한 주파수 대역별 분리와 정밀 매핑" data-fa="جداسازی باند فرکانسی و نگاشت دقیق با Audio Spectrum CHOP" data-ru="Разделение по частотным диапазонам и точный маппинг с Audio Spectrum CHOP">Audio Spectrum CHOP을 활용한 주파수 대역별 분리와 정밀 매핑</span></li>
+              <li>&#8226; <span data-ko="SOP(3D)와 CHOP의 결합 — 소리에 반응하는 3D 지오메트리" data-fa="ترکیب SOP (سه‌بعدی) و CHOP — هندسه سه‌بعدی واکنش‌پذیر به صدا" data-ru="Сочетание SOP (3D) и CHOP — 3D-геометрия, реагирующая на звук">SOP(3D)와 CHOP의 결합 — 소리에 반응하는 3D 지오메트리</span></li>
+              <li>&#8226; <span data-ko="MIDI / OSC 입력 — 외부 컨트롤러와의 연동" data-fa="ورودی MIDI / OSC — اتصال با کنترلرهای خارجی" data-ru="Ввод MIDI / OSC — подключение внешних контроллеров">MIDI / OSC 입력 — 외부 컨트롤러와의 연동</span></li>
+              <li>&#8226; <span data-ko="여러 입력을 결합한 복합 인터랙션 설계" data-fa="طراحی تعامل ترکیبی با چند ورودی" data-ru="Проектирование комплексной интерактивности с несколькими входами">여러 입력을 결합한 복합 인터랙션 설계</span></li>
             </ul>
           </div>
         </div>
@@ -1413,9 +1456,9 @@
 
       <!-- Footer -->
       <footer class="text-center text-xs" style="color: var(--color-text-dim);">
-        <p>디지털미디어비주얼 1 — CHOP / Audio Reactive 기초</p>
+        <p><span data-ko="디지털미디어비주얼 1 — CHOP / Audio Reactive 기초" data-fa="رسانه دیجیتال بصری ۱ — مبانی CHOP / Audio Reactive" data-ru="Цифровые медиавизуалы 1 — Основы CHOP / Audio Reactive">디지털미디어비주얼 1 — CHOP / Audio Reactive 기초</span></p>
         <button id="export-pdf" class="mt-3 px-4 py-2 rounded-lg no-print" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-border-light)'" onmouseout="this.style.borderColor='var(--color-border)'">
-          PDF로 내보내기
+          <span data-ko="PDF로 내보내기" data-fa="خروجی PDF" data-ru="Экспорт в PDF">PDF로 내보내기</span>
         </button>
       </footer>
     </div>
@@ -1423,6 +1466,34 @@
     <script type="module">
       import { init } from "/shared/components.js";
       init();
+
+      // Language switcher
+      function initLangSwitcher() {
+        const buttons = document.querySelectorAll('.lang-btn');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.querySelectorAll('[data-ko]').forEach(el => {
+              const text = el.getAttribute('data-' + lang);
+              if (text) {
+                if (el.children.length === 0) {
+                  el.textContent = text;
+                } else {
+                  el.innerHTML = text;
+                }
+              }
+            });
+
+            // RTL for Persian
+            document.body.dir = (lang === 'fa') ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+          });
+        });
+      }
+      initLangSwitcher();
 
       // Section nav active state
       const sections = document.querySelectorAll("section[id]");
