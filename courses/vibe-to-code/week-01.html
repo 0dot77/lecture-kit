@@ -843,6 +843,98 @@
       margin-top: 0.1rem;
     }
 
+    /* ─── Instructor Card ─── */
+    .instructor-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      padding: 2rem;
+      background: var(--blue-wash);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .instructor-avatar {
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .instructor-info h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 0.15rem;
+    }
+
+    .instructor-role {
+      font-size: 0.8rem;
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .instructor-info p {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .instructor-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+    }
+
+    .instructor-tags span {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.6rem;
+      background: rgba(26, 61, 109, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--ink-dim);
+      letter-spacing: 0.03em;
+    }
+
+    .instructor-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--blue);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .instructor-link:hover {
+      border-color: var(--blue);
+    }
+
+    @media (max-width: 768px) {
+      .instructor-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .instructor-tags { justify-content: center; }
+    }
+
     /* ─── Pattern Decoration ─── */
     .pattern-strip {
       height: 40px;
@@ -1004,6 +1096,7 @@
 <!-- Side Navigation -->
 <nav class="side-nav" id="sideNav">
   <a href="#intro" class="active"><span class="nav-dot"></span><span class="nav-text">Intro</span></a>
+  <a href="#instructor"><span class="nav-dot"></span><span class="nav-text">Instructor</span></a>
   <a href="#overview"><span class="nav-dot"></span><span class="nav-text">Overview</span></a>
   <a href="#schedule"><span class="nav-dot"></span><span class="nav-text">Schedule</span></a>
   <a href="#roundtable"><span class="nav-dot"></span><span class="nav-text">Roundtable</span></a>
@@ -1040,6 +1133,38 @@
       <span style="animation-delay:1.0s"></span>
     </div>
   </header>
+
+  <!-- ═══════ INSTRUCTOR ═══════ -->
+  <section class="content-section" id="instructor">
+    <div class="section-divider">
+      <span class="section-num">00</span>
+      <span class="section-line"></span>
+      <span class="section-label">Instructor</span>
+    </div>
+
+    <div class="instructor-card">
+      <div class="instructor-avatar">0dot77</div>
+      <div class="instructor-info">
+        <h3>유태양 Taeyang Yoo</h3>
+        <div class="instructor-role">Media Artist · Developer · Technical Director</div>
+        <p>
+          "I make tools for artists. I make art with tools."<br>
+          예술가를 위한 도구를 만들고, 그 도구로 다시 작품을 만듭니다.
+          한국예술종합학교에서 멀티미디어를 전공하며, 같은 학교에서 Digital Media Visual, 무대디자인 등을 가르치고 있습니다.
+          XR, 인터랙티브 설치, 실시간 영상 등 무대와 전시 현장에서 기술 디렉터로 활동하고 있습니다.
+        </p>
+        <div class="instructor-tags">
+          <span>Unity</span>
+          <span>TouchDesigner</span>
+          <span>XR / MetaSDK</span>
+          <span>Three.js</span>
+          <span>AI</span>
+          <span>Creative Coding</span>
+        </div>
+        <a class="instructor-link" href="https://0dot77.com" target="_blank" rel="noopener">0dot77.com &rarr;</a>
+      </div>
+    </div>
+  </section>
 
   <!-- ═══════ WORKSHOP INTRO ═══════ -->
   <section class="content-section" id="overview">

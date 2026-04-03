@@ -57,6 +57,10 @@ lecture-kit/
 
 Primary content is in **Korean (한국어)**. UI labels may be bilingual.
 
+## Workflow
+
+- **파일 수정 후 반드시 `npm run dev`로 개발 서버를 띄워서 확인할 것.** 이미 실행 중이면 다시 띄울 필요 없음.
+
 ## Commands
 
 ```bash
