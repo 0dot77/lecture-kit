@@ -1442,11 +1442,11 @@
       </div>
       <div class="info-panel-body">
         <div class="code-block" style="margin:0;">
-<span class="highlight">pwd</span>                    <span class="comment">&larr; 지금 어디에 있나요?</span>
-<span class="highlight">ls</span>                     <span class="comment">&larr; 여기에 뭐가 있나요?</span>
-<span class="highlight">mkdir my-vibe</span>          <span class="comment">&larr; 새 폴더 만들기</span>
-<span class="highlight">cd my-vibe</span>             <span class="comment">&larr; 그 폴더로 들어가기</span>
-<span class="highlight">pwd</span>                    <span class="comment">&larr; 잘 이동했는지 확인</span>
+<span style="display:block;"><span class="highlight">pwd</span>   <span class="comment">&larr; 지금 어디에 있나요?</span></span>
+<span style="display:block;"><span class="highlight">ls</span>    <span class="comment">&larr; 여기에 뭐가 있나요?</span></span>
+<span style="display:block;"><span class="highlight">mkdir my-vibe</span>  <span class="comment">&larr; 새 폴더 만들기</span></span>
+<span style="display:block;"><span class="highlight">cd my-vibe</span>     <span class="comment">&larr; 그 폴더로 들어가기</span></span>
+<span style="display:block;"><span class="highlight">pwd</span>   <span class="comment">&larr; 잘 이동했는지 확인</span></span>
           <button class="copy-btn" onclick="copyCode(this)">복사</button>
         </div>
       </div>
@@ -1519,8 +1519,8 @@
     </div>
 
     <div class="code-block" style="margin-top:1.5rem;">
-<span class="highlight">npm install -g @anthropic-ai/claude-code</span>   <span class="comment">&larr; 설치</span>
-<span class="highlight">claude</span>                                       <span class="comment">&larr; 실행</span>
+<span style="display:block;"><span class="highlight">npm install -g @anthropic-ai/claude-code</span>  <span class="comment">&larr; 설치</span></span>
+<span style="display:block;"><span class="highlight">claude</span>  <span class="comment">&larr; 실행</span></span>
       <button class="copy-btn" onclick="copyCode(this)">복사</button>
     </div>
 
@@ -1665,30 +1665,51 @@
     </div>
 
     <!-- Two-step practice -->
-    <div class="two-col">
-      <div class="info-panel-red info-panel">
-        <div class="info-panel-header">Step 1 &mdash; claude.ai (10분)</div>
-        <div class="info-panel-body">
-          <p style="margin-bottom:0.75rem;">대화로 만들어보기 &mdash; Artifact에서 바로 인터랙션 확인</p>
-          <div class="code-block" style="background:var(--ink);margin:0;font-size:0.75rem;">
-<span style="color:var(--red-light);">나를 표현하는 인터랙티브 웹페이지를 만들어줘.</span>
-<span style="color:var(--blue-pale);">나는 ___한 사람이야.</span>
-<span style="color:var(--blue-pale);">클릭하면 ___가 일어나게 해줘.</span>
-          </div>
+    <div class="info-panel-red info-panel">
+      <div class="info-panel-header">Step 1 &mdash; claude.ai (10분)</div>
+      <div class="info-panel-body">
+        <p style="margin-bottom:0.75rem;">대화로 만들어보기 &mdash; Artifact에서 바로 인터랙션 확인</p>
+        <div class="code-block" style="background:var(--ink);margin:0;font-size:0.75rem;">
+<span style="display:block;color:var(--red-light);">나를 표현하는 인터랙티브 웹페이지를 만들어줘.</span>
+<span style="display:block;color:var(--blue-pale);">나는 ___한 사람이야.</span>
+<span style="display:block;color:var(--blue-pale);">클릭하면 ___가 일어나게 해줘.</span>
         </div>
       </div>
+    </div>
 
-      <div class="info-panel">
-        <div class="info-panel-header">Step 2 &mdash; Claude Code (25분)</div>
-        <div class="info-panel-body">
-          <p style="margin-bottom:0.75rem;">파일이 생기고, 수정하고, 브라우저에서 여는 경험</p>
-          <div class="code-block" style="margin:0;font-size:0.75rem;">
-<span class="highlight">mkdir my-vibe && cd my-vibe</span>
-<span class="highlight">claude --dangerously-skip-permissions</span>
-<span class="comment"># 같은 요청을 해보기</span>
-<span class="highlight">open index.html</span>
-            <button class="copy-btn" onclick="copyCode(this)">복사</button>
-          </div>
+    <div class="info-panel" style="margin-top:1rem;">
+      <div class="info-panel-header">Step 2 &mdash; Claude Code (25분)</div>
+      <div class="info-panel-body">
+        <p style="margin-bottom:0.75rem;">터미널에서 Claude Code로 진짜 파일을 만드는 경험</p>
+
+        <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.5rem;">macOS / Linux</p>
+        <div class="code-block" style="margin:0 0 1rem;font-size:0.75rem;">
+<span class="comment" style="display:block;"># 1. 스킬 설치 (한 번만)</span>
+<span class="highlight" style="display:block;">mkdir -p ~/.claude/skills/self-intro</span>
+<span class="highlight" style="display:block;">curl -sL https://raw.githubusercontent.com/0dot77/lecture-kit/main/.claude/skills/self-intro/SKILL.md > ~/.claude/skills/self-intro/SKILL.md</span>
+<span style="display:block;">&nbsp;</span>
+<span class="comment" style="display:block;"># 2. 작업 폴더 만들고 Claude Code 시작</span>
+<span class="highlight" style="display:block;">mkdir my-vibe && cd my-vibe</span>
+<span class="highlight" style="display:block;">claude --dangerously-skip-permissions</span>
+<span style="display:block;">&nbsp;</span>
+<span class="comment" style="display:block;"># 3. Claude Code 안에서:</span>
+<span class="highlight" style="display:block;">/self-intro</span>
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        </div>
+
+        <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:0.5rem;">Windows (PowerShell)</p>
+        <div class="code-block" style="margin:0;font-size:0.75rem;">
+<span class="comment" style="display:block;"># 1. 스킬 설치 (한 번만)</span>
+<span class="highlight" style="display:block;">New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\self-intro"</span>
+<span class="highlight" style="display:block;">Invoke-WebRequest -Uri "https://raw.githubusercontent.com/0dot77/lecture-kit/main/.claude/skills/self-intro/SKILL.md" -OutFile "$env:USERPROFILE\.claude\skills\self-intro\SKILL.md"</span>
+<span style="display:block;">&nbsp;</span>
+<span class="comment" style="display:block;"># 2. 작업 폴더 만들고 Claude Code 시작</span>
+<span class="highlight" style="display:block;">mkdir my-vibe; cd my-vibe</span>
+<span class="highlight" style="display:block;">claude --dangerously-skip-permissions</span>
+<span style="display:block;">&nbsp;</span>
+<span class="comment" style="display:block;"># 3. Claude Code 안에서:</span>
+<span class="highlight" style="display:block;">/self-intro</span>
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
         </div>
       </div>
     </div>
@@ -1720,7 +1741,7 @@
     </div>
 
     <!-- Next week & homework -->
-    <div class="two-col" style="margin-top: 2rem;">
+    <div class="two-col" style="margin-top: 2rem; align-items: start;">
       <div class="info-panel">
         <div class="info-panel-header">다음 주 예고</div>
         <div class="info-panel-body">

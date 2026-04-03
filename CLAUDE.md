@@ -60,6 +60,7 @@ Primary content is in **Korean (한국어)**. UI labels may be bilingual.
 ## Workflow
 
 - **파일 수정 후 반드시 `npm run dev`로 개발 서버를 띄워서 확인할 것.** 이미 실행 중이면 다시 띄울 필요 없음.
+- **코드 블록(`.code-block`) 안의 각 줄은 반드시 `<span style="display:block;">` 으로 감싸서 라인 브레이크를 보장할 것.** 인라인 `<span>`만 쓰면 한 줄로 붙어 보인다.
 
 ## Commands
 
