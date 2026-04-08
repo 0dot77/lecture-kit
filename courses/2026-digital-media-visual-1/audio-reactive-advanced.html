@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TOP-CHOP 복습 & 오디오 리액티브 비주얼 — 디지털미디어비주얼 1</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <style>
+      .lang-switcher {
+        position: fixed;
+        top: 1rem;
+        right: 4rem;
+        z-index: 60;
+        display: flex;
+        gap: 2px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 2px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      .lang-btn {
+        padding: 4px 10px;
+        font-size: 0.65rem;
+        font-family: var(--font-sans);
+        border: none;
+        background: transparent;
+        color: var(--color-text-dim);
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .lang-btn:hover {
+        color: var(--color-text-muted);
+        background: var(--color-surface-hover);
+      }
+      .lang-btn.active {
+        background: var(--color-accent-blue);
+        color: white;
+      }
+      @media print { .lang-switcher { display: none !important; } }
+    </style>
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Language Switcher -->
+    <div class="lang-switcher no-print">
+      <button class="lang-btn active" data-lang="ko">한국어</button>
+      <button class="lang-btn" data-lang="fa">فارسی</button>
+      <button class="lang-btn" data-lang="ru">Русский</button>
+    </div>
+
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- Section Nav (right side dots)           -->
+    <!-- ════════════════════════════════════════ -->
+    <nav class="section-nav no-print" id="sectionNav">
+      <a href="#part-review" data-section="1"><span class="nav-label" data-ko="Part 1 — TOP-CHOP 복습" data-fa="Part 1 — مرور TOP-CHOP" data-ru="Part 1 — Повторение TOP-CHOP">Part 1 — TOP-CHOP 복습</span></a>
+      <a href="#part-sound" data-section="2"><span class="nav-label" data-ko="Part 2 — 소리를 이해하기" data-fa="Part 2 — درک صدا" data-ru="Part 2 — Понимание звука">Part 2 — 소리를 이해하기</span></a>
+      <a href="#part-practice" data-section="3"><span class="nav-label" data-ko="Part 3 — 실습" data-fa="Part 3 — تمرین عملی" data-ru="Part 3 — Практика">Part 3 — 실습</span></a>
+      <a href="#part-tips" data-section="4"><span class="nav-label" data-ko="Part 4 — 팁과 정리" data-fa="Part 4 — نکات و جمع‌بندی" data-ru="Part 4 — Советы и итоги">Part 4 — 팁과 정리</span></a>
+    </nav>
+
+    <div class="lecture-page">
+      <!-- ════════════════════════════════════════ -->
+      <!-- Hero Header                             -->
+      <!-- ════════════════════════════════════════ -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="badge badge-top">TOP</span>
+          <span class="badge badge-chop">CHOP</span>
+          <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">Audio Reactive</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3" style="letter-spacing: -0.03em;">
+          <span data-ko="TOP-CHOP 복습 & 오디오 리액티브 비주얼" data-fa="مرور TOP-CHOP و ویژوال واکنش‌پذیر به صدا" data-ru="Повторение TOP-CHOP и аудиореактивный визуал">TOP-CHOP 복습 & 오디오 리액티브 비주얼</span>
+        </h1>
+        <p style="color: var(--color-text-muted);" class="text-base leading-relaxed max-w-2xl">
+          <span data-ko="중간평가에서 오디오 비주얼 작업을 수행하기 위한 준비 수업. TOP과 CHOP의 핵심 개념을 복습하고, 오디오 리액티브 비주얼의 전반적인 구조와 기법을 집중적으로 다룬다." data-fa="جلسه آمادگی برای کار صوتی-بصری در ارزیابی میان‌ترم. مفاهیم کلیدی TOP و CHOP را مرور کرده و به ساختار و تکنیک‌های کلی ویژوال واکنش‌پذیر به صدا می‌پردازیم." data-ru="Подготовительное занятие к промежуточной аттестации по аудиовизуальной работе. Повторим ключевые концепции TOP и CHOP, подробно разберём общую структуру и приёмы аудиореактивного визуала.">중간평가에서 오디오 비주얼 작업을 수행하기 위한 준비 수업. TOP과 CHOP의 핵심 개념을 복습하고, 오디오 리액티브 비주얼의 전반적인 구조와 기법을 집중적으로 다룬다.</span>
+        </p>
+
+        <!-- Decorative accent line -->
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-purple), var(--color-accent-blue), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Learning Objectives                     -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="module-card mb-8">
+        <div class="module-card-header">
+          <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+          <span data-ko="학습 목표" data-fa="اهداف یادگیری" data-ru="Цели обучения">학습 목표</span>
+        </div>
+        <div class="module-card-body">
+          <ul class="space-y-2 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> <span data-ko="TOP과 CHOP의 핵심 개념을 오디오 리액티브 맥락에서 재정리할 수 있다" data-fa="مفاهیم کلیدی TOP و CHOP را در زمینه واکنش صوتی بازآرایی کنید" data-ru="Систематизировать ключевые концепции TOP и CHOP в контексте аудиореактивности">TOP과 CHOP의 핵심 개념을 오디오 리액티브 맥락에서 재정리할 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-green);">&#9679;</span> <span data-ko="오디오 신호의 특성(볼륨, 주파수, 비트)을 이해하고 각각을 시각 파라미터에 매핑할 수 있다" data-fa="ویژگی‌های سیگنال صوتی (حجم، فرکانس، بیت) را درک کرده و هر کدام را به پارامترهای بصری نگاشت کنید" data-ru="Понимать характеристики аудиосигнала (громкость, частота, бит) и уметь сопоставлять их с визуальными параметрами">오디오 신호의 특성(볼륨, 주파수, 비트)을 이해하고 각각을 시각 파라미터에 매핑할 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-purple);">&#9679;</span> <span data-ko="Audio Spectrum과 Audio Band를 활용한 주파수 기반 비주얼을 만들 수 있다" data-fa="با استفاده از Audio Spectrum و Audio Band ویژوال مبتنی بر فرکانس بسازید" data-ru="Уметь создавать визуал на основе частот с помощью Audio Spectrum и Audio Band">Audio Spectrum과 Audio Band를 활용한 주파수 기반 비주얼을 만들 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-orange);">&#9679;</span> <span data-ko="Feedback + Displace + 오디오를 결합한 복합적인 리액티브 비주얼을 설계할 수 있다" data-fa="ویژوال واکنشی ترکیبی با Feedback + Displace + صدا طراحی کنید" data-ru="Уметь проектировать сложный реактивный визуал, сочетая Feedback + Displace + аудио">Feedback + Displace + 오디오를 결합한 복합적인 리액티브 비주얼을 설계할 수 있다</span></li>
+            <li class="flex gap-2"><span style="color: var(--color-accent-blue);">&#9679;</span> <span data-ko="중간평가 과제를 위한 오디오 비주얼 작업의 기본 구조를 갖출 수 있다" data-fa="ساختار پایه کار صوتی-بصری برای تکلیف ارزیابی میان‌ترم را آماده کنید" data-ru="Подготовить базовую структуру аудиовизуальной работы для промежуточной аттестации">중간평가 과제를 위한 오디오 비주얼 작업의 기본 구조를 갖출 수 있다</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- Table of Contents                       -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="toc mb-16">
+        <div class="toc-header" data-ko="목차" data-fa="فهرست مطالب" data-ru="Содержание">목차</div>
+        <div class="toc-body">
+          <a href="#part-review" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-purple);"></span>
+            <span class="toc-num">01</span>
+            <span data-ko="TOP-CHOP 빠른 복습" data-fa="مرور سریع TOP-CHOP" data-ru="Быстрое повторение TOP-CHOP">TOP-CHOP 빠른 복습</span>
+          </a>
+          <a href="#part-sound" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-green);"></span>
+            <span class="toc-num">02</span>
+            <span data-ko="오디오 리액티브 — 소리를 이해하기" data-fa="واکنش صوتی — درک صدا" data-ru="Аудиореактив — понимание звука">오디오 리액티브 — 소리를 이해하기</span>
+          </a>
+          <a href="#part-practice" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-accent-orange);"></span>
+            <span class="toc-num">03</span>
+            <span data-ko="오디오 리액티브 비주얼 실습" data-fa="تمرین عملی ویژوال واکنش‌پذیر به صدا" data-ru="Практика аудиореактивного визуала">오디오 리액티브 비주얼 실습</span>
+          </a>
+          <a href="#part-tips" class="toc-item">
+            <span class="toc-dot" style="background: var(--color-text-dim);"></span>
+            <span class="toc-num">04</span>
+            <span data-ko="오디오 리액티브 작업을 위한 팁" data-fa="نکات کار واکنش صوتی" data-ru="Советы по аудиореактивной работе">오디오 리액티브 작업을 위한 팁</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 1 — TOP-CHOP 빠른 복습           ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="part-review">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-purple);">
+            <span class="dot" style="background: var(--color-accent-purple);"></span>
+            Part 01
+          </div>
+          <h2 class="part-title" data-ko="TOP-CHOP 빠른 복습" data-fa="مرور سریع TOP-CHOP" data-ru="Быстрое повторение TOP-CHOP">TOP-CHOP 빠른 복습</h2>
+          <p class="part-subtitle" data-ko="오디오 리액티브 비주얼을 만들기 전에, 지금까지 배운 TOP과 CHOP의 핵심 노드를 빠르게 정리한다." data-fa="قبل از ساخت ویژوال واکنش‌پذیر به صدا، نودهای کلیدی TOP و CHOP را که تا کنون یاد گرفتیم سریع مرور می‌کنیم." data-ru="Перед созданием аудиореактивного визуала быстро повторим ключевые ноды TOP и CHOP, изученные ранее.">오디오 리액티브 비주얼을 만들기 전에, 지금까지 배운 TOP과 CHOP의 핵심 노드를 빠르게 정리한다.</p>
+        </div>
+
+        <!-- 1-1. TOP 핵심 복습 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="1-1. TOP 핵심 복습" data-fa="۱-۱. مرور اصلی TOP" data-ru="1-1. Ключевое повторение TOP">1-1. TOP 핵심 복습</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="핵심 개념" data-fa="مفهوم کلیدی" data-ru="Ключевая концепция">핵심 개념</div>
+            <span data-ko="TOP(Texture Operator)은 <strong>2D 이미지/영상</strong>을 다루는 오퍼레이터다. 이미지를 입력받아 → 처리하고 → 이미지를 출력한다." data-fa="TOP (Texture Operator) اپراتوری است که با <strong>تصاویر/ویدیوهای دوبعدی</strong> کار می‌کند. تصویر دریافت → پردازش → و خروجی تصویر تولید می‌کند." data-ru="TOP (Texture Operator) — оператор для работы с <strong>2D-изображениями/видео</strong>. Получает изображение → обрабатывает → выводит изображение.">TOP(Texture Operator)은 <strong>2D 이미지/영상</strong>을 다루는 오퍼레이터다. 이미지를 입력받아 → 처리하고 → 이미지를 출력한다.</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              <span data-ko="지금까지 배운 TOP 정리" data-fa="خلاصه TOP های آموخته شده" data-ru="Обзор изученных TOP">지금까지 배운 TOP 정리</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="분류" data-fa="دسته‌بندی" data-ru="Категория">분류</th>
+                    <th>TOP</th>
+                    <th data-ko="역할" data-fa="نقش" data-ru="Роль">역할</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td data-ko="소스" data-fa="منبع" data-ru="Источник">소스</td><td>Movie File In</td><td data-ko="영상/이미지 파일을 불러온다" data-fa="فایل ویدیو/تصویر را بارگذاری می‌کند" data-ru="Загружает видео/изображения из файла">영상/이미지 파일을 불러온다</td></tr>
+                  <tr><td data-ko="소스" data-fa="منبع" data-ru="Источник">소스</td><td>Noise TOP</td><td data-ko="절차적 노이즈 패턴을 생성한다" data-fa="الگوی نویز رویه‌ای تولید می‌کند" data-ru="Генерирует процедурный шумовой паттерн">절차적 노이즈 패턴을 생성한다</td></tr>
+                  <tr><td data-ko="소스" data-fa="منبع" data-ru="Источник">소스</td><td>Ramp TOP</td><td data-ko="그라데이션 이미지를 생성한다" data-fa="تصویر گرادیان تولید می‌کند" data-ru="Создаёт градиентное изображение">그라데이션 이미지를 생성한다</td></tr>
+                  <tr><td data-ko="소스" data-fa="منبع" data-ru="Источник">소스</td><td>Constant TOP</td><td data-ko="단색 이미지를 만든다" data-fa="تصویر تک‌رنگ می‌سازد" data-ru="Создаёт однотонное изображение">단색 이미지를 만든다</td></tr>
+                  <tr><td data-ko="처리" data-fa="پردازش" data-ru="Обработка">처리</td><td>Transform</td><td data-ko="이동, 회전, 스케일을 적용한다" data-fa="جابه‌جایی، چرخش و مقیاس اعمال می‌کند" data-ru="Применяет перемещение, вращение, масштаб">이동, 회전, 스케일을 적용한다</td></tr>
+                  <tr><td data-ko="처리" data-fa="پردازش" data-ru="Обработка">처리</td><td>Level</td><td data-ko="밝기, 감마, 불투명도를 조절한다" data-fa="روشنایی، گاما و شفافیت را تنظیم می‌کند" data-ru="Регулирует яркость, гамму, непрозрачность">밝기, 감마, 불투명도를 조절한다</td></tr>
+                  <tr><td data-ko="처리" data-fa="پردازش" data-ru="Обработка">처리</td><td>Composite / Over</td><td data-ko="여러 이미지를 합성한다" data-fa="چند تصویر را ترکیب می‌کند" data-ru="Объединяет несколько изображений">여러 이미지를 합성한다</td></tr>
+                  <tr><td data-ko="처리" data-fa="پردازش" data-ru="Обработка">처리</td><td>HSV Adjust</td><td data-ko="색상, 채도, 명도를 조절한다" data-fa="رنگ، اشباع و روشنایی را تنظیم می‌کند" data-ru="Регулирует оттенок, насыщенность, яркость">색상, 채도, 명도를 조절한다</td></tr>
+                  <tr><td data-ko="특수" data-fa="ویژه" data-ru="Специальные">특수</td><td>Feedback</td><td data-ko="이전 프레임의 결과를 다시 가져온다 (잔상)" data-fa="نتیجه فریم قبلی را بازمی‌گرداند (پس‌تصویر)" data-ru="Возвращает результат предыдущего кадра (остаточный след)">이전 프레임의 결과를 다시 가져온다 (잔상)</td></tr>
+                  <tr><td data-ko="특수" data-fa="ویژه" data-ru="Специальные">특수</td><td>Displace</td><td data-ko="이미지를 다른 이미지 기반으로 왜곡한다" data-fa="تصویر را بر اساس تصویر دیگر تغییر شکل می‌دهد" data-ru="Искажает изображение на основе другого изображения">이미지를 다른 이미지 기반으로 왜곡한다</td></tr>
+                  <tr><td data-ko="제어" data-fa="کنترل" data-ru="Управление">제어</td><td>Switch</td><td data-ko="여러 입력 중 하나를 선택한다" data-fa="یکی از چند ورودی را انتخاب می‌کند" data-ru="Выбирает один из нескольких входов">여러 입력 중 하나를 선택한다</td></tr>
+                  <tr><td data-ko="정리" data-fa="مرتب‌سازی" data-ru="Организация">정리</td><td>Null</td><td data-ko="네트워크 정리용 출력 노드" data-fa="نود خروجی برای مرتب‌سازی شبکه" data-ru="Выходной нод для организации сети">네트워크 정리용 출력 노드</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Feedback Loop 개념 -->
+          <h4 class="text-base font-semibold mb-3 mt-8" data-ko="핵심 개념 ① Feedback Loop — 잔상과 누적의 원리" data-fa="مفهوم کلیدی ① Feedback Loop — اصل پس‌تصویر و انباشت" data-ru="Ключевая концепция ① Feedback Loop — принцип следа и накопления">핵심 개념 ① Feedback Loop — 잔상과 누적의 원리</h4>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="Feedback TOP은 네트워크 하류의 결과를 다시 상류로 가져와서, <strong>이전 프레임 위에 현재 프레임을 덧쌓는</strong> 루프를 만든다. 이것이 잔상, 누적, 무한 터널 등 다양한 시각 효과의 기본 원리다." data-fa="Feedback TOP نتیجه پایین‌دستی شبکه را به بالادست برمی‌گرداند و حلقه‌ای می‌سازد که <strong>فریم فعلی روی فریم قبلی انباشته</strong> شود. این اصل پایه افکت‌های بصری مختلف مثل پس‌تصویر، انباشت و تونل بی‌نهایت است." data-ru="Feedback TOP возвращает результат нижестоящей цепочки обратно вверх, создавая петлю, где <strong>текущий кадр накладывается поверх предыдущего</strong>. Это базовый принцип разнообразных эффектов: остаточный след, накопление, бесконечный туннель.">Feedback TOP은 네트워크 하류의 결과를 다시 상류로 가져와서, <strong>이전 프레임 위에 현재 프레임을 덧쌓는</strong> 루프를 만든다. 이것이 잔상, 누적, 무한 터널 등 다양한 시각 효과의 기본 원리다.</span>
+          </p>
+
+          <div class="node-diagram mb-4">
+            <span class="annotation" data-ko="Feedback 루프의 기본 구조" data-fa="ساختار پایه حلقه Feedback" data-ru="Базовая структура петли Feedback">Feedback 루프의 기본 구조</span><br><br>
+            <span class="node node-top">Feedback TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Composite (Over)</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Level (opacity &lt; 1)</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null (Target)</span>
+            <br>
+            <span style="color: var(--color-accent-orange); margin-left: 2rem;" data-ko="↑ ──────── 이전 프레임이 돌아옴 ──────── ↲" data-fa="↑ ──────── فریم قبلی برمی‌گردد ──────── ↲" data-ru="↑ ──────── предыдущий кадр возвращается ──────── ↲">↑ ──────── 이전 프레임이 돌아옴 ──────── ↲</span>
+          </div>
+
+          <div class="callout callout-warning mb-6">
+            <div class="callout-label" data-ko="주의" data-fa="هشدار" data-ru="Внимание">주의</div>
+            <span data-ko="Feedback 루프 안에서 <strong>Level TOP의 opacity를 반드시 1보다 낮게</strong> 설정해야 한다. 그렇지 않으면 이미지가 무한히 쌓여서 화면이 하얗게 된다. Transform을 추가해서 <strong>scale 0.98 + rotate 1°</strong>를 주면 잔상이 소용돌이치는 효과가 생긴다." data-fa="در حلقه Feedback حتماً <strong>opacity در Level TOP را کمتر از 1</strong> تنظیم کنید. در غیر این صورت تصاویر بی‌نهایت انباشته شده و صفحه سفید می‌شود. اگر Transform با <strong>scale 0.98 + rotate 1°</strong> اضافه کنید افکت گردابی در پس‌تصویر ایجاد می‌شود." data-ru="В петле Feedback обязательно установите <strong>opacity в Level TOP ниже 1</strong>. Иначе изображения будут бесконечно накапливаться и экран побелеет. Добавив Transform с <strong>scale 0.98 + rotate 1°</strong>, получите эффект закручивающегося следа.">Feedback 루프 안에서 <strong>Level TOP의 opacity를 반드시 1보다 낮게</strong> 설정해야 한다. 그렇지 않으면 이미지가 무한히 쌓여서 화면이 하얗게 된다. Transform을 추가해서 <strong>scale 0.98 + rotate 1°</strong>를 주면 잔상이 소용돌이치는 효과가 생긴다.</span>
+          </div>
+
+          <!-- Displacement 개념 -->
+          <h4 class="text-base font-semibold mb-3 mt-8" data-ko="핵심 개념 ② Displacement — 이미지로 이미지를 왜곡하기" data-fa="مفهوم کلیدی ② Displacement — تغییر شکل تصویر با تصویر" data-ru="Ключевая концепция ② Displacement — искажение изображения изображением">핵심 개념 ② Displacement — 이미지로 이미지를 왜곡하기</h4>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="Displace TOP은 두 개의 입력을 받는다: <strong>Source</strong>(왜곡될 원본)와 <strong>Displace Image</strong>(왜곡의 패턴). Displace Image의 밝기 값이 Source의 픽셀을 밀어낸다. <strong>Noise TOP</strong>을 Displace Image로 쓰면 유기적인 물결 왜곡이 생기고, <strong>Displace Weight</strong> 파라미터로 왜곡 강도를 제어한다." data-fa="Displace TOP دو ورودی دارد: <strong>Source</strong> (تصویر اصلی) و <strong>Displace Image</strong> (الگوی تغییر شکل). مقدار روشنایی Displace Image پیکسل‌های Source را جابه‌جا می‌کند. اگر <strong>Noise TOP</strong> را به‌عنوان Displace Image استفاده کنید تغییر شکل موجی ارگانیک ایجاد می‌شود و با پارامتر <strong>Displace Weight</strong> شدت تغییر شکل کنترل می‌شود." data-ru="Displace TOP принимает два входа: <strong>Source</strong> (исходник для искажения) и <strong>Displace Image</strong> (паттерн искажения). Яркость Displace Image сдвигает пиксели Source. Если использовать <strong>Noise TOP</strong> как Displace Image, получится органическое волновое искажение, а параметр <strong>Displace Weight</strong> управляет силой эффекта.">Displace TOP은 두 개의 입력을 받는다: <strong>Source</strong>(왜곡될 원본)와 <strong>Displace Image</strong>(왜곡의 패턴). Displace Image의 밝기 값이 Source의 픽셀을 밀어낸다. <strong>Noise TOP</strong>을 Displace Image로 쓰면 유기적인 물결 왜곡이 생기고, <strong>Displace Weight</strong> 파라미터로 왜곡 강도를 제어한다.</span>
+          </p>
+
+          <div class="node-diagram mb-4">
+            <span class="node node-top">Movie File In</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Displace TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null</span>
+            <br>
+            <span style="margin-left: 12rem; color: var(--color-text-dim);">↑</span><br>
+            <span style="margin-left: 9.5rem;" class="node node-top">Noise TOP</span>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 0.5rem;">(Displace Image)</span>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="오디오와 결합" data-fa="ترکیب با صدا" data-ru="Сочетание со звуком">오디오와 결합</div>
+            <span data-ko="오디오 리액티브에서 Displace Weight를 <strong>소리의 볼륨이나 주파수 값</strong>으로 제어하면, 소리가 클 때 화면이 일렁이고 조용할 때 안정되는 반응형 왜곡을 만들 수 있다." data-fa="در واکنش صوتی اگر Displace Weight را با <strong>مقدار حجم یا فرکانس صدا</strong> کنترل کنید، وقتی صدا بلند است صفحه موج‌دار شده و در سکوت آرام می‌شود." data-ru="В аудиореактиве, если управлять Displace Weight через <strong>значение громкости или частоты</strong>, при громком звуке экран будет волноваться, а в тишине — стабилизироваться.">오디오 리액티브에서 Displace Weight를 <strong>소리의 볼륨이나 주파수 값</strong>으로 제어하면, 소리가 클 때 화면이 일렁이고 조용할 때 안정되는 반응형 왜곡을 만들 수 있다.</span>
+          </div>
+
+          <!-- Timemachine TOP 개념 -->
+          <h4 class="text-base font-semibold mb-3 mt-8" data-ko="핵심 개념 ③ Timemachine TOP — 시간 조작" data-fa="مفهوم کلیدی ③ Timemachine TOP — دستکاری زمان" data-ru="Ключевая концепция ③ Timemachine TOP — манипуляция временем">핵심 개념 ③ Timemachine TOP — 시간 조작</h4>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="<strong>Timemachine TOP</strong>은 입력 영상의 프레임을 <strong>Texture 3D TOP</strong>에 시간순으로 쌓아두고, 두 번째 입력의 밝기 값을 기준으로 <strong>원하는 시점의 프레임을 꺼내 보여주는</strong> 오퍼레이터다. 밝기 0(검정) = 가장 오래된 프레임, 밝기 1(흰색) = 가장 최근 프레임이다. 이 원리로 영상의 속도를 바꾸거나, 되감거나, 특정 순간에 멈추는 효과를 만든다." data-fa="<strong>Timemachine TOP</strong> اپراتوری است که فریم‌های ورودی را به ترتیب زمانی در <strong>Texture 3D TOP</strong> ذخیره کرده و بر اساس مقدار روشنایی ورودی دوم، <strong>فریم زمانی دلخواه را بازیابی و نمایش</strong> می‌دهد. روشنایی 0 (سیاه) = قدیمی‌ترین فریم، روشنایی 1 (سفید) = جدیدترین فریم. با این اصل می‌توان سرعت ویدیو را تغییر داد، به عقب برگرداند یا متوقف کرد." data-ru="<strong>Timemachine TOP</strong> — оператор, который складывает кадры входного видео во временном порядке в <strong>Texture 3D TOP</strong> и показывает <strong>кадр нужного момента</strong> на основе яркости второго входа. Яркость 0 (чёрный) = самый старый кадр, 1 (белый) = самый новый. Это позволяет менять скорость видео, перематывать или останавливать."><strong>Timemachine TOP</strong>은 입력 영상의 프레임을 <strong>Texture 3D TOP</strong>에 시간순으로 쌓아두고, 두 번째 입력의 밝기 값을 기준으로 <strong>원하는 시점의 프레임을 꺼내 보여주는</strong> 오퍼레이터다. 밝기 0(검정) = 가장 오래된 프레임, 밝기 1(흰색) = 가장 최근 프레임이다. 이 원리로 영상의 속도를 바꾸거나, 되감거나, 특정 순간에 멈추는 효과를 만든다.</span>
+          </p>
+
+          <div class="node-diagram mb-4">
+            <span class="annotation" data-ko="Timemachine 네트워크 구조" data-fa="ساختار شبکه Timemachine" data-ru="Структура сети Timemachine">Timemachine 네트워크 구조</span><br><br>
+            <span class="node node-top">Video Device In</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Texture 3D TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Timemachine TOP</span>
+            <span class="arrow">→</span>
+            <span class="node node-top">Null</span>
+            <br>
+            <span style="margin-left: 22rem; color: var(--color-text-dim);">↑</span><br>
+            <span style="margin-left: 19rem;" class="node node-top">Ramp TOP</span>
+            <span style="color: var(--color-text-dim); font-size: 0.72rem; margin-left: 0.5rem;" data-ko="(시간 위치 제어)" data-fa="(کنترل موقعیت زمانی)" data-ru="(управление временной позицией)">(시간 위치 제어)</span>
+          </div>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="작동 원리" data-fa="اصل عملکرد" data-ru="Принцип работы">작동 원리</div>
+            <span data-ko="<strong>Texture 3D TOP</strong>은 입력 영상의 프레임을 3D 텍스처의 깊이(depth) 방향으로 쌓아둔다 — 시간의 기록장이다. <strong>Timemachine TOP</strong>은 첫 번째 입력으로 이 Texture 3D를 받고, 두 번째 입력(Ramp 등)의 <strong>밝기 값</strong>으로 어느 시점의 프레임을 보여줄지 결정한다. Ramp를 균일한 그라데이션으로 두면 현재가 그대로 나오고, Ramp 대신 <strong>오디오 값이나 노이즈</strong>를 넣으면 시간이 뒤틀리기 시작한다." data-fa="<strong>Texture 3D TOP</strong> فریم‌های ورودی را در جهت عمق بافت سه‌بعدی ذخیره می‌کند — دفتر ثبت زمان. <strong>Timemachine TOP</strong> ورودی اول این Texture 3D را دریافت کرده و با <strong>مقدار روشنایی</strong> ورودی دوم (مثل Ramp) تعیین می‌کند کدام فریم زمانی نمایش داده شود. اگر Ramp گرادیان یکنواخت باشد زمان حال نمایش داده می‌شود، اما اگر به جای Ramp <strong>مقادیر صوتی یا نویز</strong> وارد شود زمان شروع به پیچ خوردن می‌کند." data-ru="<strong>Texture 3D TOP</strong> складывает кадры входного видео по глубине 3D-текстуры — это летопись времени. <strong>Timemachine TOP</strong> принимает эту Texture 3D как первый вход, а <strong>яркость</strong> второго входа (например, Ramp) определяет, кадр какого момента показывать. При равномерном градиенте Ramp отображается настоящее, но если вместо Ramp подать <strong>аудиозначения или шум</strong> — время начинает искажаться."><strong>Texture 3D TOP</strong>은 입력 영상의 프레임을 3D 텍스처의 깊이(depth) 방향으로 쌓아둔다 — 시간의 기록장이다. <strong>Timemachine TOP</strong>은 첫 번째 입력으로 이 Texture 3D를 받고, 두 번째 입력(Ramp 등)의 <strong>밝기 값</strong>으로 어느 시점의 프레임을 보여줄지 결정한다. Ramp를 균일한 그라데이션으로 두면 현재가 그대로 나오고, Ramp 대신 <strong>오디오 값이나 노이즈</strong>를 넣으면 시간이 뒤틀리기 시작한다.</span>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="오디오와 결합" data-fa="ترکیب با صدا" data-ru="Сочетание со звуком">오디오와 결합</div>
+            <span data-ko="Ramp 대신 <strong>오디오 볼륨을 Constant TOP의 밝기</strong>로 변환해서 Timemachine의 두 번째 입력에 넣으면, 소리가 커질수록 과거 프레임을 보여주고 조용해지면 현재로 돌아오는 <strong>'시간 스크러빙'</strong> 효과를 만들 수 있다. <strong>Noise TOP</strong>을 넣으면 픽셀마다 다른 시점의 프레임이 섞여 글리치 같은 시간 왜곡 효과가 생긴다." data-fa="به جای Ramp، <strong>حجم صدا را به روشنایی Constant TOP</strong> تبدیل کرده و به ورودی دوم Timemachine وصل کنید. هرچه صدا بلندتر فریم‌های قدیمی‌تر نشان داده شده و در سکوت به حال برمی‌گردد — افکت <strong>«اسکراب زمانی»</strong>. اگر <strong>Noise TOP</strong> وارد کنید هر پیکسل فریم زمانی متفاوتی نشان می‌دهد و افکت گلیچ زمانی ایجاد می‌شود." data-ru="Вместо Ramp преобразуйте <strong>громкость в яркость Constant TOP</strong> и подайте на второй вход Timemachine. При громком звуке показываются прошлые кадры, в тишине — настоящее: эффект <strong>«скрабинга времени»</strong>. Если подать <strong>Noise TOP</strong>, каждый пиксель покажет кадр из разного момента — эффект временно́го глитча.">Ramp 대신 <strong>오디오 볼륨을 Constant TOP의 밝기</strong>로 변환해서 Timemachine의 두 번째 입력에 넣으면, 소리가 커질수록 과거 프레임을 보여주고 조용해지면 현재로 돌아오는 <strong>'시간 스크러빙'</strong> 효과를 만들 수 있다. <strong>Noise TOP</strong>을 넣으면 픽셀마다 다른 시점의 프레임이 섞여 글리치 같은 시간 왜곡 효과가 생긴다.</span>
+          </div>
+
+          <!-- 자주 쓰는 TOP 조합 -->
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="오디오 리액티브에서 자주 쓰는 TOP 조합" data-fa="ترکیب‌های TOP پرکاربرد در واکنش صوتی" data-ru="Часто используемые комбинации TOP в аудиореактиве">오디오 리액티브에서 자주 쓰는 TOP 조합</div>
+            <span data-ko="<strong>Feedback + Level + Composite</strong> — 잔상 효과<br><strong>Feedback + Displace + Noise</strong> — 유기적 왜곡<br><strong>Texture 3D + Timemachine + 오디오</strong> — 시간 스크러빙<br><strong>HSV Adjust + Level</strong> — 소리에 반응하는 색상/밝기 변화" data-fa="<strong>Feedback + Level + Composite</strong> — افکت پس‌تصویر<br><strong>Feedback + Displace + Noise</strong> — تغییر شکل ارگانیک<br><strong>Texture 3D + Timemachine + صدا</strong> — اسکراب زمانی<br><strong>HSV Adjust + Level</strong> — تغییر رنگ/روشنایی واکنشی به صدا" data-ru="<strong>Feedback + Level + Composite</strong> — эффект остаточного следа<br><strong>Feedback + Displace + Noise</strong> — органическое искажение<br><strong>Texture 3D + Timemachine + аудио</strong> — скрабинг времени<br><strong>HSV Adjust + Level</strong> — реактивное изменение цвета/яркости на звук"><strong>Feedback + Level + Composite</strong> — 잔상 효과<br><strong>Feedback + Displace + Noise</strong> — 유기적 왜곡<br><strong>Texture 3D + Timemachine + 오디오</strong> — 시간 스크러빙<br><strong>HSV Adjust + Level</strong> — 소리에 반응하는 색상/밝기 변화</span>
+          </div>
+        </div>
+
+        <!-- 1-2. CHOP 핵심 복습 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="1-2. CHOP 핵심 복습" data-fa="۱-۲. مرور اصلی CHOP" data-ru="1-2. Ключевое повторение CHOP">1-2. CHOP 핵심 복습</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="핵심 개념" data-fa="مفهوم کلیدی" data-ru="Ключевая концепция">핵심 개념</div>
+            <span data-ko="CHOP(Channel Operator)은 <strong>시간에 따라 변하는 숫자(채널)</strong>를 다루는 오퍼레이터다. 숫자를 생성하고, 가공하고, 다른 오퍼레이터의 파라미터에 연결하는 것이 핵심이다." data-fa="CHOP (Channel Operator) اپراتوری است که با <strong>اعداد (کانال‌ها) متغیر در طول زمان</strong> کار می‌کند. تولید اعداد، پردازش آن‌ها و اتصال به پارامترهای اپراتورهای دیگر هسته اصلی آن است." data-ru="CHOP (Channel Operator) — оператор для работы с <strong>числами (каналами), изменяющимися во времени</strong>. Суть — генерация чисел, их обработка и подключение к параметрам других операторов.">CHOP(Channel Operator)은 <strong>시간에 따라 변하는 숫자(채널)</strong>를 다루는 오퍼레이터다. 숫자를 생성하고, 가공하고, 다른 오퍼레이터의 파라미터에 연결하는 것이 핵심이다.</span>
+          </div>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation" data-ko="인터랙션의 기본 구조" data-fa="ساختار پایه تعامل" data-ru="Базовая структура интерактивности">인터랙션의 기본 구조</span><br><br>
+            <span class="node node-chop" data-ko="입력 (센서/오디오)" data-fa="ورودی (سنسور/صدا)" data-ru="Ввод (сенсор/аудио)">입력 (센서/오디오)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop" data-ko="가공 (Math/Filter)" data-fa="پردازش (Math/Filter)" data-ru="Обработка (Math/Filter)">가공 (Math/Filter)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop" data-ko="출력 (Null)" data-fa="خروجی (Null)" data-ru="Вывод (Null)">출력 (Null)</span>
+            <span class="arrow">→</span>
+            <span class="node node-top" data-ko="TOP 파라미터" data-fa="پارامتر TOP" data-ru="Параметр TOP">TOP 파라미터</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-green);"></span>
+              <span data-ko="지금까지 배운 CHOP 정리" data-fa="خلاصه CHOP های آموخته شده" data-ru="Обзор изученных CHOP">지금까지 배운 CHOP 정리</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="분류" data-fa="دسته‌بندی" data-ru="Категория">분류</th>
+                    <th>CHOP</th>
+                    <th data-ko="역할" data-fa="نقش" data-ru="Роль">역할</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td data-ko="입력" data-fa="ورودی" data-ru="Ввод">입력</td><td>Audio Device In</td><td data-ko="마이크/사운드카드에서 오디오 입력을 받는다" data-fa="ورودی صوتی از میکروفون/کارت صدا دریافت می‌کند" data-ru="Получает аудиовход с микрофона/звуковой карты">마이크/사운드카드에서 오디오 입력을 받는다</td></tr>
+                  <tr><td data-ko="입력" data-fa="ورودی" data-ru="Ввод">입력</td><td>Audio File In</td><td data-ko="오디오 파일을 재생한다" data-fa="فایل صوتی را پخش می‌کند" data-ru="Воспроизводит аудиофайл">오디오 파일을 재생한다</td></tr>
+                  <tr><td data-ko="생성" data-fa="تولید" data-ru="Генерация">생성</td><td>LFO</td><td data-ko="주기적으로 반복하는 값을 생성한다" data-fa="مقادیر تکرارشونده دوره‌ای تولید می‌کند" data-ru="Генерирует периодически повторяющиеся значения">주기적으로 반복하는 값을 생성한다</td></tr>
+                  <tr><td data-ko="생성" data-fa="تولید" data-ru="Генерация">생성</td><td>Constant</td><td data-ko="고정된 숫자 값을 만든다" data-fa="مقدار عددی ثابت می‌سازد" data-ru="Создаёт фиксированное числовое значение">고정된 숫자 값을 만든다</td></tr>
+                  <tr><td data-ko="분석" data-fa="تحلیل" data-ru="Анализ">분석</td><td>Analyze</td><td data-ko="최대, 최소, 평균, RMS 등을 계산한다" data-fa="حداکثر، حداقل، میانگین، RMS و غیره محاسبه می‌کند" data-ru="Вычисляет макс., мин., среднее, RMS и т.д.">최대, 최소, 평균, RMS 등을 계산한다</td></tr>
+                  <tr><td data-ko="분석" data-fa="تحلیل" data-ru="Анализ">분석</td><td>Audio Spectrum</td><td data-ko="오디오의 주파수 스펙트럼을 분석한다" data-fa="طیف فرکانسی صدا را تحلیل می‌کند" data-ru="Анализирует частотный спектр аудио">오디오의 주파수 스펙트럼을 분석한다</td></tr>
+                  <tr><td data-ko="가공" data-fa="پردازش" data-ru="Обработка">가공</td><td>Math</td><td data-ko="값의 범위를 변환한다 (Range, Gain 등)" data-fa="محدوده مقادیر را تبدیل می‌کند (Range، Gain و غیره)" data-ru="Преобразует диапазон значений (Range, Gain и т.д.)">값의 범위를 변환한다 (Range, Gain 등)</td></tr>
+                  <tr><td data-ko="가공" data-fa="پردازش" data-ru="Обработка">가공</td><td>Filter</td><td data-ko="값을 부드럽게 만든다 (smoothing)" data-fa="مقادیر را صاف می‌کند (smoothing)" data-ru="Сглаживает значения (smoothing)">값을 부드럽게 만든다 (smoothing)</td></tr>
+                  <tr><td data-ko="가공" data-fa="پردازش" data-ru="Обработка">가공</td><td>Select</td><td data-ko="특정 채널만 선택한다" data-fa="فقط کانال‌های خاصی را انتخاب می‌کند" data-ru="Выбирает только определённые каналы">특정 채널만 선택한다</td></tr>
+                  <tr><td data-ko="가공" data-fa="پردازش" data-ru="Обработка">가공</td><td>Null</td><td data-ko="네트워크 정리 / 결과 출력" data-fa="مرتب‌سازی شبکه / خروجی نتیجه" data-ru="Организация сети / вывод результата">네트워크 정리 / 결과 출력</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Reference 방식 복습 -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              <span data-ko="Reference 방식 복습 — CHOP 값을 파라미터에 연결하는 3가지 방법" data-fa="مرور روش‌های Reference — ۳ روش اتصال مقادیر CHOP به پارامترها" data-ru="Повторение способов Reference — 3 способа связать значения CHOP с параметрами">Reference 방식 복습 — CHOP 값을 파라미터에 연결하는 3가지 방법</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="방법" data-fa="روش" data-ru="Способ">방법</th>
+                    <th data-ko="사용법" data-fa="نحوه استفاده" data-ru="Использование">사용법</th>
+                    <th data-ko="특징" data-fa="ویژگی" data-ru="Особенность">특징</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>CHOP Reference</td>
+                    <td><code style="font-family: var(--font-mono); font-size: 0.8rem;">op('null1')['chan1']</code></td>
+                    <td data-ko="가장 일반적, 파라미터 필드에 직접 입력" data-fa="رایج‌ترین روش، ورود مستقیم در فیلد پارامتر" data-ru="Самый распространённый, вводится прямо в поле параметра">가장 일반적, 파라미터 필드에 직접 입력</td>
+                  </tr>
+                  <tr>
+                    <td>Export CHOP</td>
+                    <td data-ko="CHOP 노드에서 직접 Export" data-fa="Export مستقیم از نود CHOP" data-ru="Прямой Export из нода CHOP">CHOP 노드에서 직접 Export</td>
+                    <td data-ko="여러 파라미터에 한번에 연결 가능" data-fa="امکان اتصال به چند پارامتر به‌طور همزمان" data-ru="Можно подключить к нескольким параметрам сразу">여러 파라미터에 한번에 연결 가능</td>
+                  </tr>
+                  <tr>
+                    <td>Bind</td>
+                    <td data-ko="파라미터 우클릭 → Bind" data-fa="کلیک راست روی پارامتر → Bind" data-ru="Правый клик по параметру → Bind">파라미터 우클릭 → Bind</td>
+                    <td data-ko="간편하지만 네트워크가 보이지 않음" data-fa="آسان ولی شبکه قابل مشاهده نیست" data-ru="Удобно, но сеть не видна">간편하지만 네트워크가 보이지 않음</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1-3. 복습 실습 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="1-3. 복습 실습: 30초 만에 리액티브 구조 만들기" data-fa="۱-۳. تمرین مرور: ساخت ساختار واکنشی در ۳۰ ثانیه" data-ru="1-3. Практика повторения: реактивная структура за 30 секунд">1-3. 복습 실습: 30초 만에 리액티브 구조 만들기</h3>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation" data-ko="기본 리액티브 구조" data-fa="ساختار واکنشی پایه" data-ru="Базовая реактивная структура">기본 리액티브 구조</span><br><br>
+            <span class="node node-chop">LFO</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Math</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Null</span>
+            <span class="arrow">→ ref →</span>
+            <span class="node node-top">Transform / Level</span>
+          </div>
+
+          <div class="step-list mb-6">
+            <div class="step-item"><span data-ko="<code>LFO CHOP</code>을 만들고 Frequency를 <strong>0.5</strong>로 설정한다" data-fa="<code>LFO CHOP</code> بسازید و Frequency را <strong>0.5</strong> تنظیم کنید" data-ru="Создайте <code>LFO CHOP</code> и установите Frequency на <strong>0.5</strong>"><code>LFO CHOP</code>을 만들고 Frequency를 <strong>0.5</strong>로 설정한다</span></div>
+            <div class="step-item"><span data-ko="<code>Math CHOP</code>을 연결하고 Range 탭에서 출력 범위를 <strong>0~1</strong>로 맞춘다" data-fa="<code>Math CHOP</code> را وصل کرده و در تب Range محدوده خروجی را <strong>0~1</strong> تنظیم کنید" data-ru="Подключите <code>Math CHOP</code> и в вкладке Range установите выходной диапазон на <strong>0~1</strong>"><code>Math CHOP</code>을 연결하고 Range 탭에서 출력 범위를 <strong>0~1</strong>로 맞춘다</span></div>
+            <div class="step-item"><span data-ko="<code>Null CHOP</code>을 연결한다" data-fa="<code>Null CHOP</code> را وصل کنید" data-ru="Подключите <code>Null CHOP</code>"><code>Null CHOP</code>을 연결한다</span></div>
+            <div class="step-item"><span data-ko="Transform TOP의 Scale 파라미터에 <code>op('null1')['chan1']</code> 을 입력한다" data-fa="در پارامتر Scale از Transform TOP عبارت <code>op('null1')['chan1']</code> وارد کنید" data-ru="В параметр Scale Transform TOP введите <code>op('null1')['chan1']</code>">Transform TOP의 Scale 파라미터에 <code>op('null1')['chan1']</code> 을 입력한다</span></div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="확인 포인트" data-fa="نکته بررسی" data-ru="Контрольная точка">확인 포인트</div>
+            <span data-ko="이미지가 LFO의 주기에 맞춰 부드럽게 커졌다 작아지면 성공! 이 <strong>생성 → 가공 → 출력 → Reference</strong> 구조가 모든 리액티브 비주얼의 기본이다." data-fa="اگر تصویر هماهنگ با دوره LFO نرم بزرگ و کوچک شود موفق شدید! این ساختار <strong>تولید → پردازش → خروجی → Reference</strong> پایه تمام ویژوال‌های واکنشی است." data-ru="Если изображение плавно увеличивается и уменьшается в ритме LFO — успех! Эта структура <strong>генерация → обработка → вывод → Reference</strong> — основа всех реактивных визуалов.">이미지가 LFO의 주기에 맞춰 부드럽게 커졌다 작아지면 성공! 이 <strong>생성 → 가공 → 출력 → Reference</strong> 구조가 모든 리액티브 비주얼의 기본이다.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 2 — 소리를 이해하기               ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="part-sound">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-green);">
+            <span class="dot" style="background: var(--color-accent-green);"></span>
+            Part 02
+          </div>
+          <h2 class="part-title" data-ko="오디오 리액티브 — 소리를 이해하기" data-fa="واکنش صوتی — درک صدا" data-ru="Аудиореактив — понимание звука">오디오 리액티브 — 소리를 이해하기</h2>
+          <p class="part-subtitle" data-ko="소리가 어떻게 숫자로 바뀌고, 그 숫자를 어떻게 시각적 변화에 연결하는지 배운다." data-fa="یاد می‌گیریم صدا چگونه به عدد تبدیل شده و آن اعداد چگونه به تغییرات بصری متصل می‌شوند." data-ru="Узнаем, как звук преобразуется в числа и как эти числа подключаются к визуальным изменениям.">소리가 어떻게 숫자로 바뀌고, 그 숫자를 어떻게 시각적 변화에 연결하는지 배운다.</p>
+        </div>
+
+        <!-- 2-1. 오디오 리액티브란 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="2-1. 오디오 리액티브란?" data-fa="۲-۱. واکنش صوتی چیست؟" data-ru="2-1. Что такое аудиореактив?">2-1. 오디오 리액티브란?</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="핵심 개념" data-fa="مفهوم کلیدی" data-ru="Ключевая концепция">핵심 개념</div>
+            <span data-ko="오디오 리액티브는 <strong>소리 → 숫자 → 시각 파라미터</strong>로 이어지는 변환 과정이다. 소리에서 추출할 수 있는 세 가지 핵심 속성은 볼륨, 주파수, 비트이다." data-fa="واکنش صوتی فرآیند تبدیل <strong>صدا → عدد → پارامتر بصری</strong> است. سه ویژگی اصلی قابل استخراج از صدا عبارتند از: حجم، فرکانس و بیت." data-ru="Аудиореактив — это процесс преобразования <strong>звук → число → визуальный параметр</strong>. Три ключевых свойства, извлекаемых из звука: громкость, частота, бит.">오디오 리액티브는 <strong>소리 → 숫자 → 시각 파라미터</strong>로 이어지는 변환 과정이다. 소리에서 추출할 수 있는 세 가지 핵심 속성은 볼륨, 주파수, 비트이다.</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              <span data-ko="소리의 세 가지 속성" data-fa="سه ویژگی صدا" data-ru="Три свойства звука">소리의 세 가지 속성</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="속성" data-fa="ویژگی" data-ru="Свойство">속성</th>
+                    <th data-ko="의미" data-fa="معنی" data-ru="Значение">의미</th>
+                    <th data-ko="시각 매핑 예시" data-fa="نمونه نگاشت بصری" data-ru="Пример визуального маппинга">시각 매핑 예시</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-ko="볼륨 (Volume)" data-fa="حجم (Volume)" data-ru="Громкость (Volume)">볼륨 (Volume)</td>
+                    <td data-ko="소리의 크기, 에너지량" data-fa="بلندی صدا، مقدار انرژی" data-ru="Громкость звука, количество энергии">소리의 크기, 에너지량</td>
+                    <td data-ko="밝기, 크기, 불투명도" data-fa="روشنایی، اندازه، شفافیت" data-ru="Яркость, размер, непрозрачность">밝기, 크기, 불투명도</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="주파수 (Frequency)" data-fa="فرکانس (Frequency)" data-ru="Частота (Frequency)">주파수 (Frequency)</td>
+                    <td data-ko="소리의 높낮이 (저음~고음)" data-fa="بلندی صدا (بم~زیر)" data-ru="Высота звука (бас~высокие)">소리의 높낮이 (저음~고음)</td>
+                    <td data-ko="색상, 위치, 왜곡 강도" data-fa="رنگ، موقعیت، شدت تغییر شکل" data-ru="Цвет, позиция, интенсивность искажения">색상, 위치, 왜곡 강도</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="비트 (Beat)" data-fa="بیت (Beat)" data-ru="Бит (Beat)">비트 (Beat)</td>
+                    <td data-ko="리듬의 순간적 충격" data-fa="ضربه لحظه‌ای ریتم" data-ru="Мгновенный ритмический удар">리듬의 순간적 충격</td>
+                    <td data-ko="색 반전, 글리치, 순간 전환" data-fa="معکوس رنگ، گلیچ، تعویض لحظه‌ای" data-ru="Инверсия цвета, глитч, мгновенное переключение">색 반전, 글리치, 순간 전환</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 레퍼런스 아티스트 -->
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-purple);"></span>
+              <span data-ko="레퍼런스 아티스트" data-fa="هنرمندان مرجع" data-ru="Референсные художники">레퍼런스 아티스트</span>
+            </div>
+            <div class="module-card-body">
+              <ul class="space-y-4 text-sm" style="color: var(--color-text-muted); list-style: none; padding: 0;">
+                <li>
+                  <strong style="color: var(--color-text-light);">Ryoji Ikeda</strong> — <span data-ko="데이터와 소리를 극도로 정밀한 시각 패턴으로 변환하는 일본 아티스트" data-fa="هنرمند ژاپنی که داده و صدا را به الگوهای بصری بسیار دقیق تبدیل می‌کند" data-ru="Японский художник, преобразующий данные и звук в сверхточные визуальные паттерны">데이터와 소리를 극도로 정밀한 시각 패턴으로 변환하는 일본 아티스트</span><br>
+                  <a href="https://vimeo.com/channels/702955/73812494" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">test pattern [nº1]</a> &middot;
+                  <a href="https://vimeo.com/channels/391334/113093736" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">test pattern [enhanced]</a>
+                </li>
+                <li>
+                  <strong style="color: var(--color-text-light);">NONOTAK Studio</strong> — <span data-ko="빛과 소리의 몰입적 공간 설치 작업" data-fa="نصب فضایی غوطه‌ور نور و صدا" data-ru="Иммерсивные пространственные инсталляции света и звука">빛과 소리의 몰입적 공간 설치 작업</span><br>
+                  <a href="https://vimeo.com/nonotak/videos" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Vimeo</a> &middot;
+                  <a href="https://theconversation.com/light-and-sound-art-show-eclipse-by-nonotak-is-an-immersive-and-sensory-experience-241529" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Eclipse Review</a>
+                </li>
+                <li>
+                  <strong style="color: var(--color-text-light);">Daito Manabe / Rhizomatiks</strong> — <span data-ko="기술과 신체를 결합한 실험적 퍼포먼스" data-fa="پرفورمنس آزمایشی ترکیب فناوری و بدن" data-ru="Экспериментальный перформанс, объединяющий технологии и тело">기술과 신체를 결합한 실험적 퍼포먼스</span><br>
+                  <a href="https://vimeo.com/23381821" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Face Visualizer</a> &middot;
+                  <a href="https://daito.ws/en/" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Portfolio</a>
+                </li>
+                <li>
+                  <strong style="color: var(--color-text-light);">Playmodes Studio</strong> — <span data-ko="소리와 빛의 관계를 탐구하는 오디오비주얼 스튜디오" data-fa="استودیوی صوتی-بصری که رابطه صدا و نور را کاوش می‌کند" data-ru="Аудиовизуальная студия, исследующая связь звука и света">소리와 빛의 관계를 탐구하는 오디오비주얼 스튜디오</span><br>
+                  <a href="https://player.vimeo.com/video/464531284" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Reel</a> &middot;
+                  <a href="https://vimeo.com/playmodes" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Vimeo</a>
+                </li>
+                <li>
+                  <strong style="color: var(--color-text-light);">Refik Anadol</strong> — <span data-ko="데이터 조각과 AI 기반 몰입 설치" data-fa="مجسمه‌سازی داده و نصب غوطه‌ور مبتنی بر هوش مصنوعی" data-ru="Скульптуры из данных и иммерсивные инсталляции на основе ИИ">데이터 조각과 AI 기반 몰입 설치</span><br>
+                  <a href="https://prax.oregonstate.edu/visual-arts/data-crystal-osu" target="_blank" style="color: var(--color-accent-blue); text-decoration: underline;">Data Crystal: OSU</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-2. Audio Device In CHOP -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="2-2. Audio Device In CHOP — 소리 받기" data-fa="۲-۲. Audio Device In CHOP — دریافت صدا" data-ru="2-2. Audio Device In CHOP — приём звука">2-2. Audio Device In CHOP — 소리 받기</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="<code>Audio Device In CHOP</code>은 마이크나 사운드카드에서 실시간 오디오 신호를 받아오는 입력 노드다. 출력은 <strong>-1 ~ 1</strong> 범위의 오디오 웨이브폼(파형)이며, 왼쪽/오른쪽 두 개의 채널을 가진다." data-fa="<code>Audio Device In CHOP</code> نود ورودی است که سیگنال صوتی بلادرنگ از میکروفون یا کارت صدا دریافت می‌کند. خروجی آن شکل موج صوتی در محدوده <strong>-1 تا 1</strong> است و دو کانال چپ/راست دارد." data-ru="<code>Audio Device In CHOP</code> — входной нод, получающий аудиосигнал в реальном времени с микрофона или звуковой карты. Выход — аудиоволна в диапазоне <strong>-1 ~ 1</strong> с двумя каналами (левый/правый)."><code>Audio Device In CHOP</code>은 마이크나 사운드카드에서 실시간 오디오 신호를 받아오는 입력 노드다. 출력은 <strong>-1 ~ 1</strong> 범위의 오디오 웨이브폼(파형)이며, 왼쪽/오른쪽 두 개의 채널을 가진다.</span>
+          </p>
+
+        </div>
+
+        <!-- 2-3. 볼륨 추출 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="2-3. 볼륨 추출 — Analyze CHOP" data-fa="۲-۳. استخراج حجم — Analyze CHOP" data-ru="2-3. Извлечение громкости — Analyze CHOP">2-3. 볼륨 추출 — Analyze CHOP</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="RMS Power" data-fa="RMS Power" data-ru="RMS Power">RMS Power</div>
+            <span data-ko="<strong>Analyze CHOP</strong>의 Function을 <strong>RMS Power</strong>로 설정하면, 오디오 신호의 '평균적인 에너지'를 하나의 숫자(0~1)로 추출한다. 이것이 곧 <strong>볼륨</strong>이다. 소리가 크면 값이 높아지고, 조용하면 0에 가까워진다." data-fa="وقتی Function در <strong>Analyze CHOP</strong> را روی <strong>RMS Power</strong> تنظیم کنید، «انرژی میانگین» سیگنال صوتی به یک عدد (0~1) استخراج می‌شود. این همان <strong>حجم</strong> است. صدای بلند = مقدار بالا، سکوت = نزدیک به 0." data-ru="Если в <strong>Analyze CHOP</strong> установить Function на <strong>RMS Power</strong>, из аудиосигнала извлекается «средняя энергия» в виде одного числа (0~1). Это и есть <strong>громкость</strong>. Громко — значение высокое, тихо — близко к 0."><strong>Analyze CHOP</strong>의 Function을 <strong>RMS Power</strong>로 설정하면, 오디오 신호의 '평균적인 에너지'를 하나의 숫자(0~1)로 추출한다. 이것이 곧 <strong>볼륨</strong>이다. 소리가 크면 값이 높아지고, 조용하면 0에 가까워진다.</span>
+          </div>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation" data-ko="볼륨 추출 네트워크" data-fa="شبکه استخراج حجم" data-ru="Сеть извлечения громкости">볼륨 추출 네트워크</span><br><br>
+            <span class="node node-chop">Audio Device In</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Analyze (RMS)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Math (Range)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Null</span>
+          </div>
+
+          <div class="step-list mb-6">
+            <div class="step-item"><span data-ko="<code>Audio Device In CHOP</code>으로 오디오 입력을 받는다" data-fa="با <code>Audio Device In CHOP</code> ورودی صوتی دریافت کنید" data-ru="Получите аудиовход через <code>Audio Device In CHOP</code>"><code>Audio Device In CHOP</code>으로 오디오 입력을 받는다</span></div>
+            <div class="step-item"><span data-ko="<code>Analyze CHOP</code>을 연결하고 Function을 <strong>RMS Power</strong>로 설정" data-fa="<code>Analyze CHOP</code> را وصل کرده و Function را روی <strong>RMS Power</strong> تنظیم کنید" data-ru="Подключите <code>Analyze CHOP</code> и установите Function на <strong>RMS Power</strong>"><code>Analyze CHOP</code>을 연결하고 Function을 <strong>RMS Power</strong>로 설정</span></div>
+            <div class="step-item"><span data-ko="<code>Math CHOP</code>의 Range 탭에서 From Range를 <strong>0~0.5</strong>, To Range를 <strong>0~1</strong>로 설정 (소리에 맞게 조절)" data-fa="در تب Range از <code>Math CHOP</code> محدوده From را <strong>0~0.5</strong> و To را <strong>0~1</strong> تنظیم کنید (با توجه به صدا تنظیم کنید)" data-ru="В вкладке Range <code>Math CHOP</code> установите From Range <strong>0~0.5</strong>, To Range <strong>0~1</strong> (подстройте под звук)"><code>Math CHOP</code>의 Range 탭에서 From Range를 <strong>0~0.5</strong>, To Range를 <strong>0~1</strong>로 설정 (소리에 맞게 조절)</span></div>
+            <div class="step-item"><span data-ko="<code>Null CHOP</code>을 연결하고, Level TOP의 Opacity에 <code>op('null1')['chan1']</code> 입력" data-fa="<code>Null CHOP</code> را وصل کرده و در Opacity از Level TOP عبارت <code>op('null1')['chan1']</code> وارد کنید" data-ru="Подключите <code>Null CHOP</code> и введите <code>op('null1')['chan1']</code> в Opacity Level TOP"><code>Null CHOP</code>을 연결하고, Level TOP의 Opacity에 <code>op('null1')['chan1']</code> 입력</span></div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="실습 포인트" data-fa="نکته تمرین" data-ru="Практическая заметка">실습 포인트</div>
+            <span data-ko="소리가 클 때 밝아지고, 조용할 때 어두워지는지 확인한다. Math CHOP의 From Range를 조절해서 반응 감도를 맞춘다." data-fa="بررسی کنید که با صدای بلند روشن شده و با سکوت تاریک شود. با تنظیم From Range در Math CHOP حساسیت واکنش را تنظیم کنید." data-ru="Проверьте: при громком звуке ярче, при тишине — темнее. Настройте чувствительность реакции через From Range в Math CHOP.">소리가 클 때 밝아지고, 조용할 때 어두워지는지 확인한다. Math CHOP의 From Range를 조절해서 반응 감도를 맞춘다.</span>
+          </div>
+        </div>
+
+        <!-- 2-4. 주파수 분석 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="2-4. 주파수 분석 — audioAnalysis (Palette)" data-fa="۲-۴. تحلیل فرکانس — audioAnalysis (Palette)" data-ru="2-4. Анализ частот — audioAnalysis (Palette)">2-4. 주파수 분석 — audioAnalysis (Palette)</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="소리는 다양한 주파수가 섞여 있다. <strong>저주파(Low)</strong>는 베이스/킥 드럼 같은 깊은 소리, <strong>중주파(Mid)</strong>는 보컬/멜로디, <strong>고주파(High)</strong>는 하이햇/심벌 같은 날카로운 소리다. 이것을 직접 분리하려면 Audio Spectrum → Select CHOP을 복잡하게 세팅해야 하지만, TouchDesigner의 <strong>Palette</strong>에서 제공하는 <code>audioAnalysis</code> 컴포넌트를 사용하면 간편하게 해결된다." data-fa="صدا ترکیبی از فرکانس‌های مختلف است. <strong>فرکانس پایین (Low)</strong> صداهای عمیق مثل بیس/کیک درام، <strong>فرکانس میانی (Mid)</strong> وکال/ملودی، <strong>فرکانس بالا (High)</strong> صداهای تیز مثل های‌هت/سنج است. جداسازی دستی نیاز به تنظیم پیچیده Audio Spectrum → Select CHOP دارد، اما با کامپوننت <code>audioAnalysis</code> از <strong>Palette</strong> TouchDesigner به سادگی انجام می‌شود." data-ru="Звук состоит из различных частот. <strong>Низкие (Low)</strong> — бас/бочка; <strong>Средние (Mid)</strong> — вокал/мелодия; <strong>Высокие (High)</strong> — хай-хэт/тарелки. Ручное разделение требует сложной настройки Audio Spectrum → Select CHOP, но компонент <code>audioAnalysis</code> из <strong>Palette</strong> TouchDesigner делает это просто.">소리는 다양한 주파수가 섞여 있다. <strong>저주파(Low)</strong>는 베이스/킥 드럼 같은 깊은 소리, <strong>중주파(Mid)</strong>는 보컬/멜로디, <strong>고주파(High)</strong>는 하이햇/심벌 같은 날카로운 소리다. 이것을 직접 분리하려면 Audio Spectrum → Select CHOP을 복잡하게 세팅해야 하지만, TouchDesigner의 <strong>Palette</strong>에서 제공하는 <code>audioAnalysis</code> 컴포넌트를 사용하면 간편하게 해결된다.</span>
+          </p>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="audioAnalysis 컴포넌트" data-fa="کامپوننت audioAnalysis" data-ru="Компонент audioAnalysis">audioAnalysis 컴포넌트</div>
+            <span data-ko="Palette &gt; Tools &gt; <strong>audioAnalysis</strong>를 네트워크에 드래그하면 끝. 오디오 입력을 자동으로 분석하여 <strong>Low / Mid / High</strong> (주파수 대역별 에너지)와 <strong>Kick / Snare / Rhythm</strong> (비트 감지)을 바로 출력한다. 각 채널마다 <strong>Thresh, Gain, Smooth</strong> 노브로 감도를 조절할 수 있다." data-fa="کافی است <strong>audioAnalysis</strong> را از Palette &gt; Tools به شبکه بکشید. ورودی صوتی به طور خودکار تحلیل شده و <strong>Low / Mid / High</strong> (انرژی باند فرکانسی) و <strong>Kick / Snare / Rhythm</strong> (تشخیص بیت) مستقیماً خروجی داده می‌شود. هر کانال دارای نوب‌های <strong>Thresh، Gain، Smooth</strong> برای تنظیم حساسیت است." data-ru="Перетащите <strong>audioAnalysis</strong> из Palette &gt; Tools в сеть — готово. Аудиовход автоматически анализируется, выдавая <strong>Low / Mid / High</strong> (энергия частотных полос) и <strong>Kick / Snare / Rhythm</strong> (детекция ритма). Для каждого канала есть регуляторы <strong>Thresh, Gain, Smooth</strong>.">Palette &gt; Tools &gt; <strong>audioAnalysis</strong>를 네트워크에 드래그하면 끝. 오디오 입력을 자동으로 분석하여 <strong>Low / Mid / High</strong> (주파수 대역별 에너지)와 <strong>Kick / Snare / Rhythm</strong> (비트 감지)을 바로 출력한다. 각 채널마다 <strong>Thresh, Gain, Smooth</strong> 노브로 감도를 조절할 수 있다.</span>
+          </div>
+
+          <div class="step-list mb-6">
+            <div class="step-item"><span data-ko="Palette 브라우저를 열고 (<strong>Alt+L</strong>), <code>Tools</code> 폴더에서 <code>audioAnalysis</code>를 찾는다" data-fa="مرورگر Palette را باز کنید (<strong>Alt+L</strong>) و <code>audioAnalysis</code> را در پوشه <code>Tools</code> پیدا کنید" data-ru="Откройте браузер Palette (<strong>Alt+L</strong>) и найдите <code>audioAnalysis</code> в папке <code>Tools</code>">Palette 브라우저를 열고 (<strong>Alt+L</strong>), <code>Tools</code> 폴더에서 <code>audioAnalysis</code>를 찾는다</span></div>
+            <div class="step-item"><span data-ko="네트워크 에디터에 드래그하여 배치한다" data-fa="آن را به ویرایشگر شبکه بکشید و قرار دهید" data-ru="Перетащите его в сетевой редактор">네트워크 에디터에 드래그하여 배치한다</span></div>
+            <div class="step-item"><span data-ko="컴포넌트의 CHOP 출력에서 원하는 채널을 <strong>Select CHOP</strong>으로 골라 사용한다" data-fa="از خروجی CHOP کامپوننت، کانال دلخواه را با <strong>Select CHOP</strong> انتخاب کنید" data-ru="Из CHOP-выхода компонента выберите нужный канал через <strong>Select CHOP</strong>">컴포넌트의 CHOP 출력에서 원하는 채널을 <strong>Select CHOP</strong>으로 골라 사용한다</span></div>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              <span data-ko="audioAnalysis 출력 채널" data-fa="کانال‌های خروجی audioAnalysis" data-ru="Выходные каналы audioAnalysis">audioAnalysis 출력 채널</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="채널" data-fa="کانال" data-ru="Канал">채널</th>
+                    <th data-ko="유형" data-fa="نوع" data-ru="Тип">유형</th>
+                    <th data-ko="설명" data-fa="توضیحات" data-ru="Описание">설명</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td style="color: var(--color-accent-green);">low</td><td data-ko="연속값" data-fa="مقدار پیوسته" data-ru="Непрерывное">연속값</td><td data-ko="저주파 에너지 (베이스, 킥 드럼)" data-fa="انرژی فرکانس پایین (بیس، کیک درام)" data-ru="Энергия низких частот (бас, бочка)">저주파 에너지 (베이스, 킥 드럼)</td></tr>
+                  <tr><td style="color: var(--color-accent-green);">mid</td><td data-ko="연속값" data-fa="مقدار پیوسته" data-ru="Непрерывное">연속값</td><td data-ko="중주파 에너지 (보컬, 멜로디)" data-fa="انرژی فرکانس میانی (وکال، ملودی)" data-ru="Энергия средних частот (вокал, мелодия)">중주파 에너지 (보컬, 멜로디)</td></tr>
+                  <tr><td style="color: var(--color-accent-green);">high</td><td data-ko="연속값" data-fa="مقدار پیوسته" data-ru="Непрерывное">연속값</td><td data-ko="고주파 에너지 (하이햇, 심벌)" data-fa="انرژی فرکانس بالا (های‌هت، سنج)" data-ru="Энергия высоких частот (хай-хэт, тарелки)">고주파 에너지 (하이햇, 심벌)</td></tr>
+                  <tr><td style="color: var(--color-accent-orange);">kick</td><td data-ko="이벤트" data-fa="رویداد" data-ru="Событие">이벤트</td><td data-ko="킥 드럼 감지 (0 또는 1)" data-fa="تشخیص کیک درام (0 یا 1)" data-ru="Детекция бочки (0 или 1)">킥 드럼 감지 (0 또는 1)</td></tr>
+                  <tr><td style="color: var(--color-accent-orange);">snare</td><td data-ko="이벤트" data-fa="رویداد" data-ru="Событие">이벤트</td><td data-ko="스네어 감지 (0 또는 1)" data-fa="تشخیص اسنیر (0 یا 1)" data-ru="Детекция малого барабана (0 или 1)">스네어 감지 (0 또는 1)</td></tr>
+                  <tr><td style="color: var(--color-accent-orange);">rhythm</td><td data-ko="이벤트" data-fa="رویداد" data-ru="Событие">이벤트</td><td data-ko="전체 리듬 감지" data-fa="تشخیص کلی ریتم" data-ru="Детекция общего ритма">전체 리듬 감지</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="왜 audioAnalysis인가?" data-fa="چرا audioAnalysis؟" data-ru="Почему audioAnalysis?">왜 audioAnalysis인가?</div>
+            <span data-ko="Audio Spectrum → Select CHOP으로 직접 주파수 대역을 자르려면 샘플 인덱스를 계산해야 하고, 적절한 범위를 찾기 어렵다. <code>audioAnalysis</code>는 이 과정을 <strong>자동으로 처리</strong>하고, 각 대역의 Gain과 Smooth까지 노브로 바로 조절할 수 있어서 훨씬 실용적이다." data-fa="برای جداسازی دستی باند فرکانسی با Audio Spectrum → Select CHOP باید ایندکس نمونه محاسبه شود و یافتن محدوده مناسب دشوار است. <code>audioAnalysis</code> این فرآیند را <strong>خودکار</strong> انجام می‌دهد و با نوب‌ها می‌توان Gain و Smooth هر باند را مستقیماً تنظیم کرد." data-ru="Для ручного разделения через Audio Spectrum → Select CHOP нужно вычислять индексы сэмплов, и сложно найти правильный диапазон. <code>audioAnalysis</code> делает это <strong>автоматически</strong>, а Gain и Smooth каждой полосы настраиваются прямо регуляторами.">Audio Spectrum → Select CHOP으로 직접 주파수 대역을 자르려면 샘플 인덱스를 계산해야 하고, 적절한 범위를 찾기 어렵다. <code>audioAnalysis</code>는 이 과정을 <strong>자동으로 처리</strong>하고, 각 대역의 Gain과 Smooth까지 노브로 바로 조절할 수 있어서 훨씬 실용적이다.</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-green);"></span>
+              <span data-ko="주파수별 매핑 예시" data-fa="نمونه نگاشت بر اساس فرکانس" data-ru="Примеры маппинга по частотам">주파수별 매핑 예시</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="주파수 대역" data-fa="باند فرکانسی" data-ru="Частотная полоса">주파수 대역</th>
+                    <th data-ko="소리 예시" data-fa="نمونه صدا" data-ru="Пример звука">소리 예시</th>
+                    <th data-ko="시각 매핑" data-fa="نگاشت بصری" data-ru="Визуальный маппинг">시각 매핑</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-ko="저주파 (Low)" data-fa="فرکانس پایین (Low)" data-ru="Низкие (Low)">저주파 (Low)</td>
+                    <td data-ko="킥 드럼, 베이스" data-fa="کیک درام، بیس" data-ru="Бочка, бас">킥 드럼, 베이스</td>
+                    <td data-ko="전체 스케일, 밝기 펄스" data-fa="مقیاس کلی، پالس روشنایی" data-ru="Общий масштаб, пульс яркости">전체 스케일, 밝기 펄스</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="중주파 (Mid)" data-fa="فرکانس میانی (Mid)" data-ru="Средние (Mid)">중주파 (Mid)</td>
+                    <td data-ko="보컬, 멜로디" data-fa="وکال، ملودی" data-ru="Вокал, мелодия">보컬, 멜로디</td>
+                    <td data-ko="색상 변화, 회전 속도" data-fa="تغییر رنگ، سرعت چرخش" data-ru="Изменение цвета, скорость вращения">색상 변화, 회전 속도</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="고주파 (High)" data-fa="فرکانس بالا (High)" data-ru="Высокие (High)">고주파 (High)</td>
+                    <td data-ko="하이햇, 심벌" data-fa="های‌هت، سنج" data-ru="Хай-хэт, тарелки">하이햇, 심벌</td>
+                    <td data-ko="노이즈 강도, 디테일 왜곡" data-fa="شدت نویز، تغییر شکل جزئیات" data-ru="Интенсивность шума, искажение деталей">노이즈 강도, 디테일 왜곡</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-5. 비트 감지 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="2-5. 비트 감지 — Logic & Trigger CHOP" data-fa="۲-۵. تشخیص بیت — Logic و Trigger CHOP" data-ru="2-5. Обнаружение бита — Logic и Trigger CHOP">2-5. 비트 감지 — Logic & Trigger CHOP</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="볼륨이나 주파수는 연속적인 값이지만, <strong>비트</strong>는 순간적인 이벤트다. 볼륨 값이 특정 임계값(threshold)을 넘는 순간을 감지하여 '비트가 왔다!'는 신호를 만든다." data-fa="حجم و فرکانس مقادیر پیوسته هستند، اما <strong>بیت</strong> یک رویداد لحظه‌ای است. لحظه‌ای که مقدار حجم از آستانه (threshold) خاصی عبور می‌کند تشخیص داده شده و سیگنال «بیت آمد!» تولید می‌شود." data-ru="Громкость и частота — непрерывные значения, а <strong>бит</strong> — мгновенное событие. Обнаруживается момент, когда громкость превышает определённый порог (threshold), и генерируется сигнал «бит пришёл!».">볼륨이나 주파수는 연속적인 값이지만, <strong>비트</strong>는 순간적인 이벤트다. 볼륨 값이 특정 임계값(threshold)을 넘는 순간을 감지하여 '비트가 왔다!'는 신호를 만든다.</span>
+          </p>
+
+          <div class="node-diagram mb-6">
+            <span class="annotation" data-ko="비트 감지 네트워크" data-fa="شبکه تشخیص بیت" data-ru="Сеть обнаружения бита">비트 감지 네트워크</span><br><br>
+            <span class="node node-chop">Analyze (RMS)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Logic (Threshold)</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Trigger</span>
+            <span class="arrow">→</span>
+            <span class="node node-chop">Null</span>
+          </div>
+
+          <div class="step-list mb-6">
+            <div class="step-item"><span data-ko="<code>Logic CHOP</code>의 Convert를 <strong>Off When Outside Bounds</strong>로 설정, Bound Min을 <strong>0.3</strong> 정도로 설정" data-fa="Convert در <code>Logic CHOP</code> را <strong>Off When Outside Bounds</strong> و Bound Min را حدود <strong>0.3</strong> تنظیم کنید" data-ru="Установите Convert в <code>Logic CHOP</code> на <strong>Off When Outside Bounds</strong>, Bound Min на <strong>0.3</strong>"><code>Logic CHOP</code>의 Convert를 <strong>Off When Outside Bounds</strong>로 설정, Bound Min을 <strong>0.3</strong> 정도로 설정</span></div>
+            <div class="step-item"><span data-ko="<code>Trigger CHOP</code>을 연결 — Attack, Sustain, Decay 값으로 반응 모양을 조절" data-fa="<code>Trigger CHOP</code> را وصل کنید — شکل واکنش را با مقادیر Attack، Sustain، Decay تنظیم کنید" data-ru="Подключите <code>Trigger CHOP</code> — настройте форму реакции значениями Attack, Sustain, Decay"><code>Trigger CHOP</code>을 연결 — Attack, Sustain, Decay 값으로 반응 모양을 조절</span></div>
+            <div class="step-item"><span data-ko="비트 순간에 <strong>색 반전, 글리치 효과, 순간 전환</strong> 등에 활용" data-fa="در لحظه بیت از <strong>معکوس رنگ، افکت گلیچ، تعویض لحظه‌ای</strong> و غیره استفاده کنید" data-ru="В момент бита используйте <strong>инверсию цвета, глитч-эффект, мгновенное переключение</strong> и т.д.">비트 순간에 <strong>색 반전, 글리치 효과, 순간 전환</strong> 등에 활용</span></div>
+          </div>
+
+          <div class="callout callout-tip mb-6">
+            <div class="callout-label" data-ko="활용 예" data-fa="مثال کاربرد" data-ru="Пример использования">활용 예</div>
+            <span data-ko="Trigger CHOP의 출력을 Switch TOP의 Index에 연결하면, 비트에 맞춰 두 영상 사이를 순간 전환할 수 있다. 또는 HSV Adjust의 Hue Offset에 연결하면 비트마다 색이 바뀐다." data-fa="با اتصال خروجی Trigger CHOP به Index از Switch TOP، می‌توانید هماهنگ با بیت بین دو ویدیو سوییچ لحظه‌ای کنید. یا با اتصال به Hue Offset در HSV Adjust، با هر بیت رنگ تغییر کند." data-ru="Подключив выход Trigger CHOP к Index Switch TOP, можно мгновенно переключаться между двумя видео в ритме бита. Или подключить к Hue Offset в HSV Adjust — при каждом бите меняется цвет.">Trigger CHOP의 출력을 Switch TOP의 Index에 연결하면, 비트에 맞춰 두 영상 사이를 순간 전환할 수 있다. 또는 HSV Adjust의 Hue Offset에 연결하면 비트마다 색이 바뀐다.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 3 — 오디오 리액티브 비주얼 실습    ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="part-practice">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-accent-orange);">
+            <span class="dot" style="background: var(--color-accent-orange);"></span>
+            Part 03
+          </div>
+          <h2 class="part-title" data-ko="오디오 리액티브 비주얼 실습" data-fa="تمرین عملی ویژوال واکنش‌پذیر به صدا" data-ru="Практика аудиореактивного визуала">오디오 리액티브 비주얼 실습</h2>
+          <p class="part-subtitle" data-ko="볼륨, 주파수, 비트를 활용한 실습을 단계별로 진행하고, 마지막에는 자신만의 오디오 리액티브 비주얼을 만든다." data-fa="تمرین‌های مرحله‌ای با استفاده از حجم، فرکانس و بیت انجام داده و در پایان ویژوال واکنش‌پذیر خود را بسازید." data-ru="Пошаговые практики с использованием громкости, частот и битов, и в конце — создание собственного аудиореактивного визуала.">볼륨, 주파수, 비트를 활용한 실습을 단계별로 진행하고, 마지막에는 자신만의 오디오 리액티브 비주얼을 만든다.</p>
+        </div>
+
+        <!-- 실습 1: 볼륨 리액티브 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="3-1. 실습 1: 볼륨 리액티브 — 소리로 숨 쉬는 영상" data-fa="۳-۱. تمرین ۱: واکنش حجمی — ویدیویی که با صدا نفس می‌کشد" data-ru="3-1. Практика 1: реакция на громкость — видео, дышащее звуком">3-1. 실습 1: 볼륨 리액티브 — 소리로 숨 쉬는 영상</h3>
+
+          <details class="mb-4" open>
+            <summary>
+              <span class="badge badge-practice" style="margin-right: 0.5rem;">Practice 1</span>
+              <span data-ko="볼륨 → 밝기 + 스케일" data-fa="حجم → روشنایی + مقیاس" data-ru="Громкость → яркость + масштаб">볼륨 → 밝기 + 스케일</span>
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="annotation" data-ko="네트워크 구조" data-fa="ساختار شبکه" data-ru="Структура сети">네트워크 구조</span><br><br>
+                <span class="node node-chop">Audio Device In</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Analyze (RMS)</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Math</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Filter</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Null</span>
+                <br><br>
+                <span class="node node-top">Movie File In</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Transform</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Level</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Null</span>
+              </div>
+
+              <div class="step-list mb-4">
+                <div class="step-item"><span data-ko="<code>Audio Device In</code> → <code>Analyze</code> (RMS Power) → <code>Math</code> (Range: 0~0.5 → 0~1) → <code>Filter</code> (Width: 0.2) → <code>Null</code>" data-fa="<code>Audio Device In</code> → <code>Analyze</code> (RMS Power) → <code>Math</code> (Range: 0~0.5 → 0~1) → <code>Filter</code> (Width: 0.2) → <code>Null</code>" data-ru="<code>Audio Device In</code> → <code>Analyze</code> (RMS Power) → <code>Math</code> (Range: 0~0.5 → 0~1) → <code>Filter</code> (Width: 0.2) → <code>Null</code>"><code>Audio Device In</code> → <code>Analyze</code> (RMS Power) → <code>Math</code> (Range: 0~0.5 → 0~1) → <code>Filter</code> (Width: 0.2) → <code>Null</code></span></div>
+                <div class="step-item"><span data-ko="<code>Movie File In TOP</code>으로 영상을 불러온다" data-fa="با <code>Movie File In TOP</code> ویدیو بارگذاری کنید" data-ru="Загрузите видео через <code>Movie File In TOP</code>"><code>Movie File In TOP</code>으로 영상을 불러온다</span></div>
+                <div class="step-item"><span data-ko="<code>Transform TOP</code>의 Scale에 <code>op('null1')['chan1']</code> 입력" data-fa="در Scale از <code>Transform TOP</code> عبارت <code>op('null1')['chan1']</code> وارد کنید" data-ru="В Scale <code>Transform TOP</code> введите <code>op('null1')['chan1']</code>"><code>Transform TOP</code>의 Scale에 <code>op('null1')['chan1']</code> 입력</span></div>
+                <div class="step-item"><span data-ko="<code>Level TOP</code>의 Opacity에도 같은 Reference를 연결한다" data-fa="به Opacity از <code>Level TOP</code> نیز همان Reference را وصل کنید" data-ru="К Opacity <code>Level TOP</code> тоже подключите тот же Reference"><code>Level TOP</code>의 Opacity에도 같은 Reference를 연결한다</span></div>
+              </div>
+
+              <div class="callout callout-tip">
+                <div class="callout-label" data-ko="체크포인트" data-fa="نقطه بررسی" data-ru="Контрольная точка">체크포인트</div>
+                <span data-ko="음악이 클 때 영상이 커지고 밝아지면 성공. Filter Width를 조절해서 부드러운 정도를 바꿔본다." data-fa="اگر با بلندتر شدن موسیقی ویدیو بزرگ‌تر و روشن‌تر شود موفق شدید. Filter Width را تنظیم کنید تا نرمی را تغییر دهید." data-ru="Если при громкой музыке видео увеличивается и становится ярче — успех. Настройте Filter Width для изменения плавности.">음악이 클 때 영상이 커지고 밝아지면 성공. Filter Width를 조절해서 부드러운 정도를 바꿔본다.</span>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 실습 2: 주파수 리액티브 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="3-2. 실습 2: 주파수 리액티브 — 저음/고음 분리 반응" data-fa="۳-۲. تمرین ۲: واکنش فرکانسی — جداسازی بم/زیر" data-ru="3-2. Практика 2: реакция на частоты — разделение баса/высоких">3-2. 실습 2: 주파수 리액티브 — 저음/고음 분리 반응</h3>
+
+          <details class="mb-4" open>
+            <summary>
+              <span class="badge badge-practice" style="margin-right: 0.5rem;">Practice 2</span>
+              <span data-ko="저음 → 스케일, 고음 → Displace" data-fa="بم → مقیاس، زیر → Displace" data-ru="Бас → масштаб, высокие → Displace">저음 → 스케일, 고음 → Displace</span>
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="annotation" data-ko="네트워크 구조" data-fa="ساختار شبکه" data-ru="Структура сети">네트워크 구조</span><br><br>
+                <span class="node node-chop">Audio Device In</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Audio Spectrum</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Select (Low/High)</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Analyze → Math → Null</span>
+                <br><br>
+                <span class="node node-top">Movie File In</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Transform (← Low)</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Displace (← High)</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Null</span>
+              </div>
+
+              <div class="step-list mb-4">
+                <div class="step-item"><span data-ko="<code>Audio Spectrum CHOP</code>으로 주파수를 분석한다" data-fa="با <code>Audio Spectrum CHOP</code> فرکانس‌ها را تحلیل کنید" data-ru="Проанализируйте частоты через <code>Audio Spectrum CHOP</code>"><code>Audio Spectrum CHOP</code>으로 주파수를 분석한다</span></div>
+                <div class="step-item"><span data-ko="<code>Select CHOP</code> 두 개로 저주파 대역과 고주파 대역을 분리한다" data-fa="با دو <code>Select CHOP</code> باندهای فرکانس پایین و بالا را جدا کنید" data-ru="Двумя <code>Select CHOP</code> разделите низкие и высокие частоты"><code>Select CHOP</code> 두 개로 저주파 대역과 고주파 대역을 분리한다</span></div>
+                <div class="step-item"><span data-ko="각각 <code>Analyze → Math → Null</code>을 붙여 0~1 값으로 만든다" data-fa="به هر کدام <code>Analyze → Math → Null</code> اضافه کرده و مقدار 0~1 بسازید" data-ru="К каждому подключите <code>Analyze → Math → Null</code> для получения значения 0~1">각각 <code>Analyze → Math → Null</code>을 붙여 0~1 값으로 만든다</span></div>
+                <div class="step-item"><span data-ko="저주파 Null → <code>Transform TOP</code>의 Scale에 연결" data-fa="Null فرکانس پایین → به Scale از <code>Transform TOP</code> وصل کنید" data-ru="Null низких частот → подключите к Scale <code>Transform TOP</code>">저주파 Null → <code>Transform TOP</code>의 Scale에 연결</span></div>
+                <div class="step-item"><span data-ko="고주파 Null → <code>Displace TOP</code>의 Weight에 연결" data-fa="Null فرکانس بالا → به Weight از <code>Displace TOP</code> وصل کنید" data-ru="Null высоких частот → подключите к Weight <code>Displace TOP</code>">고주파 Null → <code>Displace TOP</code>의 Weight에 연결</span></div>
+              </div>
+
+              <div class="callout callout-tip">
+                <div class="callout-label" data-ko="포인트" data-fa="نکته" data-ru="Заметка">포인트</div>
+                <span data-ko="베이스가 울릴 때 영상이 펄스하고, 하이햇이 칠 때 영상이 왜곡되면 성공. 저음과 고음이 <strong>서로 다른 시각 요소</strong>를 움직이는 것이 핵심이다." data-fa="اگر با بیس ویدیو پالس بزند و با های‌هت تغییر شکل دهد موفق شدید. نکته کلیدی این است که بم و زیر <strong>عناصر بصری متفاوتی</strong> را حرکت دهند." data-ru="Если при басе видео пульсирует, а при хай-хэте — искажается, значит успех. Ключевое — бас и высокие управляют <strong>разными визуальными элементами</strong>.">베이스가 울릴 때 영상이 펄스하고, 하이햇이 칠 때 영상이 왜곡되면 성공. 저음과 고음이 <strong>서로 다른 시각 요소</strong>를 움직이는 것이 핵심이다.</span>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 실습 3: 비트 반응 + Feedback -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="3-3. 실습 3: 비트 반응 + Feedback" data-fa="۳-۳. تمرین ۳: واکنش بیت + Feedback" data-ru="3-3. Практика 3: реакция на бит + Feedback">3-3. 실습 3: 비트 반응 + Feedback</h3>
+
+          <details class="mb-4" open>
+            <summary>
+              <span class="badge badge-practice" style="margin-right: 0.5rem;">Practice 3</span>
+              <span data-ko="비트 → Feedback 잔상 강도" data-fa="بیت → شدت پس‌تصویر Feedback" data-ru="Бит → интенсивность остаточного следа Feedback">비트 → Feedback 잔상 강도</span>
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <div class="node-diagram mb-4">
+                <span class="annotation" data-ko="네트워크 구조" data-fa="ساختار شبکه" data-ru="Структура сети">네트워크 구조</span><br><br>
+                <span class="node node-chop">Analyze (RMS)</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Logic</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Trigger</span>
+                <span class="arrow">→</span>
+                <span class="node node-chop">Null</span>
+                <br><br>
+                <span class="node node-top">Feedback</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Composite</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Level (← beat)</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Displace</span>
+                <span class="arrow">→</span>
+                <span class="node node-top">Null (Target)</span>
+              </div>
+
+              <div class="step-list mb-4">
+                <div class="step-item"><span data-ko="비트 감지 체인을 만든다: <code>Analyze → Logic → Trigger → Null</code>" data-fa="زنجیره تشخیص بیت بسازید: <code>Analyze → Logic → Trigger → Null</code>" data-ru="Создайте цепочку обнаружения бита: <code>Analyze → Logic → Trigger → Null</code>">비트 감지 체인을 만든다: <code>Analyze → Logic → Trigger → Null</code></span></div>
+                <div class="step-item"><span data-ko="Feedback + Composite + Level + Displace + Null 구조를 만든다" data-fa="ساختار Feedback + Composite + Level + Displace + Null بسازید" data-ru="Постройте структуру Feedback + Composite + Level + Displace + Null">Feedback + Composite + Level + Displace + Null 구조를 만든다</span></div>
+                <div class="step-item"><span data-ko="비트 Null을 Level TOP의 Opacity에 Reference로 연결" data-fa="Null بیت را به Opacity از Level TOP به عنوان Reference وصل کنید" data-ru="Подключите Null бита к Opacity Level TOP через Reference">비트 Null을 Level TOP의 Opacity에 Reference로 연결</span></div>
+                <div class="step-item"><span data-ko="Trigger의 Attack을 짧게 (0.05), Decay를 길게 (0.5) 설정하여 비트에 맞춘 잔상 효과를 만든다" data-fa="Attack در Trigger را کوتاه (0.05) و Decay را بلند (0.5) تنظیم کنید تا افکت پس‌تصویر هماهنگ با بیت ایجاد شود" data-ru="Установите Attack короткий (0.05), Decay длинный (0.5) для эффекта остаточного следа в ритме бита">Trigger의 Attack을 짧게 (0.05), Decay를 길게 (0.5) 설정하여 비트에 맞춘 잔상 효과를 만든다</span></div>
+              </div>
+
+              <div class="callout callout-tip">
+                <div class="callout-label" data-ko="포인트" data-fa="نکته" data-ru="Заметка">포인트</div>
+                <span data-ko="비트가 올 때 잔상이 강해지고, 빠지면 서서히 사라지는 '호흡' 같은 느낌이 핵심이다. Displace Weight도 비트에 연결하면 더 역동적인 효과가 나온다." data-fa="نکته کلیدی این است که وقتی بیت می‌آید پس‌تصویر قوی‌تر شده و وقتی می‌رود به تدریج محو شود مثل «نفس کشیدن». اتصال Displace Weight به بیت نیز افکت پویاتری ایجاد می‌کند." data-ru="Ключевое — при бите остаточный след усиливается, без бита — постепенно исчезает, как «дыхание». Подключение Displace Weight к биту даёт ещё более динамичный эффект.">비트가 올 때 잔상이 강해지고, 빠지면 서서히 사라지는 '호흡' 같은 느낌이 핵심이다. Displace Weight도 비트에 연결하면 더 역동적인 효과가 나온다.</span>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 실습 4: 종합 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="3-4. 실습 4: 종합 — 나만의 오디오 리액티브 비주얼" data-fa="۳-۴. تمرین ۴: ترکیبی — ویژوال واکنش صوتی شخصی" data-ru="3-4. Практика 4: комплексная — свой аудиореактивный визуал">3-4. 실습 4: 종합 — 나만의 오디오 리액티브 비주얼</h3>
+
+          <details class="mb-4" open>
+            <summary>
+              <span class="badge badge-practice" style="margin-right: 0.5rem;">Practice 4</span>
+              <span data-ko="자유 조합 — 나만의 오디오 리액티브" data-fa="ترکیب آزاد — واکنش صوتی شخصی شما" data-ru="Свободная комбинация — ваш аудиореактив">자유 조합 — 나만의 오디오 리액티브</span>
+              <span class="chevron">▸</span>
+            </summary>
+            <div class="details-body">
+              <p class="text-sm mb-3" style="color: var(--color-text-muted);">
+                <strong><span data-ko="요구사항:" data-fa="الزامات:" data-ru="Требования:">요구사항:</span></strong>
+              </p>
+              <ul class="space-y-1 text-sm mb-4" style="color: var(--color-text-muted); list-style: disc; padding-left: 1.5rem;">
+                <li><span data-ko="최소 <strong>2가지 이상</strong>의 오디오 속성 활용 (볼륨 + 주파수, 볼륨 + 비트 등)" data-fa="حداقل <strong>۲ ویژگی</strong> صوتی استفاده شود (حجم + فرکانس، حجم + بیت و غیره)" data-ru="Использовать минимум <strong>2 свойства</strong> аудио (громкость + частота, громкость + бит и т.д.)">최소 <strong>2가지 이상</strong>의 오디오 속성 활용 (볼륨 + 주파수, 볼륨 + 비트 등)</span></li>
+                <li><span data-ko="Feedback 또는 Displace <strong>최소 1개</strong> 포함" data-fa="حداقل <strong>۱ مورد</strong> Feedback یا Displace شامل شود" data-ru="Включить минимум <strong>1</strong> Feedback или Displace">Feedback 또는 Displace <strong>최소 1개</strong> 포함</span></li>
+                <li><span data-ko="자신이 선택한 <strong>음악</strong>에 맞춰 반응하도록 설계" data-fa="طراحی شده تا به <strong>موسیقی</strong> انتخابی شما واکنش نشان دهد" data-ru="Спроектировать реакцию под выбранную <strong>музыку</strong>">자신이 선택한 <strong>음악</strong>에 맞춰 반응하도록 설계</span></li>
+              </ul>
+
+              <div class="module-card mb-4">
+                <div class="module-card-header">
+                  <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+                  <span data-ko="조합 아이디어" data-fa="ایده‌های ترکیبی" data-ru="Идеи комбинаций">조합 아이디어</span>
+                </div>
+                <div class="module-card-body">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th data-ko="조합" data-fa="ترکیب" data-ru="Комбинация">조합</th>
+                        <th data-ko="오디오 소스" data-fa="منبع صوتی" data-ru="Источник аудио">오디오 소스</th>
+                        <th data-ko="시각 효과" data-fa="افکت بصری" data-ru="Визуальный эффект">시각 효과</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>A</td>
+                        <td data-ko="볼륨 + 저주파" data-fa="حجم + فرکانس پایین" data-ru="Громкость + бас">볼륨 + 저주파</td>
+                        <td data-ko="Feedback 잔상 + 스케일 펄스" data-fa="پس‌تصویر Feedback + پالس مقیاس" data-ru="Остаточный след Feedback + пульс масштаба">Feedback 잔상 + 스케일 펄스</td>
+                      </tr>
+                      <tr>
+                        <td>B</td>
+                        <td data-ko="주파수 3밴드" data-fa="۳ باند فرکانسی" data-ru="3 полосы частот">주파수 3밴드</td>
+                        <td data-ko="저음=크기, 중음=색상, 고음=왜곡" data-fa="بم=اندازه، میانی=رنگ، زیر=تغییر شکل" data-ru="Бас=размер, средние=цвет, высокие=искажение">저음=크기, 중음=색상, 고음=왜곡</td>
+                      </tr>
+                      <tr>
+                        <td>C</td>
+                        <td data-ko="비트 + 볼륨" data-fa="بیت + حجم" data-ru="Бит + громкость">비트 + 볼륨</td>
+                        <td data-ko="비트=장면전환, 볼륨=Displace 강도" data-fa="بیت=تعویض صحنه، حجم=شدت Displace" data-ru="Бит=смена сцены, громкость=интенсивность Displace">비트=장면전환, 볼륨=Displace 강도</td>
+                      </tr>
+                      <tr>
+                        <td>D</td>
+                        <td data-ko="저주파 + 비트" data-fa="فرکانس پایین + بیت" data-ru="Бас + бит">저주파 + 비트</td>
+                        <td data-ko="Feedback + Displace + 색 반전" data-fa="Feedback + Displace + معکوس رنگ" data-ru="Feedback + Displace + инверсия цвета">Feedback + Displace + 색 반전</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="callout callout-concept">
+                <div class="callout-label" data-ko="발표 체크리스트" data-fa="چک‌لیست ارائه" data-ru="Чек-лист презентации">발표 체크리스트</div>
+                <span data-ko="<strong>1.</strong> 어떤 소리 속성을 사용했는가?<br><strong>2.</strong> 그 속성을 어떤 시각 파라미터에 매핑했는가?<br><strong>3.</strong> Math/Filter로 값을 어떻게 다듬었는가?<br><strong>4.</strong> 결과물이 음악과 어울리는가?" data-fa="<strong>1.</strong> از چه ویژگی صوتی استفاده شد؟<br><strong>2.</strong> آن ویژگی به چه پارامتر بصری نگاشت شد؟<br><strong>3.</strong> مقادیر با Math/Filter چگونه تنظیم شدند؟<br><strong>4.</strong> آیا نتیجه با موسیقی هماهنگ است؟" data-ru="<strong>1.</strong> Какое свойство звука использовано?<br><strong>2.</strong> К какому визуальному параметру привязано?<br><strong>3.</strong> Как настроены значения через Math/Filter?<br><strong>4.</strong> Гармонирует ли результат с музыкой?"><strong>1.</strong> 어떤 소리 속성을 사용했는가?<br><strong>2.</strong> 그 속성을 어떤 시각 파라미터에 매핑했는가?<br><strong>3.</strong> Math/Filter로 값을 어떻게 다듬었는가?<br><strong>4.</strong> 결과물이 음악과 어울리는가?</span>
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- ╔══════════════════════════════════════╗ -->
+      <!-- ║  PART 4 — 팁과 정리                    ║ -->
+      <!-- ╚══════════════════════════════════════╝ -->
+      <section id="part-tips">
+        <div class="part-header">
+          <div class="part-number" style="color: var(--color-text-dim);">
+            <span class="dot" style="background: var(--color-text-dim);"></span>
+            Part 04
+          </div>
+          <h2 class="part-title" data-ko="오디오 리액티브 작업을 위한 팁" data-fa="نکات کار واکنش صوتی" data-ru="Советы по аудиореактивной работе">오디오 리액티브 작업을 위한 팁</h2>
+          <p class="part-subtitle" data-ko="오디오 리액티브 비주얼을 더 완성도 있게 만들기 위한 실전 노하우." data-fa="نکات عملی برای ساخت ویژوال واکنش‌پذیر به صدا با کیفیت بالاتر." data-ru="Практические советы для более качественного аудиореактивного визуала.">오디오 리액티브 비주얼을 더 완성도 있게 만들기 위한 실전 노하우.</p>
+        </div>
+
+        <!-- 4-1. 값 다듬기가 전부다 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="4-1. 값 다듬기가 전부다" data-fa="۴-۱. تنظیم مقادیر همه چیز است" data-ru="4-1. Настройка значений — это всё">4-1. 값 다듬기가 전부다</h3>
+
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-muted);">
+            <span data-ko="오디오 리액티브에서 가장 중요한 것은 '어떤 노드를 쓰느냐'가 아니라, <strong>추출한 값을 얼마나 잘 다듬느냐</strong>이다. 아래는 흔한 문제와 해결 방법이다." data-fa="مهم‌ترین چیز در واکنش صوتی «استفاده از کدام نود» نیست، بلکه <strong>تنظیم درست مقادیر استخراج‌شده</strong> است. مشکلات رایج و راه‌حل‌های آن‌ها در زیر آمده." data-ru="В аудиореактиве важнее всего не «какой нод использовать», а <strong>насколько хорошо настроены извлечённые значения</strong>. Ниже — частые проблемы и решения.">오디오 리액티브에서 가장 중요한 것은 '어떤 노드를 쓰느냐'가 아니라, <strong>추출한 값을 얼마나 잘 다듬느냐</strong>이다. 아래는 흔한 문제와 해결 방법이다.</span>
+          </p>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-orange);"></span>
+              <span data-ko="트러블슈팅" data-fa="عیب‌یابی" data-ru="Устранение неполадок">트러블슈팅</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="문제" data-fa="مشکل" data-ru="Проблема">문제</th>
+                    <th data-ko="원인" data-fa="علت" data-ru="Причина">원인</th>
+                    <th data-ko="해결" data-fa="راه‌حل" data-ru="Решение">해결</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-ko="반응이 너무 약하다" data-fa="واکنش خیلی ضعیف است" data-ru="Реакция слишком слабая">반응이 너무 약하다</td>
+                    <td data-ko="값 범위가 너무 좁다" data-fa="محدوده مقادیر خیلی کم است" data-ru="Диапазон значений слишком узкий">값 범위가 너무 좁다</td>
+                    <td data-ko="Math CHOP의 From Range를 줄인다 (예: 0~0.1)" data-fa="From Range در Math CHOP را کم کنید (مثلاً 0~0.1)" data-ru="Уменьшите From Range в Math CHOP (напр. 0~0.1)">Math CHOP의 From Range를 줄인다 (예: 0~0.1)</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="반응이 너무 과하다" data-fa="واکنش بیش از حد است" data-ru="Реакция слишком сильная">반응이 너무 과하다</td>
+                    <td data-ko="값 범위가 너무 넓다" data-fa="محدوده مقادیر خیلی زیاد است" data-ru="Диапазон значений слишком широкий">값 범위가 너무 넓다</td>
+                    <td data-ko="Math CHOP의 To Range를 좁히거나 Clamp 활성화" data-fa="To Range در Math CHOP را محدود کرده یا Clamp فعال کنید" data-ru="Сузьте To Range в Math CHOP или активируйте Clamp">Math CHOP의 To Range를 좁히거나 Clamp 활성화</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="움직임이 떨린다" data-fa="حرکت می‌لرزد" data-ru="Движение дрожит">움직임이 떨린다</td>
+                    <td data-ko="오디오 신호의 노이즈" data-fa="نویز سیگنال صوتی" data-ru="Шум аудиосигнала">오디오 신호의 노이즈</td>
+                    <td data-ko="Filter CHOP의 Width를 높인다 (0.3~0.5)" data-fa="Width در Filter CHOP را افزایش دهید (0.3~0.5)" data-ru="Увеличьте Width в Filter CHOP (0.3~0.5)">Filter CHOP의 Width를 높인다 (0.3~0.5)</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="반응이 너무 느리다" data-fa="واکنش خیلی کند است" data-ru="Реакция слишком медленная">반응이 너무 느리다</td>
+                    <td data-ko="필터가 너무 강하다" data-fa="فیلتر خیلی قوی است" data-ru="Фильтр слишком сильный">필터가 너무 강하다</td>
+                    <td data-ko="Filter Width를 낮춘다 (0.05~0.1)" data-fa="Filter Width را کم کنید (0.05~0.1)" data-ru="Уменьшите Filter Width (0.05~0.1)">Filter Width를 낮춘다 (0.05~0.1)</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="조용할 때도 반응한다" data-fa="در سکوت هم واکنش نشان می‌دهد" data-ru="Реагирует даже в тишине">조용할 때도 반응한다</td>
+                    <td data-ko="노이즈 플로어" data-fa="کف نویز" data-ru="Шумовой порог">노이즈 플로어</td>
+                    <td data-ko="Math CHOP의 From Range 하한을 올린다 (예: 0.02~)" data-fa="حد پایین From Range در Math CHOP را بالا ببرید (مثلاً 0.02~)" data-ru="Поднимите нижнюю границу From Range в Math CHOP (напр. 0.02~)">Math CHOP의 From Range 하한을 올린다 (예: 0.02~)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-2. 소리마다 다른 필터 속도 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="4-2. 소리마다 다른 필터 속도" data-fa="۴-۲. سرعت فیلتر متفاوت برای هر صدا" data-ru="4-2. Разная скорость фильтра для разных звуков">4-2. 소리마다 다른 필터 속도</h3>
+
+          <div class="callout callout-concept mb-6">
+            <div class="callout-label" data-ko="핵심 원칙" data-fa="اصل کلیدی" data-ru="Ключевой принцип">핵심 원칙</div>
+            <span data-ko="모든 오디오 속성에 같은 Filter Width를 쓰면 안 된다. 소리의 성격에 맞는 필터 속도를 각각 다르게 설정해야 자연스러운 반응이 나온다." data-fa="نباید برای همه ویژگی‌های صوتی Filter Width یکسان استفاده کرد. سرعت فیلتر مناسب با ماهیت هر صدا باید متفاوت تنظیم شود تا واکنش طبیعی ایجاد شود." data-ru="Нельзя использовать одинаковый Filter Width для всех свойств звука. Для каждого нужна своя скорость фильтра, соответствующая характеру звука, чтобы реакция выглядела естественно.">모든 오디오 속성에 같은 Filter Width를 쓰면 안 된다. 소리의 성격에 맞는 필터 속도를 각각 다르게 설정해야 자연스러운 반응이 나온다.</span>
+          </div>
+
+          <div class="module-card mb-6">
+            <div class="module-card-header">
+              <span class="module-dot" style="background: var(--color-accent-blue);"></span>
+              <span data-ko="권장 Filter Width" data-fa="Filter Width توصیه‌شده" data-ru="Рекомендуемый Filter Width">권장 Filter Width</span>
+            </div>
+            <div class="module-card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-ko="소리 속성" data-fa="ویژگی صدا" data-ru="Свойство звука">소리 속성</th>
+                    <th data-ko="Filter Width" data-fa="Filter Width" data-ru="Filter Width">Filter Width</th>
+                    <th data-ko="이유" data-fa="دلیل" data-ru="Причина">이유</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-ko="비트 / 킥 드럼" data-fa="بیت / کیک درام" data-ru="Бит / бочка">비트 / 킥 드럼</td>
+                    <td>0.02 ~ 0.08</td>
+                    <td data-ko="빠르게 반응해야 펀치감이 있다" data-fa="واکنش سریع برای حس ضربه‌ای لازم است" data-ru="Нужна быстрая реакция для ощущения удара">빠르게 반응해야 펀치감이 있다</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="볼륨 / 전체 에너지" data-fa="حجم / انرژی کلی" data-ru="Громкость / общая энергия">볼륨 / 전체 에너지</td>
+                    <td>0.1 ~ 0.3</td>
+                    <td data-ko="중간 정도의 부드러움이 자연스럽다" data-fa="نرمی متوسط طبیعی‌تر است" data-ru="Средняя плавность выглядит естественно">중간 정도의 부드러움이 자연스럽다</td>
+                  </tr>
+                  <tr>
+                    <td data-ko="분위기 / 앰비언스" data-fa="جو / محیط" data-ru="Атмосфера / эмбиент">분위기 / 앰비언스</td>
+                    <td>0.5 ~ 1.0</td>
+                    <td data-ko="느리게 변해야 배경 같은 느낌이 난다" data-fa="تغییر آهسته حس پس‌زمینه ایجاد می‌کند" data-ru="Медленные изменения создают ощущение фона">느리게 변해야 배경 같은 느낌이 난다</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-3. 음악 선택도 작업의 일부 -->
+        <div class="mb-10">
+          <h3 class="text-lg font-semibold mb-4" data-ko="4-3. 음악 선택도 작업의 일부" data-fa="۴-۳. انتخاب موسیقی بخشی از کار است" data-ru="4-3. Выбор музыки — часть работы">4-3. 음악 선택도 작업의 일부</h3>
+
+          <div class="callout callout-warning mb-6">
+            <div class="callout-label" data-ko="중요" data-fa="مهم" data-ru="Важно">중요</div>
+            <span data-ko="오디오 리액티브 비주얼의 품질은 <strong>음악 선택</strong>에 크게 좌우된다. 리듬이 명확하고, 저음과 고음이 잘 분리된 음악이 오디오 리액티브에 적합하다. 주파수 대역이 뚜렷하지 않은 앰비언트/드론 음악은 볼륨 기반 반응에 더 적합하다." data-fa="کیفیت ویژوال واکنش صوتی تا حد زیادی به <strong>انتخاب موسیقی</strong> بستگی دارد. موسیقی با ریتم واضح و جداسازی خوب بم/زیر برای واکنش صوتی مناسب‌تر است. موسیقی محیطی/درون بدون باندهای فرکانسی مشخص برای واکنش مبتنی بر حجم مناسب‌تر است." data-ru="Качество аудиореактивного визуала во многом зависит от <strong>выбора музыки</strong>. Музыка с чётким ритмом и хорошим разделением баса и высоких лучше подходит для аудиореактива. Эмбиент/дроун без выраженных частотных полос больше подходит для реакции на громкость.">오디오 리액티브 비주얼의 품질은 <strong>음악 선택</strong>에 크게 좌우된다. 리듬이 명확하고, 저음과 고음이 잘 분리된 음악이 오디오 리액티브에 적합하다. 주파수 대역이 뚜렷하지 않은 앰비언트/드론 음악은 볼륨 기반 반응에 더 적합하다.</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Accent line footer -->
+      <div class="accent-line mt-16 mb-8" style="background: linear-gradient(90deg, transparent, var(--color-accent-green), var(--color-accent-blue), var(--color-accent-purple), transparent);"></div>
+
+      <!-- Footer -->
+      <footer class="text-center text-xs" style="color: var(--color-text-dim);">
+        <p><span data-ko="디지털미디어비주얼 1 — TOP-CHOP 복습 & 오디오 리액티브 비주얼" data-fa="رسانه دیجیتال بصری ۱ — مرور TOP-CHOP و ویژوال واکنش‌پذیر به صدا" data-ru="Цифровые медиавизуалы 1 — Повторение TOP-CHOP и аудиореактивный визуал">디지털미디어비주얼 1 — TOP-CHOP 복습 & 오디오 리액티브 비주얼</span></p>
+        <button id="export-pdf" class="mt-3 px-4 py-2 rounded-lg no-print" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-border-light)'" onmouseout="this.style.borderColor='var(--color-border)'">
+          <span data-ko="PDF로 내보내기" data-fa="خروجی PDF" data-ru="Экспорт в PDF">PDF로 내보내기</span>
+        </button>
+      </footer>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+
+      // Language switcher
+      function initLangSwitcher() {
+        const buttons = document.querySelectorAll('.lang-btn');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.querySelectorAll('[data-ko]').forEach(el => {
+              const text = el.getAttribute('data-' + lang);
+              if (text) {
+                if (el.children.length === 0) {
+                  el.textContent = text;
+                } else {
+                  el.innerHTML = text;
+                }
+              }
+            });
+
+            // RTL for Persian
+            document.body.dir = (lang === 'fa') ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+          });
+        });
+      }
+      initLangSwitcher();
+
+      // Section nav active state
+      const sections = document.querySelectorAll("section[id]");
+      const navLinks = document.querySelectorAll(".section-nav a");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              navLinks.forEach((link) => link.classList.remove("active"));
+              const activeLink = document.querySelector(
+                `.section-nav a[href="#${entry.target.id}"]`
+              );
+              if (activeLink) activeLink.classList.add("active");
+            }
+          });
+        },
+        { rootMargin: "-20% 0px -60% 0px" }
+      );
+
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+</html>

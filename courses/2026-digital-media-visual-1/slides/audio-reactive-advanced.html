@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOP-CHOP 복습 & 오디오 리액티브 비주얼 — 디지털미디어비주얼 1</title>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&f[]=satoshi@400;500;700&f[]=jet-brains-mono@400;500&display=swap">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — SIGNAL PANEL THEME
+           Inspired by hardware signal conditioning panels
+           =========================================== */
+        :root {
+            --bg-primary: #2c2c2c;
+            --bg-secondary: #363636;
+            --bg-panel: #333333;
+            --bg-inset: #292929;
+            --border-panel: #4a4a4a;
+            --border-screw: #555555;
+            --text-primary: #e8e0d4;
+            --text-secondary: #9a9285;
+            --text-dim: #6b6560;
+            --accent-orange: #d4843e;
+            --accent-blue: #4a9ece;
+            --accent-green: #4caf6e;
+            --accent-purple: #8b6cc4;
+            --accent-cyan: #5bbfbf;
+            --cream: #e8e0d4;
+            --cream-dim: rgba(232, 224, 212, 0.08);
+            --cream-border: rgba(232, 224, 212, 0.15);
+
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 5vw, 4rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            --body-size: clamp(0.8rem, 1.4vw, 1.1rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --label-size: clamp(0.6rem, 0.9vw, 0.75rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.25rem, 1vw, 0.75rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE / VIEWPORT FITTING
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            padding-bottom: clamp(2rem, 4vw, 3.5rem);
+        }
+
+        /* ===========================================
+           PANEL FRAME — hardware panel border with screws
+           =========================================== */
+        .panel-frame {
+            position: absolute;
+            inset: clamp(8px, 1.2vw, 16px);
+            border: 1px solid var(--border-panel);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Corner screws */
+        .panel-frame::before,
+        .panel-frame::after {
+            content: '';
+            position: absolute;
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-screw);
+        }
+        .panel-frame::before { top: clamp(6px, 1vw, 12px); left: clamp(6px, 1vw, 12px); }
+        .panel-frame::after { top: clamp(6px, 1vw, 12px); right: clamp(6px, 1vw, 12px); }
+
+        .screw-bl, .screw-br {
+            position: absolute;
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-screw);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .screw-bl { bottom: clamp(14px, 2.2vw, 28px); left: clamp(14px, 2.2vw, 28px); }
+        .screw-br { bottom: clamp(14px, 2.2vw, 28px); right: clamp(14px, 2.2vw, 28px); }
+
+        /* ===========================================
+           GRID BACKGROUND PATTERN
+           =========================================== */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(232, 224, 212, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(232, 224, 212, 0.02) 1px, transparent 1px);
+            background-size: clamp(30px, 4vw, 50px) clamp(30px, 4vw, 50px);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--cream);
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            color: var(--cream);
+            margin-bottom: var(--content-gap);
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            color: var(--cream);
+            margin-bottom: var(--element-gap);
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .label {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+        }
+
+        .accent-orange { color: var(--accent-orange); }
+        .accent-blue { color: var(--accent-blue); }
+        .accent-green { color: var(--accent-green); }
+        .accent-purple { color: var(--accent-purple); }
+        .accent-cyan { color: var(--accent-cyan); }
+
+        /* ===========================================
+           CODE BLOCKS
+           =========================================== */
+        code, .code-inline {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+            background: var(--bg-inset);
+            padding: 0.15em 0.4em;
+            border-radius: 3px;
+            color: var(--accent-cyan);
+        }
+
+        .code-block {
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1vw, 0.85rem);
+            line-height: 1.6;
+            color: var(--text-primary);
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        .code-block .comment { color: var(--text-dim); }
+        .code-block .keyword { color: var(--accent-orange); }
+        .code-block .string { color: var(--accent-green); }
+        .code-block .op-name { color: var(--accent-cyan); }
+
+        /* ===========================================
+           TABLES
+           =========================================== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--body-size);
+        }
+
+        .data-table th {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-align: left;
+            padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid var(--cream-border);
+        }
+
+        .data-table td {
+            padding: clamp(0.35rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid rgba(232, 224, 212, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .data-table td:first-child {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        /* ===========================================
+           CARDS / PANELS
+           =========================================== */
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+        }
+
+        .info-card h3 {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            margin-bottom: clamp(0.3rem, 0.5vw, 0.5rem);
+        }
+
+        .info-card p, .info-card li {
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+        }
+
+        /* ===========================================
+           FLOW DIAGRAMS (text-based)
+           =========================================== */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.3rem, 0.8vw, 0.75rem);
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem) 0;
+        }
+
+        .flow-node {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 4px;
+            padding: clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.5rem, 1vw, 0.8rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 1vw, 0.8rem);
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .flow-node.highlight {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .flow-node.green {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .flow-node.blue {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .flow-arrow {
+            color: var(--text-dim);
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
+        }
+
+        /* ===========================================
+           GRID LAYOUTS
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.75rem, 2vw, 2rem);
+            align-items: start;
+            align-content: start;
+            width: 100%;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.5rem, 1.5vw, 1.5rem);
+            align-items: start;
+            align-content: start;
+            width: 100%;
+        }
+
+        .four-col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        @media (max-width: 768px) {
+            .two-col, .three-col, .four-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===========================================
+           DECORATIVE ELEMENTS
+           =========================================== */
+        .knob {
+            width: clamp(24px, 3vw, 40px);
+            height: clamp(24px, 3vw, 40px);
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, var(--bg-secondary) 0%, var(--bg-inset) 100%);
+            border: 2px solid var(--cream-border);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .knob::after {
+            content: '';
+            width: 2px;
+            height: 40%;
+            background: var(--cream);
+            border-radius: 1px;
+            transform: rotate(-45deg);
+        }
+
+        .led {
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .led-orange { background: var(--accent-orange); box-shadow: 0 0 6px var(--accent-orange); }
+        .led-green { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+        .led-blue { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
+
+        .cable-line {
+            height: 3px;
+            border-radius: 2px;
+            flex: 1;
+            min-width: 30px;
+        }
+
+        .cable-orange { background: linear-gradient(90deg, var(--accent-orange), rgba(212, 132, 62, 0.3)); }
+        .cable-blue { background: linear-gradient(90deg, var(--accent-blue), rgba(74, 158, 206, 0.3)); }
+        .cable-green { background: linear-gradient(90deg, var(--accent-green), rgba(76, 175, 110, 0.3)); }
+
+        /* Dot matrix pattern */
+        .dot-matrix {
+            display: grid;
+            gap: clamp(3px, 0.4vw, 5px);
+            opacity: 0.15;
+        }
+
+        .dot-matrix .dot {
+            width: clamp(3px, 0.4vw, 5px);
+            height: clamp(3px, 0.4vw, 5px);
+            border-radius: 50%;
+            background: var(--cream);
+        }
+
+        /* ===========================================
+           SPECIAL SLIDE TYPES
+           =========================================== */
+
+        /* Title slide */
+        .title-slide .slide-content {
+            justify-content: flex-end;
+            padding-bottom: clamp(3rem, 8vw, 6rem);
+        }
+
+        .title-slide .course-label {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .title-slide h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .title-slide .subtitle {
+            font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* Section divider */
+        .section-slide {
+            background: var(--bg-inset);
+        }
+
+        .section-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .section-slide .part-number {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--accent-orange);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .section-slide h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            text-align: center;
+        }
+
+        .section-slide .section-desc {
+            max-width: 500px;
+            text-align: center;
+            margin-top: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        /* Practice slide */
+        .practice-slide {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .practice-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-green);
+            margin-bottom: var(--content-gap);
+        }
+
+        /* Quote / highlight */
+        .highlight-box {
+            background: rgba(212, 132, 62, 0.08);
+            border-left: 3px solid var(--accent-orange);
+            padding: clamp(0.6rem, 1.2vw, 1rem) clamp(0.8rem, 1.5vw, 1.25rem);
+            border-radius: 0 6px 6px 0;
+            margin: var(--element-gap) 0;
+        }
+
+        .highlight-box p {
+            color: var(--text-primary);
+            font-size: clamp(0.75rem, 1.2vw, 1rem);
+        }
+
+        /* ===========================================
+           VIDEO SLIDE
+           =========================================== */
+        .video-slide .vid-container {
+            width: min(90%, 900px);
+            aspect-ratio: 16/9;
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+        .video-slide .vid-container iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .video-slide .vid-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: opacity 0.3s;
+            z-index: 2;
+        }
+        .video-slide .vid-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .video-slide .play-btn {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--accent-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .video-slide .play-btn::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 0 12px 20px;
+            border-color: transparent transparent transparent var(--accent-orange);
+            margin-left: 4px;
+        }
+        .video-slide .vid-overlay:hover .play-btn {
+            background: var(--accent-orange);
+            transform: scale(1.1);
+        }
+        .video-slide .vid-overlay:hover .play-btn::after {
+            border-color: transparent transparent transparent var(--bg-primary);
+        }
+        .video-slide .vid-play-label {
+            margin-top: 12px;
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-orange);
+        }
+        .video-slide .vid-meta {
+            text-align: center;
+            margin-top: var(--content-gap);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .video-slide .vid-meta p {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+        }
+        .video-slide .vid-meta a {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            color: var(--accent-blue);
+            text-decoration: none;
+            border: 1px solid rgba(74, 158, 206, 0.3);
+            padding: 0.2em 0.6em;
+            border-radius: 3px;
+            margin-top: 0.5em;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .video-slide .vid-meta a:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .reveal:nth-child(6) { transition-delay: 0.40s; }
+
+        @keyframes pulse-led {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .led-pulse { animation: pulse-led 2s ease-in-out infinite; }
+
+        @keyframes signal-flow {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent-orange);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        /* ===========================================
+           SLIDE NUMBER
+           =========================================== */
+        .slide-number {
+            position: fixed;
+            bottom: clamp(12px, 2vw, 20px);
+            right: clamp(16px, 2.5vw, 28px);
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            color: var(--text-dim);
+            z-index: 100;
+        }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(12px, 2vw, 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.7vw, 0.65rem);
+            color: var(--text-dim);
+            opacity: 0.5;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        /* ===========================================
+           SPEAKER NOTES
+           =========================================== */
+        .speaker-note {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: clamp(0.5rem, 1vw, 1rem) var(--slide-padding);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            z-index: 50;
+            max-height: 25vh;
+            overflow-y: auto;
+        }
+
+        body.show-notes .speaker-note { display: block; }
+
+        /* ===========================================
+           OVERVIEW MODE
+           =========================================== */
+        .overview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .overview-overlay.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; align-content: start; }
+
+        .overview-thumb {
+            aspect-ratio: 16/9;
+            border: 1px solid var(--cream-border);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: var(--bg-secondary);
+            transition: border-color 0.2s;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .overview-thumb:hover { border-color: var(--accent-orange); }
+        .overview-thumb.current { border-color: var(--accent-orange); background: rgba(212, 132, 62, 0.1); }
+
+        /* ===========================================
+           KEYWORD BADGES
+           =========================================== */
+        .keyword-badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.9vw, 0.75rem);
+            padding: clamp(0.2rem, 0.4vw, 0.35rem) clamp(0.5rem, 0.8vw, 0.7rem);
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            color: var(--text-primary);
+            margin: clamp(0.15rem, 0.3vw, 0.25rem);
+        }
+
+        .keyword-badge.orange { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .keyword-badge.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .keyword-badge.green { border-color: var(--accent-green); color: var(--accent-green); }
+        .keyword-badge.purple { border-color: var(--accent-purple); color: var(--accent-purple); }
+        .keyword-badge.cyan { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+        /* ===========================================
+           WARNING BOX
+           =========================================== */
+        .warning-box {
+            background: rgba(212, 132, 62, 0.06);
+            border: 1px solid rgba(212, 132, 62, 0.25);
+            border-radius: 6px;
+            padding: clamp(0.5rem, 1vw, 0.8rem) clamp(0.7rem, 1.2vw, 1rem);
+        }
+
+        .warning-box p {
+            font-size: var(--small-size);
+            color: var(--accent-orange);
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1.1rem, 3vw, 1.75rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .keyboard-hint, .panel-frame, .screw-bl, .screw-br { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .two-col, .three-col, .four-col { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           UTILITY
+           =========================================== */
+        .gap-sm { gap: var(--element-gap); }
+        .gap-md { gap: var(--content-gap); }
+        .mt-sm { margin-top: var(--element-gap); }
+        .mt-md { margin-top: var(--content-gap); }
+        .mb-sm { margin-bottom: var(--element-gap); }
+        .text-center { text-align: center; }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-row { display: flex; align-items: center; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-start { align-items: start; }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Slide number -->
+    <div class="slide-number" id="slideNumber">01 / 51</div>
+
+    <!-- Keyboard hint -->
+    <div class="keyboard-hint" id="keyboardHint">&larr; &rarr; navigate &middot; N notes &middot; O overview &middot; F fullscreen</div>
+
+    <!-- Overview overlay -->
+    <div class="overview-overlay" id="overviewOverlay"></div>
+
+
+    <!-- ============================================
+         SLIDE 01: TITLE
+         ============================================ -->
+    <section class="slide title-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="course-label reveal">Digital Media Visual 1 &mdash; Week 06</div>
+            <h1 class="reveal">TOP-CHOP 복습 &amp;<br>오디오 리액티브 비주얼</h1>
+            <p class="subtitle reveal">TouchDesigner TOP-CHOP 전체 복습과 오디오 리액티브 심화</p>
+            <div style="display:flex;align-items:center;gap:clamp(0.5rem,1vw,1rem);margin-top:clamp(1rem,2vw,2rem);" class="reveal">
+                <span class="led led-orange led-pulse"></span>
+                <span class="led led-green led-pulse" style="animation-delay:0.5s;"></span>
+                <span class="led led-blue led-pulse" style="animation-delay:1s;"></span>
+                <span class="cable-line cable-orange" style="max-width:80px;"></span>
+                <span class="cable-line cable-blue" style="max-width:60px;"></span>
+            </div>
+            <div class="reveal" style="margin-top:clamp(0.5rem,1vw,1rem);font-size:var(--small-size);color:var(--text-dim);">한예종 디지털미디어비주얼 1</div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 02: 수업 개요
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Overview</div>
+            <h2 class="reveal">수업 개요</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>Part</th><th>내용</th><th>시간</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-cyan">Part 1</td><td>TOP-CHOP 빠른 복습</td><td>30분</td></tr>
+                    <tr><td class="accent-cyan">Part 2</td><td>소리를 이해하기 &mdash; 오디오 리액티브</td><td>40분</td></tr>
+                    <tr><td class="accent-cyan">Part 3</td><td>오디오 리액티브 비주얼 실습</td><td>50분</td></tr>
+                    <tr><td class="accent-cyan">Part 4</td><td>팁과 정리</td><td>20분</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 03: 학습 목표
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Objectives</div>
+            <h2 class="reveal">학습 목표</h2>
+            <div class="flex-col gap-sm">
+                <div class="info-card reveal">
+                    <p><span class="led led-orange" style="margin-right:0.5em;"></span> TOP과 CHOP의 핵심 개념과 주요 Operator를 <strong>빠르게 복습</strong>한다</p>
+                </div>
+                <div class="info-card reveal">
+                    <p><span class="led led-orange" style="margin-right:0.5em;"></span> 소리의 3가지 속성(볼륨, 주파수, 비트)을 이해하고 <strong>분석하는 방법</strong>을 배운다</p>
+                </div>
+                <div class="info-card reveal">
+                    <p><span class="led led-orange" style="margin-right:0.5em;"></span> <strong>Audio Device In, Analyze, Audio Spectrum CHOP</strong>을 활용할 수 있다</p>
+                </div>
+                <div class="info-card reveal">
+                    <p><span class="led led-orange" style="margin-right:0.5em;"></span> 주파수 대역을 분리하여 <strong>각각 다른 시각 파라미터에 매핑</strong>할 수 있다</p>
+                </div>
+                <div class="info-card reveal">
+                    <p><span class="led led-orange" style="margin-right:0.5em;"></span> Feedback, Displace, Timemachine 등을 조합하여 <strong>나만의 오디오 리액티브 비주얼</strong>을 만든다</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 04: SECTION DIVIDER — Part 1
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 1</div>
+            <h2 class="reveal">TOP-CHOP<br><span class="accent-orange">빠른 복습</span></h2>
+            <p class="section-desc reveal">지금까지 배운 TOP과 CHOP의 핵심을 정리한다</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 05: TOP 핵심 복습
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">TOP Review</div>
+            <h2 class="reveal">TOP 핵심 복습</h2>
+            <div class="highlight-box reveal">
+                <p><strong>TOP = Texture Operator</strong> &mdash; 이미지(텍스처)를 생성하고 처리하는 노드</p>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">입력</span></h3>
+                    <p>카메라, 영상, 이미지, 노이즈 등 시각 소스를 만든다</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">처리</span></h3>
+                    <p>합성, 변형, 색 보정, 왜곡 등 이미지를 가공한다</p>
+                </div>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">소스 TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">처리 TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">처리 TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">출력 / Null</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 06: 지금까지 배운 TOP 정리 (1)
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">TOP Recap &mdash; 1/2</div>
+            <h2 class="reveal">지금까지 배운 TOP 정리</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>분류</th><th>Operator</th><th>역할</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">소스</td><td>Movie File In</td><td>영상/이미지 불러오기</td></tr>
+                    <tr><td class="accent-orange">소스</td><td>Video Device In</td><td>웹캠 실시간 입력</td></tr>
+                    <tr><td class="accent-orange">소스</td><td>Noise</td><td>절차적 노이즈 생성</td></tr>
+                    <tr><td class="accent-blue">처리</td><td>Composite</td><td>레이어 합성 (Add, Over, Multiply...)</td></tr>
+                    <tr><td class="accent-blue">처리</td><td>Transform</td><td>이동, 회전, 스케일</td></tr>
+                    <tr><td class="accent-blue">처리</td><td>Level</td><td>밝기, 대비, 투명도 조절</td></tr>
+                    <tr><td class="accent-blue">처리</td><td>HSV Adjust</td><td>색조, 채도, 명도 변경</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 07: 지금까지 배운 TOP 정리 (2)
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">TOP Recap &mdash; 2/2</div>
+            <h2 class="reveal">지금까지 배운 TOP 정리 (계속)</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>분류</th><th>Operator</th><th>역할</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-purple">특수</td><td>Feedback</td><td>이전 프레임 결과를 다시 입력 (잔상/누적)</td></tr>
+                    <tr><td class="accent-purple">특수</td><td>Displace</td><td>밝기값으로 픽셀 위치 왜곡</td></tr>
+                    <tr><td class="accent-purple">특수</td><td>Texture 3D</td><td>2D 텍스처를 3D 볼륨으로 누적</td></tr>
+                    <tr><td class="accent-purple">특수</td><td>Timemachine</td><td>시간축 탐색 (Ramp으로 시간 조작)</td></tr>
+                    <tr><td class="accent-green">제어</td><td>Switch</td><td>여러 소스 중 하나 선택</td></tr>
+                    <tr><td class="accent-green">제어</td><td>Null</td><td>참조 포인트 / 네트워크 정리</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 08: Feedback Loop 원리
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Feedback TOP</div>
+            <h2 class="reveal">Feedback Loop 원리</h2>
+            <div class="highlight-box reveal">
+                <p><strong>잔상과 누적</strong> &mdash; 이전 프레임의 결과가 다음 프레임의 입력이 된다</p>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Level</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Null</span>
+            </div>
+            <div class="warning-box reveal">
+                <p>Level TOP의 Opacity를 반드시 <strong>1보다 작게</strong> 설정 &mdash; 그렇지 않으면 화면이 하얗게 폭발한다!</p>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);">Feedback의 Target TOP을 마지막 Null로 지정하면 루프가 완성된다</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 09: Feedback + Transform
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Feedback + Transform</div>
+            <h2 class="reveal">Feedback + Transform = 무한 터널</h2>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">핵심 트릭</span></h3>
+                    <p>Feedback 루프 안에 Transform TOP을 넣고:</p>
+                    <ul style="margin-top:0.5em;padding-left:1.2em;">
+                        <li>Scale: <code>0.98</code> (조금씩 축소)</li>
+                        <li>Rotate: <code>1</code> (천천히 회전)</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">결과</span></h3>
+                    <p>이미지가 매 프레임 축소 + 회전되며 <strong>무한히 빨려들어가는 터널 효과</strong>가 만들어진다</p>
+                </div>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Transform</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Level</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Null</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 10: Displacement 원리
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Displace TOP</div>
+            <h2 class="reveal">Displacement 원리</h2>
+            <div class="highlight-box reveal">
+                <p><strong>밝기값이 픽셀을 밀어낸다</strong> &mdash; Displace Image의 밝기에 따라 원본 픽셀 위치가 이동</p>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Source (원본)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Displace TOP</span>
+                <span class="flow-arrow">&larr;</span>
+                <span class="flow-node blue">Displace Image (노이즈 등)</span>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3>Input 1</h3>
+                    <p>왜곡할 원본 이미지</p>
+                </div>
+                <div class="info-card">
+                    <h3>Input 2</h3>
+                    <p>밝기값으로 왜곡 방향/정도를 결정하는 이미지 (Noise, Ramp 등)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 11: Timemachine TOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Timemachine TOP</div>
+            <h2 class="reveal">Timemachine TOP</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Video Device In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Texture 3D</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Timemachine</span>
+                <span class="flow-arrow">&larr;</span>
+                <span class="flow-node blue">Ramp (2nd input)</span>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-purple">Texture 3D</span></h3>
+                    <p>시간순으로 프레임을 쌓아 3D 볼륨 텍스처를 만든다</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-orange">Timemachine</span></h3>
+                    <p>Ramp의 밝기값으로 "어느 시점의 프레임을 볼지" 결정 &mdash; <strong>시간 조작</strong></p>
+                </div>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--text-dim);">Ramp를 수직으로 설정하면 화면 위 = 과거, 아래 = 현재</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 12: 오디오 리액티브에서 자주 쓰는 TOP 조합
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Useful Combos</div>
+            <h2 class="reveal">오디오 리액티브에서 자주 쓰는 TOP 조합</h2>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">Feedback + Level + Composite</span></h3>
+                    <p>소리에 따라 Opacity를 조절하면 잔상이 음악에 반응</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">Feedback + Displace + Noise</span></h3>
+                    <p>노이즈 강도를 볼륨에 연결하면 소리에 따라 이미지가 일렁인다</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-purple">Texture3D + Timemachine + 오디오</span></h3>
+                    <p>오디오 값으로 시간축을 탐색하면 소리에 따라 과거 프레임이 나타난다</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-green">HSV Adjust + Level</span></h3>
+                    <p>주파수에 따라 색상(Hue)을 변경, 볼륨으로 밝기 조절</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 13: CHOP 핵심 복습
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">CHOP Review</div>
+            <h2 class="reveal">CHOP 핵심 복습</h2>
+            <div class="highlight-box reveal">
+                <p><strong>CHOP = Channel Operator</strong> &mdash; 시간에 따라 변하는 숫자(채널)를 생성하고 가공하는 노드</p>
+            </div>
+            <div class="info-card reveal">
+                <h3>인터랙션의 기본 구조</h3>
+                <div class="flow-diagram" style="padding:0.5rem 0;">
+                    <span class="flow-node green">입력 (센서/오디오/마우스)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-node green">가공 (필터/매핑/분석)</span>
+                    <span class="flow-arrow">&rarr;</span>
+                    <span class="flow-node highlight">출력 (TOP 파라미터)</span>
+                </div>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);">CHOP은 <strong>숫자의 흐름</strong>이다. 소리, 마우스, LFO, 타이머 등 모든 변화하는 값을 다룬다.</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 14: 지금까지 배운 CHOP 정리
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">CHOP Recap</div>
+            <h2 class="reveal">지금까지 배운 CHOP 정리</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>분류</th><th>Operator</th><th>역할</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">입력</td><td>Audio Device In</td><td>마이크/오디오 실시간 입력</td></tr>
+                    <tr><td class="accent-orange">입력</td><td>Mouse In</td><td>마우스 위치/클릭</td></tr>
+                    <tr><td class="accent-blue">생성</td><td>LFO</td><td>반복 파형 생성 (sin, ramp...)</td></tr>
+                    <tr><td class="accent-blue">생성</td><td>Noise</td><td>부드러운 랜덤 값</td></tr>
+                    <tr><td class="accent-green">분석</td><td>Analyze</td><td>RMS, Max, Average 등 통계 추출</td></tr>
+                    <tr><td class="accent-green">분석</td><td>Audio Spectrum</td><td>FFT 주파수 분석</td></tr>
+                    <tr><td class="accent-purple">가공</td><td>Math</td><td>범위 변환, 사칙연산</td></tr>
+                    <tr><td class="accent-purple">가공</td><td>Filter</td><td>값 부드럽게 (떨림 제거)</td></tr>
+                    <tr><td class="accent-purple">가공</td><td>Select</td><td>채널/범위 선택</td></tr>
+                    <tr><td class="accent-purple">가공</td><td>Null</td><td>참조 포인트</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 15: Reference 방식 복습
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">CHOP Reference</div>
+            <h2 class="reveal">Reference 방식 복습</h2>
+            <div class="three-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">1. Export</span></h3>
+                    <p>CHOP에서 우클릭 &rarr; Export &rarr; 파라미터 선택</p>
+                    <p style="margin-top:0.3em;font-size:var(--small-size);color:var(--text-dim);">초록색 = Export 활성</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">2. Expression</span></h3>
+                    <p>파라미터에 직접 입력:</p>
+                    <div class="code-block" style="margin-top:0.3em;"><span style="display:block;"><span class="op-name">op</span>(<span class="string">'null1'</span>)[<span class="string">'chan1'</span>]</span></div>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-green">3. CHOP Reference</span></h3>
+                    <p>파라미터 우클릭 &rarr; Reference Mode</p>
+                    <p style="margin-top:0.3em;font-size:var(--small-size);color:var(--text-dim);">드래그앤드롭으로 빠르게 연결</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 16: SECTION DIVIDER — Part 2
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 2</div>
+            <h2 class="reveal">오디오 리액티브<br><span class="accent-orange">소리를 이해하기</span></h2>
+            <p class="section-desc reveal">소리를 숫자로 바꾸고, 숫자를 시각으로 연결한다</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 17: 오디오 리액티브란
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Audio Reactive</div>
+            <h2 class="reveal">오디오 리액티브란</h2>
+            <div class="highlight-box reveal">
+                <p><strong>소리 &rarr; 숫자 &rarr; 시각 파라미터</strong></p>
+            </div>
+            <table class="data-table reveal">
+                <thead><tr><th>소리 속성</th><th>의미</th><th>비주얼 매핑 예</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">볼륨 (Amplitude)</td><td>소리의 크기/세기</td><td>밝기, 크기, 투명도</td></tr>
+                    <tr><td class="accent-blue">주파수 (Frequency)</td><td>소리의 높낮이</td><td>색상, 노이즈 속도, 왜곡</td></tr>
+                    <tr><td class="accent-green">비트 (Beat)</td><td>리듬의 타격점</td><td>색 전환, 이미지 전환, 플래시</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 18: 레퍼런스 아티스트 소개
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Reference Artists</div>
+            <h2 class="reveal">레퍼런스 아티스트</h2>
+            <p class="reveal">오디오 리액티브 비주얼의 다양한 접근 방식을 탐구하는 아티스트들</p>
+            <div class="three-col reveal" style="margin-top:var(--element-gap);">
+                <div class="info-card">
+                    <h3>Ryoji Ikeda</h3>
+                    <p>데이터 &times; 사운드의 극도로 정밀한 흑백 매핑</p>
+                </div>
+                <div class="info-card">
+                    <h3>NONOTAK</h3>
+                    <p>기하학적 빛 패턴과 전자음악의 몰입형 설치</p>
+                </div>
+                <div class="info-card">
+                    <h3>Daito Manabe</h3>
+                    <p>기술과 신체의 경계를 탐구하는 퍼포먼스</p>
+                </div>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3>Playmodes Studio</h3>
+                    <p>빛, 레이저, 사운드, 프로젝션의 결합</p>
+                </div>
+                <div class="info-card" style="opacity:0.5;">
+                    <p style="font-size:var(--small-size);">다음 슬라이드에서 각 아티스트의 영상을 살펴봅니다</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 19: Ryoji Ikeda — test pattern
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &mdash; Ryoji Ikeda</div>
+            <h2 class="reveal" style="text-align:center;">Ryoji Ikeda &mdash; test pattern</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);text-align:center;">데이터를 소리와 흑백 픽셀로 직접 변환하는 극한의 미니멀리즘 (2008&ndash;)</p>
+            <div class="two-col reveal" style="max-width:800px;">
+                <div class="info-card" style="text-align:center;">
+                    <h3 style="color:var(--accent-cyan);">test pattern [100m version]</h3>
+                    <p style="margin-top:0.5em;">100미터 스크린에 투사되는 바코드 패턴. 데이터가 실시간으로 흑백 패턴과 사운드로 변환된다.</p>
+                    <div style="margin-top:0.8em;">
+                        <a href="https://vimeo.com/channels/702955/73812494" target="_blank" style="font-family:var(--font-mono);font-size:var(--label-size);color:var(--accent-blue);text-decoration:none;border:1px solid rgba(74,158,206,0.3);padding:0.3em 0.8em;border-radius:3px;transition:all 0.2s;">Watch on Vimeo &rarr;</a>
+                    </div>
+                </div>
+                <div class="info-card" style="text-align:center;">
+                    <h3 style="color:var(--accent-cyan);">test pattern [Times Square]</h3>
+                    <p style="margin-top:0.5em;">뉴욕 타임스퀘어 전광판을 활용한 대규모 공공 오디오비주얼 설치.</p>
+                    <div style="margin-top:0.8em;">
+                        <a href="https://vimeo.com/channels/391334/113093736" target="_blank" style="font-family:var(--font-mono);font-size:var(--label-size);color:var(--accent-blue);text-decoration:none;border:1px solid rgba(74,158,206,0.3);padding:0.3em 0.8em;border-radius:3px;transition:all 0.2s;">Watch on Vimeo &rarr;</a>
+                    </div>
+                </div>
+            </div>
+            <div class="highlight-box reveal" style="max-width:700px;">
+                <p>소리와 이미지가 <strong>완전히 1:1로 동기화</strong>된다. 소리의 파형 자체가 곧 시각 패턴이 되는, 오디오 리액티브의 가장 극단적인 사례.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 20: VIDEO — NONOTAK "LATE SPECULATION MEDLEY"
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &mdash; NONOTAK</div>
+            <h2 class="reveal" style="text-align:center;">NONOTAK &mdash; LATE SPECULATION MEDLEY</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);text-align:center;">Noemi Schipfer &times; Takami Nakamoto (2013)</p>
+            <div class="vid-container reveal" data-vimeo="75064950">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>기하학적 빛 패턴이 전자음악에 정밀하게 동기화되는 40분 A/V 퍼포먼스.</p>
+                <a href="https://www.nonotak.com/_LATE-SPECULATION-1" target="_blank">nonotak.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 21: VIDEO — NONOTAK "DAYDREAM V.4"
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &mdash; NONOTAK</div>
+            <h2 class="reveal" style="text-align:center;">NONOTAK &mdash; DAYDREAM V.4</h2>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--accent-orange);text-align:center;">A/V Installation, GLOW NEXT (2014)</p>
+            <div class="vid-container reveal" data-vimeo="111889372">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>가상 공간과 실제 공간의 경계를 흐리며 관객을 현실에서의 짧은 이탈로 이끄는 몰입형 설치.</p>
+                <a href="https://www.nonotak.com/_daydream-v-4" target="_blank">nonotak.com</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 22: VIDEO — Daito Manabe "Face Visualizer"
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &mdash; Daito Manabe</div>
+            <h2 class="reveal" style="text-align:center;">Daito Manabe &mdash; Face Visualizer</h2>
+            <div class="vid-container reveal" data-vimeo="23381821">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>얼굴에 전기 자극을 가해 근육을 움직이는 퍼포먼스. 기술과 신체의 경계 탐구.</p>
+                <a href="https://vimeo.com/23381821" target="_blank">Vimeo</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 23: VIDEO — Playmodes Studio "Forms"
+         ============================================ -->
+    <section class="slide video-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="align-items:center;">
+            <div class="label reveal">Reference &mdash; Playmodes Studio</div>
+            <h2 class="reveal" style="text-align:center;">Playmodes Studio &mdash; Forms</h2>
+            <div class="vid-container reveal" data-vimeo="464531284">
+                <div class="vid-overlay" onclick="loadVideo(this)">
+                    <div class="play-btn"></div>
+                    <div class="vid-play-label">Click to Play</div>
+                </div>
+            </div>
+            <div class="vid-meta reveal">
+                <p>빛, 레이저, 사운드, 프로젝션을 결합한 바르셀로나 기반 오디오비주얼 스튜디오.</p>
+                <a href="https://vimeo.com/464531284" target="_blank">Vimeo</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 24: Audio Device In CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Audio Device In</div>
+            <h2 class="reveal">Audio Device In CHOP</h2>
+            <div class="highlight-box reveal">
+                <p><strong>소리 받기</strong> &mdash; 마이크나 오디오 인터페이스에서 실시간 소리를 TouchDesigner로 가져온다</p>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">기본 설정</span></h3>
+                    <ul style="padding-left:1.2em;">
+                        <li>Device: 사용할 오디오 장치 선택</li>
+                        <li>Driver: DirectSound / ASIO</li>
+                        <li>Channels: Stereo (Left + Right)</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">출력</span></h3>
+                    <p>실시간 파형 데이터가 채널로 출력된다</p>
+                    <p style="margin-top:0.3em;font-size:var(--small-size);color:var(--text-dim);">MacOS: CoreAudio / Built-in Microphone</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 25: Audio Device In 출력 특성
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Raw Audio Signal</div>
+            <h2 class="reveal">Audio Device In 출력 특성</h2>
+            <div class="three-col reveal">
+                <div class="info-card">
+                    <h3>채널</h3>
+                    <p>chan1 = Left<br>chan2 = Right</p>
+                </div>
+                <div class="info-card">
+                    <h3>값 범위</h3>
+                    <p><strong>-1 ~ +1</strong><br>양수와 음수를 빠르게 오간다</p>
+                </div>
+                <div class="info-card">
+                    <h3>문제점</h3>
+                    <p>원시 신호를 그대로 파라미터에 연결하면 <strong>너무 빠르게 떨린다</strong></p>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>그래서 <span class="accent-orange">분석(Analyze)</span>이 필요하다 &mdash; 원시 파형에서 의미 있는 숫자를 추출해야 한다</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 26: 볼륨 추출 — Analyze CHOP
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Volume Extraction</div>
+            <h2 class="reveal">볼륨 추출 &mdash; Analyze CHOP</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node green">Audio Device In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Analyze (RMS Power)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Filter</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Null</span>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">Analyze CHOP</span></h3>
+                    <p>Function: <code>RMS Power</code></p>
+                    <p style="margin-top:0.3em;">수천 개의 샘플을 하나의 숫자(볼륨)로 요약한다</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">RMS란?</span></h3>
+                    <p>Root Mean Square &mdash; 파형의 "평균 에너지"를 계산</p>
+                    <p style="margin-top:0.3em;font-size:var(--small-size);">출력: 0 (무음) ~ 1 (최대)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 27: Analyze CHOP Function 비교
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Analyze Functions</div>
+            <h2 class="reveal">Analyze CHOP Function 비교</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>Function</th><th>설명</th><th>특성</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">RMS Power</td><td>파형의 평균 에너지 (실효값)</td><td>가장 안정적, 볼륨 추출에 최적</td></tr>
+                    <tr><td class="accent-blue">Maximum</td><td>샘플 중 가장 큰 값</td><td>피크 감지, 급격한 변화에 민감</td></tr>
+                    <tr><td class="accent-green">Average</td><td>샘플의 산술 평균</td><td>오디오에선 0에 가까움 (음수+양수 상쇄)</td></tr>
+                </tbody>
+            </table>
+            <div class="warning-box reveal">
+                <p>Average는 오디오 파형에 적합하지 않다 &mdash; 양수와 음수가 상쇄되어 거의 0이 된다. <strong>RMS Power를 사용하자!</strong></p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 28: Math CHOP 범위 조절
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Range Mapping</div>
+            <h2 class="reveal">Math CHOP &mdash; 범위 조절</h2>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">From Range</span></h3>
+                    <p>입력값의 실제 범위</p>
+                    <div class="code-block" style="margin-top:0.3em;"><span style="display:block;">From: 0 ~ 0.3  <span class="comment"># 실제 RMS 범위</span></span></div>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">To Range</span></h3>
+                    <p>원하는 출력 범위</p>
+                    <div class="code-block" style="margin-top:0.3em;"><span style="display:block;">To: 0 ~ 1  <span class="comment"># 파라미터 범위</span></span></div>
+                </div>
+            </div>
+            <div class="flow-diagram reveal">
+                <span class="flow-node green">Analyze</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Math (Range)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Filter</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Level TOP (Opacity)</span>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);">볼륨 0~0.3 &rarr; 밝기 0~1 으로 매핑하면, 작은 소리에도 충분히 반응한다</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 29: 주파수 분석 개념
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Frequency Analysis</div>
+            <h2 class="reveal">주파수 분석 개념</h2>
+            <div class="three-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">저주파 (Bass)</span></h3>
+                    <p>20 ~ 250 Hz</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">킥 드럼, 베이스 기타, 서브베이스</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">중주파 (Mid)</span></h3>
+                    <p>250 ~ 4,000 Hz</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">보컬, 기타, 피아노 멜로디</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-cyan">고주파 (High)</span></h3>
+                    <p>4,000 ~ 20,000 Hz</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">하이햇, 심벌즈, 치찰음</p>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>같은 음악이라도 <strong>저음/중음/고음을 분리</strong>하면 각각 다른 비주얼 요소를 제어할 수 있다</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 30: audioAnalysis (Palette)
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Palette &mdash; audioAnalysis</div>
+            <h2 class="reveal">audioAnalysis 컴포넌트</h2>
+            <div class="highlight-box reveal">
+                <p><strong>Palette &gt; Tools &gt; audioAnalysis</strong> &mdash; 드래그 한 번으로 주파수 분리 + 비트 감지를 자동 처리</p>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3 class="accent-green">연속값 (주파수 대역)</h3>
+                    <p><code>low</code> &mdash; 저주파 (베이스, 킥)</p>
+                    <p><code>mid</code> &mdash; 중주파 (보컬, 멜로디)</p>
+                    <p><code>high</code> &mdash; 고주파 (하이햇, 심벌)</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="accent-orange">이벤트 (비트 감지)</h3>
+                    <p><code>kick</code> &mdash; 킥 드럼 감지 (0/1)</p>
+                    <p><code>snare</code> &mdash; 스네어 감지 (0/1)</p>
+                    <p><code>rhythm</code> &mdash; 전체 리듬 감지</p>
+                </div>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);color:var(--text-dim);text-align:center;">각 채널별 Thresh, Gain, Smooth 노브로 감도 조절 가능</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 31: audioAnalysis 사용법
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">How to Use</div>
+            <h2 class="reveal">audioAnalysis 사용법</h2>
+            <div class="info-card reveal">
+                <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.5em;">
+                    <li>Palette 브라우저를 연다 (<strong style="color:var(--accent-cyan);">Alt+L</strong>)</li>
+                    <li><code>Tools</code> 폴더에서 <code>audioAnalysis</code>를 찾아 네트워크에 드래그</li>
+                    <li>컴포넌트가 자동으로 오디오를 분석 &mdash; 노드를 클릭하면 스펙트럼이 보인다</li>
+                    <li>CHOP 출력에서 원하는 채널을 <strong>Select CHOP</strong>으로 골라 사용</li>
+                </ol>
+            </div>
+            <div class="highlight-box reveal">
+                <p><strong>왜 audioAnalysis인가?</strong> &mdash; Audio Spectrum &rarr; Select CHOP으로 직접 주파수를 자르려면 샘플 인덱스를 계산해야 한다. audioAnalysis는 이 과정을 자동 처리하고, 노브로 바로 감도를 조절할 수 있어 훨씬 실용적이다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 32: 주파수별 매핑 예시
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Frequency Mapping</div>
+            <h2 class="reveal">주파수별 매핑 예시</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>대역</th><th>매핑 대상</th><th>효과</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">Bass (저음)</td><td>Transform &rarr; Scale</td><td>베이스 드럼에 맞춰 이미지가 커졌다 줄어든다</td></tr>
+                    <tr><td class="accent-blue">Mid (중음)</td><td>Displace &rarr; Weight</td><td>멜로디에 따라 이미지가 일렁인다</td></tr>
+                    <tr><td class="accent-cyan">High (고음)</td><td>Noise &rarr; Period / Offset</td><td>하이햇에 맞춰 노이즈 패턴이 변한다</td></tr>
+                </tbody>
+            </table>
+            <div class="highlight-box reveal">
+                <p>각 대역을 <strong>서로 다른 시각 파라미터</strong>에 연결하면 음악의 구조가 시각적으로 드러난다</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 33: 비트 감지
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Beat Detection</div>
+            <h2 class="reveal">비트 감지</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node green">Analyze (RMS)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Logic CHOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Trigger CHOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Null</span>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">Logic CHOP</span></h3>
+                    <p>Convert: <strong>Off When Outside Bounds</strong></p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">Bound Min/Max 범위 밖이면 0, 안이면 1</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">Trigger CHOP</span></h3>
+                    <p>1이 들어오면 <strong>Attack &rarr; Sustain &rarr; Release</strong> 엔벨로프 생성</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">부드러운 펄스로 변환</p>
+                </div>
+            </div>
+            <p class="reveal" style="font-size:var(--small-size);">Threshold를 잘 조절하는 것이 비트 감지의 핵심 &mdash; 너무 낮으면 모든 소리에 반응, 너무 높으면 반응하지 않음</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 34: SECTION DIVIDER — Part 3
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 3</div>
+            <h2 class="reveal">오디오 리액티브<br><span class="accent-orange">비주얼 실습</span></h2>
+            <p class="section-desc reveal">배운 개념을 직접 만들어본다</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 35: 실습 1 개요
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 1</div>
+            <h2 class="reveal">볼륨 리액티브 &mdash; 소리로 숨 쉬는 영상</h2>
+            <div class="highlight-box reveal">
+                <p>소리의 <strong>볼륨(RMS)</strong>을 추출하여 영상의 밝기와 크기를 제어한다</p>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">목표</span></h3>
+                    <p>소리가 커지면 영상이 밝아지고 커진다. 소리가 작아지면 어두워지고 줄어든다.</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">사용 Operator</span></h3>
+                    <p>Audio Device In, Analyze, Math, Filter, Level TOP, Transform TOP</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 36: 실습 1 네트워크
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 1 &mdash; Network</div>
+            <h2 class="reveal">볼륨 리액티브 네트워크</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node green">Audio Device In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Analyze (RMS)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Math (Range)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Filter</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Null</span>
+            </div>
+            <div class="info-card reveal">
+                <h3>단계별 설정</h3>
+                <ol style="padding-left:1.2em;font-size:var(--small-size);">
+                    <li>Audio Device In &mdash; Device 선택 (마이크 또는 시스템 오디오)</li>
+                    <li>Analyze &mdash; Function: RMS Power</li>
+                    <li>Math &mdash; From Range: 0~0.3 / To Range: 0~1</li>
+                    <li>Filter &mdash; Width: 0.1 (부드럽게)</li>
+                    <li>Null &rarr; Level TOP의 Opacity에 Export 또는 Reference</li>
+                    <li>같은 값으로 Transform TOP의 Scale에도 연결 (0.8 ~ 1.2)</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 37: 실습 2 개요
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 2</div>
+            <h2 class="reveal">주파수 리액티브 &mdash; 저음/고음 분리</h2>
+            <div class="highlight-box reveal">
+                <p><strong>주파수 대역</strong>을 분리하여 저음과 고음을 각각 다른 비주얼 요소에 매핑한다</p>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">목표</span></h3>
+                    <p>베이스 드럼 &rarr; 이미지 스케일 변화<br>하이햇 &rarr; 노이즈 왜곡</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">사용 Operator</span></h3>
+                    <p>Audio Spectrum, Select, Analyze, Math, Displace TOP, Noise TOP</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 38: 실습 2 네트워크
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 2 &mdash; Network</div>
+            <h2 class="reveal">주파수 리액티브 네트워크</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node green">Audio Device In</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Audio Spectrum</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Select (저음)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Analyze</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Transform Scale</span>
+            </div>
+            <div class="flow-diagram reveal" style="padding-top:0;">
+                <span class="flow-node green" style="visibility:hidden;">Audio Device In</span>
+                <span class="flow-arrow" style="visibility:hidden;">&rarr;</span>
+                <span class="flow-node green" style="visibility:hidden;">Audio Spectrum</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Select (고음)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Analyze</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Displace Weight</span>
+            </div>
+            <div class="info-card reveal">
+                <h3>핵심 설정</h3>
+                <p style="font-size:var(--small-size);">Select CHOP의 Channel Name Range로 저음/고음 대역 분리 &rarr; 각각 Analyze (RMS) &rarr; Math로 범위 조절 &rarr; 서로 다른 TOP 파라미터에 연결</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 39: 실습 3 개요
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 3</div>
+            <h2 class="reveal">비트 반응 + Feedback</h2>
+            <div class="highlight-box reveal">
+                <p>비트를 감지하여 <strong>Feedback 루프의 파라미터를 순간적으로 변화</strong>시킨다</p>
+            </div>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">목표</span></h3>
+                    <p>드럼 비트마다 Feedback 잔상이 강해지고, 비트 사이에는 서서히 사라진다</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">사용 Operator</span></h3>
+                    <p>Logic, Trigger, Feedback TOP, Level TOP, Composite TOP</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 40: 실습 3 네트워크
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 3 &mdash; Network</div>
+            <h2 class="reveal">비트 반응 + Feedback 네트워크</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node green">Analyze (RMS)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Logic (Threshold)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Trigger (A/S/R)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">Null</span>
+            </div>
+            <div class="flow-diagram reveal" style="padding-top:0;">
+                <span class="flow-node highlight">Feedback</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Level (Opacity &larr; Trigger)</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Composite</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Null (Target)</span>
+            </div>
+            <div class="info-card reveal">
+                <h3>단계별 설정</h3>
+                <ol style="padding-left:1.2em;font-size:var(--small-size);">
+                    <li>Logic &mdash; Channel Pre OP: Off to On, Boundary Threshold: 0.15</li>
+                    <li>Trigger &mdash; Attack: 0.02s, Sustain: 0.05s, Release: 0.3s</li>
+                    <li>Trigger 출력 &rarr; Level TOP Opacity에 Reference</li>
+                    <li>Feedback Target을 마지막 Null로 지정</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 41: 실습 4 — 종합
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 4</div>
+            <h2 class="reveal">종합 &mdash; 나만의 오디오 리액티브 비주얼</h2>
+            <div class="highlight-box reveal">
+                <p>지금까지 배운 모든 기법을 조합하여 <strong>자신만의 오디오 리액티브 비주얼</strong>을 완성한다</p>
+            </div>
+            <div class="info-card reveal">
+                <h3>자유 실습</h3>
+                <p>음악을 선택하고, 소리의 어떤 특성을 어떤 비주얼 요소에 연결할지 직접 설계한다. 실습 1~3에서 만든 네트워크를 확장하거나 새로 만들어도 좋다.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 42: 실습 4 필수 조건 + 조합 아이디어
+         ============================================ -->
+    <section class="slide practice-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="practice-badge reveal"><span class="led led-green"></span> Practice 4 &mdash; Requirements</div>
+            <h2 class="reveal">필수 조건 &amp; 조합 아이디어</h2>
+            <div class="two-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">필수 조건</span></h3>
+                    <ul style="padding-left:1.2em;font-size:var(--small-size);">
+                        <li>최소 2가지 오디오 분석 (볼륨 + 주파수 or 비트)</li>
+                        <li>분석된 값이 각각 다른 시각 파라미터에 연결</li>
+                        <li>Filter를 사용하여 값 다듬기</li>
+                        <li>Feedback 또는 Displace 중 하나 이상 사용</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">조합 아이디어</span></h3>
+                    <table class="data-table" style="font-size:var(--small-size);">
+                        <tbody>
+                            <tr><td>Bass + Feedback</td><td>비트마다 잔상 폭발</td></tr>
+                            <tr><td>Mid + Displace</td><td>멜로디로 물결 왜곡</td></tr>
+                            <tr><td>High + HSV Adjust</td><td>고음에 색 변화</td></tr>
+                            <tr><td>Volume + Timemachine</td><td>소리로 시간 탐색</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 43: 발표 체크리스트
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Presentation Checklist</div>
+            <h2 class="reveal">발표 체크리스트</h2>
+            <div class="flex-col gap-sm">
+                <div class="info-card reveal">
+                    <h3><span class="accent-orange">1.</span> 어떤 오디오 정보를 사용했나?</h3>
+                    <p>볼륨(RMS)? 주파수(FFT)? 비트(Logic+Trigger)? 어떤 대역?</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3><span class="accent-blue">2.</span> 어떤 파라미터에 매핑했나?</h3>
+                    <p>Opacity? Scale? Displace Weight? Hue? Noise Period?</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3><span class="accent-green">3.</span> 왜 그 조합을 선택했나?</h3>
+                    <p>음악의 어떤 특성이 비주얼의 어떤 느낌과 연결되는지 설명</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3><span class="accent-purple">4.</span> 값 다듬기는 어떻게 했나?</h3>
+                    <p>Filter Width, Math Range, Threshold 등 세부 조절 과정</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 44: SECTION DIVIDER — Part 4
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 4</div>
+            <h2 class="reveal">오디오 리액티브<br><span class="accent-orange">작업 팁</span></h2>
+            <p class="section-desc reveal">실전에서 자주 만나는 문제와 해결법</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 45: 값 다듬기가 전부다
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Troubleshooting</div>
+            <h2 class="reveal">값 다듬기가 전부다</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">떨림이 심하다</td><td>원시 오디오를 그대로 사용</td><td>Filter CHOP Width 높이기 (0.1~0.5)</td></tr>
+                    <tr><td class="accent-orange">반응이 없다</td><td>값 범위가 너무 작음</td><td>Math CHOP From Range 좁히기</td></tr>
+                    <tr><td class="accent-orange">과반응한다</td><td>값 범위가 너무 큼</td><td>Math CHOP To Range 줄이기 / Clamp</td></tr>
+                    <tr><td class="accent-orange">리듬감이 없다</td><td>연속적 매핑만 사용</td><td>Logic+Trigger로 이벤트 방식 추가</td></tr>
+                    <tr><td class="accent-orange">무겁다/느리다</td><td>불필요한 고해상도</td><td>Resolution 낮추기, Cook 최적화</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 46: 소리마다 다른 필터 속도
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Filter Tuning</div>
+            <h2 class="reveal">소리마다 다른 필터 속도</h2>
+            <table class="data-table reveal">
+                <thead><tr><th>대상</th><th>Filter Width</th><th>이유</th></tr></thead>
+                <tbody>
+                    <tr><td class="accent-orange">킥 드럼 (비트)</td><td>0.01 ~ 0.05</td><td>빠른 반응이 필요, 순간적 충격</td></tr>
+                    <tr><td class="accent-blue">볼륨 전체</td><td>0.1 ~ 0.3</td><td>부드럽게 따라가야 자연스럽다</td></tr>
+                    <tr><td class="accent-green">앰비언트/패드</td><td>0.3 ~ 1.0</td><td>천천히 변하는 텍스처에 적합</td></tr>
+                    <tr><td class="accent-purple">배경 색상</td><td>1.0 ~ 3.0</td><td>느리게 바뀌어야 편안하다</td></tr>
+                </tbody>
+            </table>
+            <div class="highlight-box reveal">
+                <p>같은 오디오 소스라도 <strong>매핑 대상에 따라 Filter Width를 다르게</strong> 설정한다</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 47: 음악 선택도 작업의 일부
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Music Selection</div>
+            <h2 class="reveal">음악 선택도 작업의 일부</h2>
+            <div class="three-col reveal">
+                <div class="info-card">
+                    <h3><span class="accent-orange">비트 명확한 음악</span></h3>
+                    <p>테크노, 하우스, 힙합</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;color:var(--text-dim);">Logic+Trigger 비트 감지가 잘 작동. 리듬 기반 비주얼에 적합.</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">앰비언트</span></h3>
+                    <p>드론, 패드, 환경음</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;color:var(--text-dim);">RMS 볼륨으로 천천히 변하는 텍스처. 명상적/유기적 비주얼.</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-purple">복잡한 음악</span></h3>
+                    <p>오케스트라, 재즈, IDM</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;color:var(--text-dim);">주파수 대역 분리가 핵심. 대역별 매핑으로 풍성한 반응.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 48: 핵심 키워드 정리
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Keywords</div>
+            <h2 class="reveal">핵심 키워드 정리</h2>
+            <div class="reveal" style="display:flex;flex-wrap:wrap;gap:clamp(0.3rem,0.5vw,0.5rem);justify-content:center;">
+                <span class="keyword-badge orange">Volume</span>
+                <span class="keyword-badge orange">Frequency</span>
+                <span class="keyword-badge orange">Beat</span>
+                <span class="keyword-badge green">RMS</span>
+                <span class="keyword-badge green">FFT</span>
+                <span class="keyword-badge green">Spectrum</span>
+                <span class="keyword-badge blue">Threshold</span>
+                <span class="keyword-badge blue">Trigger</span>
+                <span class="keyword-badge purple">Feedback</span>
+                <span class="keyword-badge purple">Displacement</span>
+                <span class="keyword-badge purple">Timemachine</span>
+                <span class="keyword-badge cyan">Audio Reactive</span>
+                <span class="keyword-badge cyan">Continuous vs Event</span>
+            </div>
+            <div class="two-col reveal" style="margin-top:var(--content-gap);">
+                <div class="info-card">
+                    <h3><span class="accent-orange">Continuous (연속)</span></h3>
+                    <p>볼륨, 주파수 에너지처럼 매 프레임 부드럽게 변하는 값</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">Scale, Opacity, Color에 적합</p>
+                </div>
+                <div class="info-card">
+                    <h3><span class="accent-blue">Event (이벤트)</span></h3>
+                    <p>비트, 트리거처럼 특정 순간에 발생하는 신호</p>
+                    <p style="font-size:var(--small-size);margin-top:0.3em;">Switch, Flash, Color Change에 적합</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 49: 오늘 배운 것 요약
+         ============================================ -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Summary</div>
+            <h2 class="reveal">오늘 배운 것 요약</h2>
+            <div class="flex-col gap-sm">
+                <div class="info-card reveal">
+                    <h3><span class="accent-orange">Part 1</span> &mdash; TOP-CHOP 빠른 복습</h3>
+                    <p>Feedback, Displace, Timemachine 등 핵심 TOP과 CHOP Reference 방식을 정리했다</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3><span class="accent-blue">Part 2</span> &mdash; 소리를 이해하기</h3>
+                    <p>볼륨(RMS), 주파수(FFT/Spectrum), 비트(Logic+Trigger)를 추출하고 매핑하는 방법을 배웠다</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3><span class="accent-green">Part 3</span> &mdash; 실습</h3>
+                    <p>볼륨 리액티브, 주파수 리액티브, 비트 리액티브, 종합 실습으로 직접 만들어보았다</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3><span class="accent-purple">Part 4</span> &mdash; 팁과 정리</h3>
+                    <p>Filter Width 조절, 음악 선택, 트러블슈팅 등 실전 작업 팁을 익혔다</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+         SLIDE 50: 끝
+         ============================================ -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div style="display:flex;gap:clamp(0.5rem,1vw,1rem);justify-content:center;margin-bottom:clamp(1rem,2vw,2rem);" class="reveal">
+                <span class="led led-orange led-pulse"></span>
+                <span class="led led-green led-pulse" style="animation-delay:0.3s;"></span>
+                <span class="led led-blue led-pulse" style="animation-delay:0.6s;"></span>
+                <span class="led led-orange led-pulse" style="animation-delay:0.9s;"></span>
+                <span class="led led-green led-pulse" style="animation-delay:1.2s;"></span>
+            </div>
+            <h2 class="reveal" style="margin-bottom:clamp(0.5rem,1vw,1rem);">수고하셨습니다</h2>
+            <p class="section-desc reveal">소리를 보는 눈을 가지셨습니다</p>
+            <div style="display:flex;gap:clamp(0.3rem,0.5vw,0.5rem);justify-content:center;margin-top:clamp(1.5rem,3vw,3rem);" class="reveal">
+                <span class="cable-line cable-orange" style="max-width:60px;"></span>
+                <span class="cable-line cable-green" style="max-width:40px;"></span>
+                <span class="cable-line cable-blue" style="max-width:50px;"></span>
+            </div>
+            <p class="reveal" style="font-size:var(--label-size);color:var(--text-dim);margin-top:clamp(0.5rem,1vw,1rem);text-align:center;">한예종 디지털미디어비주얼 1 &mdash; Week 06</p>
+        </div>
+    </section>
+
+
+    <!-- ============================================
+       JAVASCRIPT — Presentation Controller
+       ============================================ -->
+    <script>
+    function loadVideo(overlay) {
+        const container = overlay.parentElement;
+        const vimeoId = container.dataset.vimeo;
+        if (vimeoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1&title=0&byline=0';
+            iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+            iframe.allowFullscreen = true;
+            container.appendChild(iframe);
+            overlay.classList.add('hidden');
+        }
+    }
+
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.currentSlide = 0;
+            this.totalSlides = this.slides.length;
+            this.isScrolling = false;
+
+            this.setupIntersectionObserver();
+            this.setupKeyboardNav();
+            this.setupTouchNav();
+            this.setupWheelNav();
+            this.setupProgressBar();
+            this.setupOverview();
+            this.updateSlideNumber();
+
+            // Show first slide
+            this.slides[0].classList.add('visible');
+
+            // Hide keyboard hint after interaction
+            setTimeout(() => {
+                const hint = document.getElementById('keyboardHint');
+                if (hint) hint.style.opacity = '0';
+            }, 8000);
+        }
+
+        setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        const idx = Array.from(this.slides).indexOf(entry.target);
+                        if (idx >= 0) {
+                            this.currentSlide = idx;
+                            this.updateSlideNumber();
+                            this.updateProgressBar();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            this.slides.forEach(slide => observer.observe(slide));
+        }
+
+        setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide + 1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide - 1);
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    this.goToSlide(0);
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    this.goToSlide(this.totalSlides - 1);
+                } else if (e.key === 'n' || e.key === 'N') {
+                    document.body.classList.toggle('show-notes');
+                } else if (e.key === 'o' || e.key === 'O') {
+                    this.toggleOverview();
+                } else if (e.key === 'f' || e.key === 'F') {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen?.();
+                    } else {
+                        document.exitFullscreen?.();
+                    }
+                } else if (e.key === 'Escape') {
+                    const ov = document.getElementById('overviewOverlay');
+                    if (ov.classList.contains('active')) {
+                        ov.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        setupTouchNav() {
+            let startY = 0;
+            let startX = 0;
+            document.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            document.addEventListener('touchend', (e) => {
+                const dy = startY - e.changedTouches[0].clientY;
+                const dx = startX - e.changedTouches[0].clientX;
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+                    if (dy > 0) this.goToSlide(this.currentSlide + 1);
+                    else this.goToSlide(this.currentSlide - 1);
+                }
+            }, { passive: true });
+        }
+
+        setupWheelNav() {
+            let lastWheel = 0;
+            document.addEventListener('wheel', (e) => {
+                const now = Date.now();
+                if (now - lastWheel < 800) return;
+                lastWheel = now;
+                if (e.deltaY > 0) this.goToSlide(this.currentSlide + 1);
+                else if (e.deltaY < 0) this.goToSlide(this.currentSlide - 1);
+            }, { passive: true });
+        }
+
+        goToSlide(idx) {
+            if (idx < 0 || idx >= this.totalSlides) return;
+            this.currentSlide = idx;
+            this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+            this.updateSlideNumber();
+            this.updateProgressBar();
+        }
+
+        setupProgressBar() {
+            this.progressBar = document.getElementById('progressBar');
+            this.updateProgressBar();
+        }
+
+        updateProgressBar() {
+            if (!this.progressBar) return;
+            const pct = ((this.currentSlide + 1) / this.totalSlides) * 100;
+            this.progressBar.style.width = pct + '%';
+        }
+
+        updateSlideNumber() {
+            const el = document.getElementById('slideNumber');
+            if (el) {
+                const cur = String(this.currentSlide + 1).padStart(2, '0');
+                const tot = String(this.totalSlides).padStart(2, '0');
+                el.textContent = `${cur} / ${tot}`;
+            }
+        }
+
+        setupOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            this.slides.forEach((slide, i) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'overview-thumb' + (i === this.currentSlide ? ' current' : '');
+                const h2 = slide.querySelector('h2');
+                const label = slide.querySelector('.label, .part-number, .practice-badge');
+                let text = `Slide ${i + 1}`;
+                if (label) text = label.textContent.trim();
+                if (h2) text += '\n' + h2.textContent.trim().substring(0, 40);
+                thumb.textContent = text;
+                thumb.addEventListener('click', () => {
+                    overlay.classList.remove('active');
+                    this.goToSlide(i);
+                });
+                overlay.appendChild(thumb);
+            });
+        }
+
+        toggleOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                overlay.querySelectorAll('.overview-thumb').forEach((t, i) => {
+                    t.classList.toggle('current', i === this.currentSlide);
+                });
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        new SlidePresentation();
+    });
+    </script>
+
+</body>
+</html>
