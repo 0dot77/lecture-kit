@@ -17,6 +17,7 @@ export default defineConfig({
         "cc-level2": "courses/claude-code-intro/level-2-basics.html",
         "vtc-index": "courses/vibe-to-code/index.html",
         "vtc-week01": "courses/vibe-to-code/week-01.html",
+        "vtc-week02": "courses/vibe-to-code/week-02.html",
         "comfyui-index": "courses/comfyui-basics/index.html",
         "comfyui-week03": "courses/comfyui-basics/week-03.html",
       },
