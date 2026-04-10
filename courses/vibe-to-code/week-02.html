@@ -385,6 +385,7 @@
       font-size: 0.8rem;
       line-height: 1.8;
       color: var(--blue-pale);
+      white-space: pre;
     }
 
     .code-block .comment { color: rgba(200, 216, 234, 0.4); }
@@ -977,18 +978,18 @@
 
     <div class="code-block">
       <button class="copy-btn" onclick="copyCode(this)">COPY</button>
-      <span style="display:block;">┌────────────────────────────────────────────┐</span>
-      <span style="display:block;">│  탐색기              │  편집기              │</span>
-      <span style="display:block;">│                      │                      │</span>
-      <span style="display:block;">│  my-character/       │  CLAUDE.md 편집 중   │</span>
-      <span style="display:block;">│  ├── CLAUDE.md       │                      │</span>
-      <span style="display:block;">│  └── .claude/        │                      │</span>
-      <span style="display:block;">│      ├── settings.json│                     │</span>
-      <span style="display:block;">│      └── skills/     │                      │</span>
-      <span style="display:block;">├──────────────────────┴──────────────────────┤</span>
-      <span style="display:block;">│  터미널  (Ctrl+`)                           │</span>
-      <span style="display:block;">│  $ claude                                   │</span>
-      <span style="display:block;">└─────────────────────────────────────────────┘</span>
+      <span style="display:block;">+---------------------------+---------------------------+</span>
+      <span style="display:block;">|  [Explorer]               |  [Editor]                 |</span>
+      <span style="display:block;">|                           |                           |</span>
+      <span style="display:block;">|  my-character/            |  CLAUDE.md                |</span>
+      <span style="display:block;">|  +-- CLAUDE.md            |                           |</span>
+      <span style="display:block;">|  +-- .claude/             |                           |</span>
+      <span style="display:block;">|      +-- settings.json    |                           |</span>
+      <span style="display:block;">|      +-- skills/          |                           |</span>
+      <span style="display:block;">+---------------------------+---------------------------+</span>
+      <span style="display:block;">|  [Terminal]  Ctrl+`                                   |</span>
+      <span style="display:block;">|  $ claude                                             |</span>
+      <span style="display:block;">+-------------------------------------------------------+</span>
     </div>
 
     <div class="highlight-box">
