@@ -375,6 +375,26 @@
     .info-panel-red .info-panel-header { background: var(--red); }
     .info-panel-red { border-color: var(--red-pale); }
 
+    .signal-figure {
+      margin-top: 1.25rem;
+      border: 1px solid var(--border);
+      background: white;
+      padding: 0.75rem;
+    }
+
+    .signal-figure img {
+      display: block;
+      width: 100%;
+      border-radius: 2px;
+    }
+
+    .signal-figure figcaption {
+      margin-top: 0.6rem;
+      font-size: 0.72rem;
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+
     .code-block {
       position: relative;
       background: var(--blue);
@@ -535,6 +555,36 @@
     }
 
     .compare-table tbody tr:hover td { background: white; }
+
+    .git-lab {
+      margin: 1.5rem 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .git-lab details {
+      border: 1px solid var(--border);
+      background: var(--cream-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .git-lab summary {
+      cursor: pointer;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--blue);
+      background: white;
+    }
+
+    .git-lab details div {
+      padding: 0.75rem 1rem 1rem;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
 
     .two-col {
       display: grid;
@@ -817,6 +867,7 @@
   <a href="#recap"><span class="nav-dot"></span><span class="nav-text">Recap</span></a>
   <a href="#loop"><span class="nav-dot"></span><span class="nav-text">Agent Loop</span></a>
   <a href="#claude-code"><span class="nav-dot"></span><span class="nav-text">Claude Code</span></a>
+  <a href="#plugins"><span class="nav-dot"></span><span class="nav-text">Plugins</span></a>
   <a href="#skills"><span class="nav-dot"></span><span class="nav-text">Skills</span></a>
   <a href="#design"><span class="nav-dot"></span><span class="nav-text">DESIGN.md</span></a>
   <a href="#github"><span class="nav-dot"></span><span class="nav-text">GitHub</span></a>
@@ -928,9 +979,15 @@
       <div class="info-panel-header">오늘 짚고 갈 신호</div>
       <div class="info-panel-body">
         <ul>
-          <li><strong>Mythos Preview</strong> — 세계관, 캐릭터, 이야기 구조를 도구가 어떻게 흡수하는가</li>
-          <li><strong>새 모델 릴리스</strong> — 성능 경쟁보다 제작 흐름이 어떻게 바뀌는지 보기</li>
+          <li>
+            <strong>새 모델 릴리즈</strong> — Opus 4.7 출시
+            <figure class="signal-figure">
+              <img src="./assets/opus-4-7-preview.png" alt="Opus 4.6과 Opus 4.7을 비교하는 이미지" />
+              <figcaption>강의 노트의 Opus 4.7 출시 참고 이미지. 모델 업데이트를 제작 환경의 변화로 읽어본다.</figcaption>
+            </figure>
+          </li>
           <li><strong>Codex Computer Use</strong> — AI가 화면과 앱을 직접 조작하는 방향성</li>
+          <li><strong>qwen3.6 local model</strong> — 로컬 모델이 개인 컴퓨터의 제작 환경에 들어오는 흐름</li>
         </ul>
       </div>
     </div>
@@ -943,7 +1000,6 @@
       <span class="chip chip-blue">Claude Code</span>
       <span class="chip chip-blue">Codex</span>
       <span class="chip">Computer Use</span>
-      <span class="chip chip-red">MCP</span>
       <span class="chip">Desktop App</span>
     </div>
   </section>
@@ -1060,7 +1116,7 @@
     </div>
 
     <div class="highlight-box">
-      <strong>좋은 요청은 루프를 쉽게 만든다.</strong> "예쁘게 해줘"보다 "2주차 페이지 형식을 참고해서, week-03 강의 노트를 HTML 강의 페이지로 만들어줘"가 훨씬 좋은 이유다.
+      <strong>좋은 요청은 루프를 쉽게 만든다.</strong> "예쁘게 해줘"보다 "index.html을 먼저 확인하고, 첫 화면의 문장을 짧게 줄인 뒤 버튼 색만 더 또렷하게 바꿔줘"가 훨씬 좋은 이유다.
     </div>
   </section>
 
@@ -1145,9 +1201,90 @@
     </div>
   </section>
 
-  <section class="content-section" id="skills">
+  <section class="content-section" id="plugins">
     <div class="section-divider">
       <span class="section-num">06</span>
+      <span class="section-line"></span>
+      <span class="section-label">Plugins</span>
+    </div>
+
+    <h2 class="section-title">플러그인: 기능을 설치해서 확장하기</h2>
+    <p class="section-desc" style="margin-bottom: 1.5rem;">
+      스킬이 "Claude가 어떻게 행동할지"를 가르치는 문서라면, 플러그인은 쓸 수 있는 기능 묶음을 설치해 작업 환경을 넓히는 방식이다.
+    </p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>개념</th>
+          <th>오늘의 설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>/plugin</code></td>
+          <td>사용 가능한 플러그인을 확인하거나 설치 흐름으로 들어가는 명령</td>
+        </tr>
+        <tr>
+          <td>전역 설치</td>
+          <td>여러 프로젝트에서 계속 쓰는 도구를 내 작업 환경 전체에 추가하는 방식</td>
+        </tr>
+        <tr>
+          <td>로컬 설치</td>
+          <td>특정 프로젝트 안에서만 필요한 도구를 그 프로젝트에 묶어두는 방식</td>
+        </tr>
+        <tr>
+          <td>Skill과의 차이</td>
+          <td>Skill은 절차와 판단 기준을 적는 문서이고, Plugin은 새 기능이나 연결 지점을 설치하는 단위에 가깝다</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="compare-table" style="margin-top: 1.5rem;">
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>Skill</th>
+          <th>Plugin</th>
+          <th>MCP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>핵심 질문</td>
+          <td>AI가 어떻게 행동해야 하나?</td>
+          <td>어떤 기능 묶음을 추가하나?</td>
+          <td>외부 도구와 어떻게 연결하나?</td>
+        </tr>
+        <tr>
+          <td>주된 형태</td>
+          <td><code>SKILL.md</code> 같은 지침 문서</td>
+          <td>설치 가능한 패키지, 앱, 확장</td>
+          <td>서버, 프로토콜, tool 목록</td>
+        </tr>
+        <tr>
+          <td>잘하는 것</td>
+          <td>절차, 판단 기준, 작업 방식 고정</td>
+          <td>기능 배포, 권한, UI/명령 묶음</td>
+          <td>외부 시스템의 데이터 읽기와 조작</td>
+        </tr>
+        <tr>
+          <td>입문자 설명</td>
+          <td>나만의 작업법</td>
+          <td>새 도구 설치</td>
+          <td>도구와 AI 사이의 연결선</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box">
+      <strong>오늘의 기준:</strong> 반복되는 나의 작업 방식은 스킬로 만들고, 새 기능이 필요할 때만 플러그인을 검토한다. 외부 연결 도구는 오늘 깊게 다루지 않고 위치만 잡는다.
+    </div>
+  </section>
+
+  <section class="content-section" id="skills">
+    <div class="section-divider">
+      <span class="section-num">07</span>
       <span class="section-line"></span>
       <span class="section-label">Custom Skill</span>
     </div>
@@ -1222,11 +1359,22 @@
         <span style="display:block;">이 작업을 /___ 라는 스킬로 만들 수 있게 SKILL.md를 설계해줘.</span>
       </div>
     </div>
+
+    <div class="info-panel">
+      <div class="info-panel-header">나에게 꼭 필요한 스킬팩 아이디에이션</div>
+      <div class="info-panel-body">
+        <ul>
+          <li>내 작업 폴더를 보면서 반복되는 컴퓨터 작업을 찾는다</li>
+          <li>그 작업을 2-3개의 작은 스킬로 나눠본다</li>
+          <li>오늘은 그중 하나만 <code>SKILL.md</code>로 구현하고, 나머지는 스킬팩 후보로 남긴다</li>
+        </ul>
+      </div>
+    </div>
   </section>
 
   <section class="content-section" id="design">
     <div class="section-divider">
-      <span class="section-num">07</span>
+      <span class="section-num">08</span>
       <span class="section-line"></span>
       <span class="section-label">DESIGN.md</span>
     </div>
@@ -1276,7 +1424,7 @@
 
   <section class="content-section" id="github">
     <div class="section-divider">
-      <span class="section-num">08</span>
+      <span class="section-num">09</span>
       <span class="section-line"></span>
       <span class="section-label">Git & GitHub</span>
     </div>
@@ -1322,21 +1470,43 @@
     </table>
 
     <div class="hands-on">
-      <h3>오늘 사용할 Git 흐름</h3>
-      <p>작업 폴더에서 아래 순서만 기억한다.</p>
+      <h3>Git을 인터랙티브하게 읽어보기</h3>
+      <p>Git은 명령어 암기보다 "지금 무엇이 바뀌었고, 무엇을 기록할지"를 판단하는 도구로 접근한다.</p>
       <div class="code-block">
         <button class="copy-btn" onclick="copyCode(this)">COPY</button>
-        <span style="display:block;"><span class="comment"># 1. 현재 상태 확인</span></span>
+        <span style="display:block;"><span class="comment"># 1. 지금 뭐가 바뀌었는지 보기</span></span>
         <span style="display:block;"><span class="highlight">git status</span></span>
         <span style="display:block;"></span>
-        <span style="display:block;"><span class="comment"># 2. 배포할 파일 선택</span></span>
-        <span style="display:block;"><span class="highlight">git add index.html style.css script.js</span></span>
+        <span style="display:block;"><span class="comment"># 2. 실제 차이 훑어보기</span></span>
+        <span style="display:block;"><span class="highlight">git diff --stat</span></span>
         <span style="display:block;"></span>
-        <span style="display:block;"><span class="comment"># 3. 하나의 기록으로 저장</span></span>
-        <span style="display:block;"><span class="highlight">git commit -m</span> <span class="string">"Publish my first vibe page"</span></span>
+        <span style="display:block;"><span class="comment"># 3. 이번 기록에 넣을 파일 고르기</span></span>
+        <span style="display:block;"><span class="highlight">git add index.html assets/hero.png</span></span>
         <span style="display:block;"></span>
-        <span style="display:block;"><span class="comment"># 4. GitHub로 올리기</span></span>
+        <span style="display:block;"><span class="comment"># 4. 하나의 기록으로 저장하기</span></span>
+        <span style="display:block;"><span class="highlight">git commit -m</span> <span class="string">"Add first portfolio draft"</span></span>
+        <span style="display:block;"></span>
+        <span style="display:block;"><span class="comment"># 5. GitHub로 올리기</span></span>
         <span style="display:block;"><span class="highlight">git push</span></span>
+      </div>
+
+      <div class="git-lab">
+        <details>
+          <summary>질문 1. <code>git status</code>에서 무엇을 봐야 하나?</summary>
+          <div>수정된 파일, 새로 생긴 파일, 아직 기록에 포함되지 않은 파일을 구분한다. 여기서 "이번 기록에 넣을 것"과 "아직 빼둘 것"을 고른다.</div>
+        </details>
+        <details>
+          <summary>질문 2. 언제 <code>git add</code>를 하나?</summary>
+          <div>눈으로 확인한 파일 중 이번 스냅샷에 포함할 것만 고를 때 쓴다. 임시 파일, 실패한 실험, 개인 메모는 빼둘 수 있다.</div>
+        </details>
+        <details>
+          <summary>질문 3. 좋은 commit 메시지는 무엇인가?</summary>
+          <div>"수정"보다 "Add first portfolio draft", "Refine hero copy", "Publish GitHub Pages version"처럼 무엇을 위한 기록인지 드러나는 문장이 좋다.</div>
+        </details>
+        <details>
+          <summary>질문 4. 언제 <code>push</code>하나?</summary>
+          <div>로컬에서 페이지를 열어보고, 기록할 파일이 맞는지 확인한 뒤 GitHub와 Pages에 반영하고 싶을 때 push한다.</div>
+        </details>
       </div>
     </div>
 
@@ -1374,7 +1544,7 @@
 
   <section class="content-section" id="appendix">
     <div class="section-divider">
-      <span class="section-num">09</span>
+      <span class="section-num">10</span>
       <span class="section-line"></span>
       <span class="section-label">Appendix</span>
     </div>
@@ -1419,11 +1589,23 @@
         </ul>
       </div>
     </div>
+
+    <div class="info-panel info-panel-red">
+      <div class="info-panel-header">부록에 더 넣기 좋은 것들</div>
+      <div class="info-panel-body">
+        <ul>
+          <li><strong>요청 템플릿</strong> — 파일 지칭, 원하는 변화, 확인 방법을 한 문장으로 묶는 예시</li>
+          <li><strong>GitHub Pages 체크리스트</strong> — repo 생성, <code>index.html</code> 위치, Pages 설정, 배포 대기 확인</li>
+          <li><strong>DESIGN.md 점검표</strong> — 색, 글꼴, 여백, 컴포넌트, 피해야 할 스타일이 들어갔는지 확인</li>
+          <li><strong>기호 치트시트</strong> — <code>@</code>는 볼 대상, <code>/</code>는 실행 명령, <code>$</code>는 Codex/OMX 스킬 호출로 구분</li>
+        </ul>
+      </div>
+    </div>
   </section>
 
   <section class="content-section" id="wrapup">
     <div class="section-divider">
-      <span class="section-num">10</span>
+      <span class="section-num">11</span>
       <span class="section-line"></span>
       <span class="section-label">Wrap-up</span>
     </div>
@@ -1456,17 +1638,6 @@
     <div class="pullquote" style="margin-top: 2rem;">
       <p>바이브는 감각으로 시작하지만,<br>
       <strong>공유 가능한 작품이 되려면 파일, 규칙, 기록, 배포가 필요하다.</strong></p>
-    </div>
-
-    <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--blue); margin: 2rem 0 0.75rem;">다음 주를 위한 선택 과제</h3>
-    <div class="info-panel">
-      <div class="info-panel-body">
-        <ul>
-          <li><strong>내 스킬 다듬기</strong> — 실제로 한 번 호출해보고 부족한 입력과 출력 규칙을 추가한다</li>
-          <li><strong>DESIGN.md 정리</strong> — 마음에 드는 웹페이지나 Stitch 결과를 기준으로 색, 레이아웃, 금지사항을 적는다</li>
-          <li><strong>GitHub Pages 링크 만들기</strong> — 내 HTML이 웹 주소로 열리는지 확인한다</li>
-        </ul>
-      </div>
     </div>
 
     <div style="margin-top: 2rem; text-align: center;">
