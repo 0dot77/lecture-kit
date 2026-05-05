@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEEK 01 — Papri AI Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=Archivo+Black&display=swap" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    :root {
+      --navy: #1e2a4a;
+      --navy-deep: #161e3a;
+      --cream: #ede4d3;
+      --cream-light: #f5efe1;
+      --cream-dim-on-navy: rgba(237, 228, 211, 0.6);
+      --cream-faint-on-navy: rgba(237, 228, 211, 0.18);
+      --ink: #1a2542;
+      --ink-muted: rgba(26, 37, 66, 0.62);
+      --ink-faint: rgba(26, 37, 66, 0.18);
+      --accent: #d4623a;
+
+      --font-body: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+      --font-display-en: "Archivo Black", "Bebas Neue", "Pretendard Variable", sans-serif;
+      --font-display-ko: "Black Han Sans", "Pretendard Variable", sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      background: #000;
+      color: var(--cream);
+    }
+
+    .deck { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: clamp(1.4rem, 3vw, 2.8rem) clamp(2rem, 5vw, 4.5rem);
+      background: var(--navy);
+      color: var(--cream);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.cream { background: var(--cream); color: var(--ink); }
+
+    /* ─── Header / Footer rails ─── */
+    .rail {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: clamp(0.6rem, 0.8vw, 0.78rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--cream-dim-on-navy);
+    }
+    .slide.cream .rail { color: var(--ink-muted); }
+    .rail-bottom { padding-top: 0.9rem; border-top: 1px solid var(--cream-faint-on-navy); }
+    .slide.cream .rail-bottom { border-top-color: var(--ink-faint); }
+
+    /* ─── Body ─── */
+    .body {
+      flex: 1;
+      display: flex; flex-direction: column;
+      padding: clamp(1.2rem, 2.5vw, 2.5rem) 0;
+      overflow: hidden;
+      justify-content: center;
+    }
+
+    /* ─── Display typography (Earth Day chunky) ─── */
+    .ko-display {
+      font-family: var(--font-display-ko);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.015em;
+    }
+    .en-display {
+      font-family: var(--font-display-en);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .display-xl { font-size: clamp(3rem, 11vw, 9.5rem); }
+    .display-lg { font-size: clamp(2.5rem, 8vw, 6.5rem); }
+    .display-md { font-size: clamp(2rem, 6vw, 5rem); }
+    .display-sm { font-size: clamp(1.5rem, 4vw, 3.2rem); }
+
+    /* ─── Labels & body ─── */
+    .label {
+      font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .lead {
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      line-height: 1.55;
+      max-width: 60ch;
+      opacity: 0.9;
+    }
+    .body-text {
+      font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+      line-height: 1.65;
+      opacity: 0.82;
+    }
+
+    /* ─── Layout helpers ─── */
+    .row { display: flex; gap: clamp(2rem, 4vw, 4rem); height: 100%; }
+    .col { display: flex; flex-direction: column; gap: clamp(1rem, 2vw, 1.5rem); }
+    .col.center { justify-content: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 4vw, 4rem); height: 100%; align-items: center; }
+    .grid-2.lopsided { grid-template-columns: 1.1fr 0.9fr; }
+    .grid-2.image-left { grid-template-columns: 0.9fr 1.1fr; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.2rem, 2.5vw, 2.2rem); height: 100%; }
+    .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(1rem, 2vw, 1.8rem); height: 100%; }
+
+    /* ─── Photo block ─── */
+    .photo {
+      position: relative;
+      width: 100%; height: 100%;
+      min-height: clamp(220px, 40vh, 460px);
+      background: var(--navy-deep);
+      overflow: hidden;
+      filter: grayscale(100%) contrast(1.1) brightness(0.85);
+    }
+    .slide.cream .photo { filter: grayscale(100%) contrast(1.05) brightness(0.92); }
+    .photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .photo .photo-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        repeating-linear-gradient(45deg, transparent 0 12px, rgba(237,228,211,0.06) 12px 13px),
+        var(--navy-deep);
+      color: var(--cream-dim-on-navy);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .photo.tinted::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(30,42,74,0.35) 0%, rgba(30,42,74,0.55) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    /* ─── Numbered list ─── */
+    .num-list { display: flex; flex-direction: column; gap: clamp(0.6rem, 1.2vw, 1rem); list-style: none; }
+    .num-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: clamp(0.9rem, 1.8vw, 1.5rem);
+      align-items: baseline;
+      padding-bottom: clamp(0.5rem, 0.9vw, 0.85rem);
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .num-list li { border-bottom-color: var(--ink-faint); }
+    .num-list .num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .num-list .text {
+      font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .num-list .sub {
+      display: block; margin-top: 0.25rem;
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      font-weight: 400; opacity: 0.65;
+      letter-spacing: 0; text-transform: none;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      border: 1px solid var(--cream-faint-on-navy);
+      padding: clamp(1.1rem, 1.8vw, 1.7rem);
+      display: flex; flex-direction: column;
+      gap: 0.55rem;
+      height: 100%;
+    }
+    .slide.cream .card { border-color: var(--ink-faint); }
+    .card .c-num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    .card .c-title {
+      font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+    }
+    .card .c-body {
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      line-height: 1.55;
+      opacity: 0.78;
+    }
+
+    /* ─── Tags ─── */
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+    .tag {
+      font-size: clamp(0.7rem, 0.9vw, 0.82rem);
+      padding: 0.28rem 0.65rem;
+      border: 1px solid var(--cream-faint-on-navy);
+      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+    .slide.cream .tag { border-color: var(--ink-faint); }
+    .tag.solid { background: var(--accent); color: var(--cream-light); border-color: var(--accent); }
+
+    /* ─── Code block ─── */
+    .code {
+      font-family: var(--font-mono);
+      font-size: clamp(0.82rem, 1.15vw, 1.02rem);
+      line-height: 1.7;
+      padding: clamp(1rem, 1.8vw, 1.5rem) clamp(1.1rem, 2vw, 1.7rem);
+      background: var(--navy-deep);
+      color: var(--cream);
+      border-left: 3px solid var(--accent);
+    }
+    .slide.cream .code { background: var(--navy); }
+    .code .cm { color: var(--cream-dim-on-navy); }
+
+    /* ─── Date stack (cover) ─── */
+    .datestack {
+      font-family: var(--font-display-en);
+      font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .datestack .slash { color: var(--accent); margin: 0 0.05em; }
+
+    /* ─── Cover hero — hamster planet ─── */
+    .hero-orb {
+      position: relative;
+      width: clamp(220px, 34vw, 420px);
+      height: clamp(220px, 34vw, 420px);
+      border-radius: 50%;
+      background-image: url('./assets/hamster.png');
+      background-size: 135% auto;
+      background-position: 60% 18%;
+      background-repeat: repeat-x;
+      box-shadow:
+        inset -30px -45px 70px rgba(0,0,0,0.55),
+        inset 22px 28px 50px rgba(255,255,255,0.14),
+        0 0 90px rgba(212, 98, 58, 0.28),
+        0 0 0 1px rgba(237,228,211,0.08);
+      overflow: hidden;
+      will-change: background-position;
+    }
+    /* Spherical highlight (top-left) */
+    .hero-orb::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse 55% 40% at 28% 28%, rgba(255,255,255,0.32) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 28% at 78% 78%, rgba(0,0,0,0.45) 0%, transparent 65%);
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+    /* Edge darkening + faint scanlines for "planet" feel */
+    .hero-orb::after {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, transparent 55%, rgba(22,30,58,0.55) 95%),
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,0.06) 3px 4px);
+      pointer-events: none;
+    }
+
+    .stars {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, rgba(237,228,211,0.7), transparent 50%),
+        radial-gradient(1px 1px at 65% 15%, rgba(237,228,211,0.55), transparent 50%),
+        radial-gradient(1.5px 1.5px at 80% 60%, rgba(237,228,211,0.6), transparent 50%),
+        radial-gradient(1px 1px at 12% 70%, rgba(237,228,211,0.5), transparent 50%),
+        radial-gradient(1px 1px at 88% 85%, rgba(237,228,211,0.7), transparent 50%),
+        radial-gradient(1.5px 1.5px at 35% 88%, rgba(237,228,211,0.5), transparent 50%),
+        radial-gradient(1px 1px at 52% 22%, rgba(237,228,211,0.6), transparent 50%),
+        radial-gradient(1px 1px at 8% 45%, rgba(237,228,211,0.4), transparent 50%),
+        radial-gradient(1px 1px at 75% 38%, rgba(237,228,211,0.5), transparent 50%),
+        radial-gradient(1px 1px at 28% 12%, rgba(237,228,211,0.55), transparent 50%);
+    }
+    .star-glyph {
+      position: absolute;
+      color: var(--cream);
+      opacity: 0.5;
+      font-family: var(--font-display-en);
+      font-size: 1.2rem;
+      pointer-events: none;
+    }
+
+    /* ─── Big quote ─── */
+    .quote-block {
+      font-family: var(--font-display-ko);
+      font-size: clamp(2rem, 5.5vw, 4.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .quote-block .accent { color: var(--accent); }
+
+    /* ─── Year band (timeline) ─── */
+    .year-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 22%) 1fr;
+      gap: clamp(1.5rem, 3vw, 3rem);
+      align-items: center;
+      padding: clamp(1rem, 2vw, 1.7rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .year-row:last-child { border-bottom: none; }
+    .slide.cream .year-row { border-bottom-color: var(--ink-faint); }
+    .year-row .y {
+      font-family: var(--font-display-en);
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.9;
+      color: var(--accent);
+    }
+    .year-row .y-title {
+      font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .year-row .y-sub {
+      font-size: clamp(0.85rem, 1.1vw, 1.02rem);
+      opacity: 0.72;
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Flow strip ─── */
+    .flow { display: flex; width: 100%; }
+    .flow-step {
+      flex: 1;
+      padding: clamp(1.1rem, 2vw, 1.7rem);
+      border: 1px solid var(--cream-faint-on-navy);
+      border-right: none;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .flow-step:last-child { border-right: 1px solid var(--cream-faint-on-navy); }
+    .slide.cream .flow-step { border-color: var(--ink-faint); }
+    .slide.cream .flow-step:last-child { border-right-color: var(--ink-faint); }
+    .flow-step.hi { background: var(--accent); color: var(--cream-light); border-color: var(--accent); }
+    .flow-step.hi + .flow-step { border-left-color: var(--accent); }
+    .flow-step .s-num { font-family: var(--font-display-en); font-size: 0.78rem; letter-spacing: 0.15em; opacity: 0.7; }
+    .flow-step .s-title {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+      letter-spacing: 0.02em; line-height: 1.05;
+    }
+    .flow-step .s-quote { font-size: clamp(0.78rem, 1vw, 0.95rem); line-height: 1.45; opacity: 0.85; font-style: italic; }
+
+    /* ─── Speaker note ─── */
+    .speaker-note {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-height: 38vh; overflow-y: auto;
+      background: var(--navy-deep);
+      border-top: 2px solid var(--accent);
+      color: var(--cream);
+      padding: 1.1rem 2rem;
+      font-size: 0.92rem; line-height: 1.6;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .speaker-note.visible { transform: translateY(0); }
+    .speaker-note .sn-label {
+      font-family: var(--font-display-en);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    /* ─── Host intro card (slide 02) ─── */
+    .host-card {
+      width: 100%;
+      height: 100%;
+      min-height: clamp(220px, 42vh, 480px);
+      background:
+        linear-gradient(160deg, rgba(22,30,58,0.25) 0%, rgba(22,30,58,0.45) 70%, rgba(22,30,58,0.7) 100%),
+        url('./assets/sun.jpg') center / cover no-repeat,
+        var(--navy-deep);
+      color: var(--cream);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(1.4rem, 3vw, 2.4rem);
+      position: relative;
+      overflow: hidden;
+    }
+    .host-card::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 30%, rgba(255,170,90,0.12), transparent 65%),
+        radial-gradient(ellipse 40% 35% at 80% 80%, rgba(237,228,211,0.05), transparent 60%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    .host-card::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,0.08) 3px 4px);
+      pointer-events: none;
+    }
+    .host-card > * { position: relative; z-index: 1; }
+    .host-handle {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 0.98vw, 0.95rem);
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      position: relative; z-index: 1;
+    }
+    .host-mark {
+      font-family: var(--font-display-en);
+      font-size: clamp(4.5rem, 13vw, 10rem);
+      line-height: 0.85;
+      letter-spacing: -0.05em;
+      position: relative; z-index: 1;
+    }
+    .host-mark span { color: var(--accent); }
+    .host-name {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.85rem, 1.15vw, 1.05rem);
+      letter-spacing: 0.2em;
+      opacity: 0.7;
+      position: relative; z-index: 1;
+    }
+    .host-meta {
+      display: flex; flex-direction: column;
+      gap: clamp(0.4rem, 0.8vw, 0.65rem);
+      font-size: clamp(0.85rem, 1.13vw, 1rem);
+      color: var(--ink-muted);
+    }
+    .host-meta-row {
+      display: grid;
+      grid-template-columns: clamp(60px, 7vw, 80px) 1fr;
+      gap: clamp(0.7rem, 1.4vw, 1.1rem);
+      align-items: baseline;
+      padding-bottom: clamp(0.35rem, 0.7vw, 0.55rem);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .host-meta-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .host-meta-key {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.74rem, 0.9vw, 0.85rem);
+      letter-spacing: 0.16em;
+      color: var(--ink);
+    }
+    .host-meta-val { line-height: 1.5; }
+    .host-quote {
+      font-style: italic;
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      line-height: 1.4;
+      color: var(--ink);
+      border-left: 3px solid var(--accent);
+      padding: clamp(0.3rem, 0.6vw, 0.5rem) 0 clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.7rem, 1.2vw, 1rem);
+    }
+    .host-links {
+      display: flex; gap: clamp(0.8rem, 1.6vw, 1.5rem);
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1vw, 0.9rem);
+      color: var(--ink-muted);
+      padding-top: clamp(0.5rem, 1vw, 0.8rem);
+      border-top: 1px solid var(--ink-faint);
+    }
+    .host-links a {
+      color: inherit; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .host-links a:hover { color: var(--accent); }
+
+    /* ─── Diagnostic form (slide 03) ─── */
+    .diag-disclaimer {
+      font-size: clamp(0.78rem, 1vw, 0.9rem);
+      line-height: 1.55;
+      padding: clamp(0.7rem, 1.2vw, 1rem) clamp(0.85rem, 1.4vw, 1.15rem);
+      border-left: 3px solid var(--accent);
+      background: rgba(212, 98, 58, 0.07);
+      color: var(--ink-muted);
+    }
+    .diag-disclaimer strong { color: var(--ink); font-weight: 700; }
+
+    .diag-progress {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.78rem, 1vw, 0.9rem);
+      letter-spacing: 0.16em;
+      color: var(--ink-muted);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .diag-progress .bar {
+      width: clamp(60px, 8vw, 100px);
+      height: 4px;
+      background: var(--ink-faint);
+      position: relative; overflow: hidden;
+    }
+    .diag-progress .bar::after {
+      content: ""; position: absolute; inset: 0;
+      width: var(--p, 0%);
+      background: var(--accent);
+      transition: width 0.25s;
+    }
+
+    .diag-form-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: clamp(0.4rem, 1vw, 0.7rem);
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-faint) transparent;
+    }
+    .diag-form-wrap::-webkit-scrollbar { width: 6px; }
+    .diag-form-wrap::-webkit-scrollbar-track { background: transparent; }
+    .diag-form-wrap::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 3px; }
+
+    .diag-form { display: flex; flex-direction: column; gap: clamp(0.6rem, 1vw, 0.85rem); }
+
+    .diag-q {
+      display: flex; flex-direction: column;
+      gap: 0.35rem;
+      padding-bottom: clamp(0.55rem, 0.9vw, 0.8rem);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .diag-q:last-child { border-bottom: none; }
+    .diag-q-head { display: flex; align-items: baseline; gap: 0.6rem; }
+    .diag-q-num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.78rem, 1vw, 0.9rem);
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .diag-q-text {
+      font-size: clamp(0.85rem, 1.1vw, 0.98rem);
+      line-height: 1.4;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+    }
+    .diag-q-control {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: clamp(0.7rem, 1.3vw, 1rem);
+      align-items: center;
+    }
+    .diag-q-control input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px;
+      outline: none; border-radius: 2px; cursor: pointer;
+      margin: 0;
+      background: linear-gradient(
+        to right,
+        var(--ink-faint) 0%,
+        var(--ink-faint) 49.5%,
+        rgba(26, 37, 66, 0.45) 49.5%,
+        rgba(26, 37, 66, 0.45) 50.5%,
+        var(--ink-faint) 50.5%,
+        var(--ink-faint) 100%
+      );
+    }
+    .diag-q-control input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2.5px solid var(--cream);
+      box-shadow: 0 0 0 1.5px var(--accent);
+      transition: transform 0.12s;
+    }
+    .diag-q-control input[type=range]::-webkit-slider-thumb:active { transform: scale(1.15); }
+    .diag-q-control input[type=range]::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2.5px solid var(--cream);
+      box-shadow: 0 0 0 1.5px var(--accent);
+    }
+    .diag-q-value {
+      font-family: var(--font-display-en);
+      font-size: clamp(1rem, 1.4vw, 1.2rem);
+      color: var(--ink-muted);
+      font-variant-numeric: tabular-nums;
+      min-width: 2em;
+      text-align: right;
+      transition: color 0.2s;
+    }
+    .diag-q-value.touched { color: var(--accent); }
+    .diag-q-scale {
+      display: flex; justify-content: space-between;
+      font-family: var(--font-display-en);
+      font-size: clamp(0.65rem, 0.78vw, 0.72rem);
+      opacity: 0.45;
+      letter-spacing: 0.08em;
+      padding: 0 calc(clamp(2.2rem, 4vw, 3rem)) 0 0;
+    }
+
+    .diag-textarea-row {
+      display: flex; flex-direction: column;
+      gap: 0.4rem;
+      padding-top: clamp(0.55rem, 1vw, 0.85rem);
+      border-top: 1px solid var(--ink-faint);
+    }
+    .diag-textarea-row:first-of-type {
+      margin-top: clamp(0.5rem, 1vw, 0.85rem);
+      border-top: 1.5px dashed rgba(26, 37, 66, 0.35);
+    }
+    .diag-form textarea {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: clamp(0.86rem, 1.12vw, 1rem);
+      line-height: 1.5;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.5);
+      border: none;
+      border-bottom: 1.5px solid var(--ink-faint);
+      padding: 0.55rem 0.7rem;
+      resize: none;
+      outline: none;
+      transition: border-bottom-color 0.2s, background 0.2s;
+    }
+    .diag-form textarea:focus {
+      border-bottom-color: var(--accent);
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .diag-form textarea::placeholder {
+      color: var(--ink); opacity: 0.35;
+    }
+
+    .diag-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem;
+      padding-top: clamp(0.6rem, 1.2vw, 1rem);
+      border-top: 1.5px solid var(--ink);
+      margin-top: clamp(0.4rem, 0.8vw, 0.7rem);
+      flex-wrap: wrap;
+    }
+    .diag-saved {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.7rem, 0.88vw, 0.78rem);
+      letter-spacing: 0.18em;
+      color: var(--ink-muted);
+      display: inline-flex; align-items: center; gap: 0.45rem;
+    }
+    .diag-saved::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--ink-faint); transition: background 0.3s;
+    }
+    .diag-saved.active { color: var(--accent); }
+    .diag-saved.active::before { background: var(--accent); }
+
+    .diag-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .diag-btn {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.78rem, 0.95vw, 0.86rem);
+      letter-spacing: 0.14em;
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--ink);
+      padding: 0.55rem 1.05rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .diag-btn:hover { background: var(--ink); color: var(--cream); }
+    .diag-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--cream-light);
+    }
+    .diag-btn.primary:hover {
+      background: var(--ink); border-color: var(--ink);
+    }
+    .diag-btn:disabled {
+      opacity: 0.35; cursor: not-allowed;
+    }
+    .diag-btn:disabled:hover { background: transparent; color: var(--ink); }
+
+    /* Result block (left column) */
+    .diag-result {
+      display: none;
+      flex-direction: column;
+      gap: clamp(0.6rem, 1.2vw, 1rem);
+      padding: clamp(1rem, 1.8vw, 1.5rem);
+      border: 1.5px solid var(--ink);
+      background: rgba(255, 255, 255, 0.45);
+      animation: result-in 0.45s ease;
+    }
+    .diag-result.visible { display: flex; }
+    @keyframes result-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .diag-result-label {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.72rem, 0.92vw, 0.82rem);
+      letter-spacing: 0.2em;
+      color: var(--ink-muted);
+    }
+    .diag-result-score {
+      font-family: var(--font-display-en);
+      font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+      line-height: 0.95;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .diag-result-type {
+      font-family: var(--font-display-ko);
+      font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+    }
+    .diag-result-desc {
+      font-size: clamp(0.85rem, 1.1vw, 0.98rem);
+      line-height: 1.55;
+      color: var(--ink-muted);
+    }
+
+    /* ─── Vendor logo on cards (slides 9 / 10) ─── */
+    .vendor-logo {
+      width: clamp(40px, 4.5vw, 56px);
+      height: clamp(40px, 4.5vw, 56px);
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+      margin-bottom: clamp(0.5rem, 1vw, 0.85rem);
+    }
+    .inline-logo {
+      width: clamp(26px, 2.4vw, 34px);
+      height: clamp(26px, 2.4vw, 34px);
+      object-fit: contain;
+      vertical-align: middle;
+      margin-right: 0.55rem;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    /* ─── Logo (bottom-left of slides 2+) ─── */
+    .papri-logo {
+      height: clamp(34px, 3.6vw, 52px);
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* ─── Progress / help ─── */
+    .progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 50; transition: width 0.3s ease; }
+    .help {
+      position: fixed; inset: 0; background: rgba(22,30,58,0.96);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; color: var(--cream);
+    }
+    .help.visible { display: flex; }
+    .help-content { max-width: 500px; padding: 2rem; }
+    .help-content h3 { font-family: var(--font-display-en); font-size: 1.6rem; margin-bottom: 1.4rem; letter-spacing: 0.02em; }
+    .help-content kbd {
+      display: inline-block; padding: 0.2rem 0.55rem;
+      background: var(--navy-deep);
+      border: 1px solid var(--cream-faint-on-navy);
+      font-family: var(--font-mono); font-size: 0.82rem;
+      margin-right: 0.5rem; min-width: 2.4rem; text-align: center;
+    }
+    .help-content ul { list-style: none; }
+    .help-content li { padding: 0.45rem 0; font-size: 0.95rem; }
+
+    @media (max-width: 760px) {
+      .grid-2, .grid-2.lopsided, .grid-2.image-left, .grid-3 { grid-template-columns: 1fr; gap: 1.5rem; }
+      .grid-4 { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .row { flex-direction: column; }
+      .flow { flex-direction: column; }
+      .flow-step { border-right: 1px solid var(--cream-faint-on-navy); }
+      .photo { min-height: 200px; }
+      .year-row { grid-template-columns: 1fr; gap: 0.6rem; }
+    }
+
+    @media print {
+      .slide { position: relative; opacity: 1; page-break-after: always; height: 100vh; }
+      .progress, .speaker-note, .help { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <!-- ===== 01 / COVER ===== -->
+    <section class="slide active">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body" style="justify-content: center; align-items: center; position: relative;">
+        <div class="stars"></div>
+        <span class="star-glyph" style="top: 10%; left: 8%;">✦</span>
+        <span class="star-glyph" style="top: 18%; right: 12%;">+</span>
+        <span class="star-glyph" style="bottom: 22%; left: 15%;">✦</span>
+        <span class="star-glyph" style="bottom: 12%; right: 8%;">+</span>
+        <div class="hero-orb" style="margin-bottom: clamp(1rem, 3vw, 2.5rem); z-index: 2;"></div>
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; width: 100%; flex-wrap: wrap; z-index: 2;">
+          <div class="datestack">
+            <span>2026</span><span class="slash">/</span><span>05</span>
+          </div>
+          <div style="text-align: center; flex: 1; min-width: 280px;">
+            <div class="label" style="margin-bottom: 0.6rem;">AI를 이해하며 쓴다는 것</div>
+          </div>
+          <div class="datestack" style="text-align: right;">
+            <span>WEEK</span><span class="slash">\</span><span>01</span>
+          </div>
+        </div>
+        <h1 class="en-display display-xl" style="text-align: center; margin-top: clamp(0.5rem, 1.5vw, 1rem); z-index: 2;">PAPRI<br/>AI WORKSHOP</h1>
+      </div>
+      <div class="rail rail-bottom">
+        <div>WORKSHOP — 2026</div>
+        <div>PRESENTED BY YOO TAEYANG</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        오리엔테이션 + 자기소개 + 1주차 본론. 약 2시간 분량.
+      </div>
+    </section>
+
+    <!-- ===== 02 / HOST INTRO ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="host-card">
+            <div class="host-handle">@0dot77</div>
+            <div class="host-mark">0<span>.</span>77</div>
+            <div class="host-name">TAEYANG YOO</div>
+          </div>
+          <div class="col center">
+            <div class="label">— HOST / 주인장 소개</div>
+            <h1 class="ko-display display-md" style="font-size: clamp(1.8rem, 4.6vw, 3.6rem);">유태양<br/>TAEYANG<br/>YOO.</h1>
+            <p class="host-quote">
+              "I make tools for artists.<br/>I make art with tools."
+            </p>
+            <div class="host-meta">
+              <div class="host-meta-row">
+                <span class="host-meta-key">ROLE</span>
+                <span class="host-meta-val">Technical Director · Interactive Developer · XR / Immersive</span>
+              </div>
+              <div class="host-meta-row">
+                <span class="host-meta-key">TEACH</span>
+                <span class="host-meta-val">한예종 무용원 창작과 / 영상원 멀티미디어영상과</span>
+              </div>
+              <div class="host-meta-row">
+                <span class="host-meta-key">RECENT</span>
+                <span class="host-meta-val">Imagine Your Heart · 문문문 · XR 뮤지컬 〈문을 넘어〉</span>
+              </div>
+            </div>
+            <div class="tags" style="margin-top: 0.2rem;">
+              <span class="tag">Unity</span>
+              <span class="tag">TouchDesigner</span>
+              <span class="tag">Three.js</span>
+              <span class="tag">Blender</span>
+              <span class="tag solid">AI Workflows</span>
+            </div>
+            <div class="host-links">
+              <a href="https://0dot77.com" target="_blank" rel="noopener">↗ 0dot77.com</a>
+              <a href="https://github.com/0dot77" target="_blank" rel="noopener">↗ github/0dot77</a>
+              <a href="https://instagram.com/0dot77" target="_blank" rel="noopener">↗ ig/@0dot77</a>
+              <a href="mailto:yty0706@gmail.com">↗ yty0706@gmail.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>02</div>
+      </div>
+    </section>
+
+    <!-- ===== 03 / 참여자 소개 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col" style="justify-content: center; gap: clamp(0.7rem, 1.4vw, 1.1rem);">
+            <div class="label">SELF-DIAGNOSIS / 자가진단</div>
+            <h1 class="ko-display display-md" style="font-size: clamp(1.8rem, 4.5vw, 3.6rem);">AI 작업<br/>활용<br/>자가진단.</h1>
+            <div class="diag-progress" id="diag-progress">
+              <span id="diag-progress-text">0 / 12 응답</span>
+              <div class="bar" style="--p: 0%;"></div>
+            </div>
+
+            <div class="diag-result" id="diag-result">
+              <div class="diag-result-label">— YOUR TYPE</div>
+              <div class="diag-result-score" id="diag-result-score">+0</div>
+              <div class="diag-result-type" id="diag-result-type">AI 찍먹러</div>
+              <div class="diag-result-desc" id="diag-result-desc">몇 번 써봤고 가능성은 느끼지만, 아직 습관은 아니다.</div>
+            </div>
+          </div>
+
+          <div class="col" style="height: 100%; min-height: 0; gap: clamp(0.5rem, 1vw, 0.8rem);">
+            <div class="diag-form-wrap">
+              <form class="diag-form" id="diag-form" autocomplete="off"></form>
+            </div>
+            <div class="diag-toolbar">
+              <span class="diag-saved" id="diag-saved">자동 저장 대기</span>
+              <div class="diag-actions">
+                <button type="button" class="diag-btn" id="diag-reset">RESET</button>
+                <button type="button" class="diag-btn" id="diag-download">↓ JSON</button>
+                <button type="button" class="diag-btn primary" id="diag-submit">집계하기 →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>03</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        한 사람씩 1~2분. 라이트하게.
+      </div>
+    </section>
+
+    <!-- ===== 03 / 워크숍 매니페스토 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1400&q=80" alt="Code" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">MANIFESTO</div>
+          </div>
+          <div class="col center">
+            <div class="label">대-딸깍 시대</div>
+            <h1 class="ko-display display-lg">AI를<br/><span style="color: var(--accent);">이해하며</span><br/>쓴다는 것은?</h1>
+            <p class="lead">
+              더 단단한 '추상화' 라는 AI의 껍질이<br/>덧씌워지기 전에, 지금 그 안쪽을 한 번 들여다 봅시다.<br/>
+              그리고 — 나를 위한 도구를 한 가지, 직접 만들어 봅니다.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>04</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        딸깍의 시대 = 누구나 한 번에 결과를 받는 시대. 이해하면서 쓰자.
+      </div>
+    </section>
+
+    <!-- ===== 04 / 4주 커리큘럼 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <h1 class="en-display display-md">CURRICULUM<br/>4 WEEKS</h1>
+            <div class="label">WK01 → WK04</div>
+          </div>
+          <div class="grid-4" style="flex: 1; margin-top: clamp(0.6rem, 1.5vw, 1.2rem);">
+            <div class="card">
+              <div class="c-num">— WK 01 / TODAY</div>
+              <div class="c-title">최신 흐름 이해<br/>AI 도구 살펴보기</div>
+              <div class="c-body">전체 지형도를 그리고, 도구를 직접 한 번 사용해 봅니다.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— WK 02</div>
+              <div class="c-title">AI 설계의 주요 문서</div>
+              <div class="c-body">AGENTS.md / CLAUDE.md / Rules — 함께 작성해 봅니다.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— WK 03</div>
+              <div class="c-title">Skill / MCP / Rules</div>
+              <div class="c-body">AI를 확장하는 세 가지 인터페이스를 다룹니다.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— WK 04</div>
+              <div class="c-title">나의 도구 제작 / 회고</div>
+              <div class="c-body">Try and Error 공유, 4주의 회고로 마무리합니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>05</div>
+      </div>
+    </section>
+
+    <!-- ===== 05 / PART I 디바이더 (역사) ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>A BRIEF HISTORY</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1400&q=80" alt="Circuits" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">PART I</div>
+          </div>
+          <div class="col center">
+            <div class="label">— 01 / SECTION</div>
+            <h1 class="ko-display display-xl">제대로<br/>알려면<br/><span style="color: var(--accent);">역시</span><br/>역사.</h1>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>06</div>
+      </div>
+    </section>
+
+    <!-- ===== 07 / 타임라인 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>THE HISTORY</div>
+      </div>
+      <div class="body">
+        <div class="row">
+          <div class="col" style="flex: 0 0 28%; justify-content: flex-start;">
+            <div class="label">— TIMELINE</div>
+            <h1 class="en-display display-md">2023<br/>→<br/>2026</h1>
+            <p class="body-text">Prompt → Context → Harness.<br/>한 흐름의 키워드 변천사.</p>
+          </div>
+          <div class="col" style="flex: 1; justify-content: center; gap: 0;">
+            <div class="year-row">
+              <div class="y">2023</div>
+              <div>
+                <div class="y-title">GPT-4 / ChatGPT 대중화 / Prompt Engineering</div>
+                <div class="y-sub">"질문을 잘해야 한다" — 프롬프트가 곧 결과물의 운명</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">24<br/>—25</div>
+              <div>
+                <div class="y-title">AI BOOM</div>
+                <div class="y-sub">멀티모달 / 에이전트 / 코드 생성 — 동시다발적 도입</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">25<sup style="font-size: 0.4em; opacity: 0.7;">後</sup></div>
+              <div>
+                <div class="y-title">Context Engineering / MCP / Claude Code</div>
+                <div class="y-sub">"맥락을 잘 주어야 한다" — 도구가 모델 바깥에서 자라기 시작</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">2026</div>
+              <div>
+                <div class="y-title">Harness Engineering / Local LLM</div>
+                <div class="y-sub">Moltbot · OpenClaw · Hermes Agent · Codex — 마구를 채우는 시기</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>07</div>
+      </div>
+    </section>
+
+    <!-- ===== 06 / 연구자 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%; gap: clamp(0.6rem, 1.2vw, 1rem);">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div class="label">눈여겨보면 좋을</div>
+              <h1 class="ko-display display-md" style="margin-top: 0.4rem;">연구자 &amp; 과학자.</h1>
+            </div>
+            <div class="label">— 1 ORG / 5 PEOPLE</div>
+          </div>
+          <div class="grid-3" style="grid-template-rows: repeat(2, 1fr); flex: 1;">
+            <div class="card">
+              <div class="c-num">— ORG</div>
+              <div class="c-title">Google DeepMind</div>
+              <div class="c-body">AlphaGo로 시작해 멀티모달, 사이언스 영역의 프론티어를 끌고 가는 조직.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— RESEARCHER / 01</div>
+              <div class="c-title">Andrej Karpathy<br/><span style="font-family: var(--font-mono); font-size: 0.7em; font-weight: 500; color: var(--accent);">@karpathy</span></div>
+              <div class="c-body">LLM · 딥러닝 · AI 교육. 복잡한 개념을 쉽게 풀어주는 설명이 좋음.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— RESEARCHER / 02</div>
+              <div class="c-title">François Chollet<br/><span style="font-family: var(--font-mono); font-size: 0.7em; font-weight: 500; color: var(--accent);">@fchollet</span></div>
+              <div class="c-body">Keras 창시자, ARC Prize. LLM 중심 흐름을 비판적으로 바라보는 관점.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— RESEARCHER / 03</div>
+              <div class="c-title">Yann LeCun<br/><span style="font-family: var(--font-mono); font-size: 0.7em; font-weight: 500; color: var(--accent);">@ylecun</span></div>
+              <div class="c-body">딥러닝 원로. LLM 이후의 world model, 새로운 AI 아키텍처에 대한 관점.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— RESEARCHER / 04</div>
+              <div class="c-title">Lilian Weng<br/><span style="font-family: var(--font-mono); font-size: 0.7em; font-weight: 500; color: var(--accent);">@lilianweng</span></div>
+              <div class="c-body">에이전트 · RL · AI safety. 블로그 Lil'Log도 함께 추천.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— RESEARCHER / 05</div>
+              <div class="c-title">Jim Fan<br/><span style="font-family: var(--font-mono); font-size: 0.7em; font-weight: 500; color: var(--accent);">@DrJimFan</span></div>
+              <div class="c-body">AI agents · embodied AI · 로봇/시뮬레이션 쪽 흐름을 잘 짚어줌.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>08</div>
+      </div>
+    </section>
+
+    <!-- ===== 08 / PART II 디바이더 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>TOOLS</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 02 / SECTION</div>
+            <h1 class="ko-display display-xl">우리가<br/>쓸 수 있는<br/><span style="color: var(--accent);">도구들.</span></h1>
+            <p class="lead">지형도 한 장 — 어디에 무엇이 있는가.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=1400&q=80" alt="Tools" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">TOOLS</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>09</div>
+      </div>
+    </section>
+
+    <!-- ===== 09 / 벤더 매트릭스 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>FRONTIER LABS</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <h1 class="en-display display-md">FRONTIER<br/>VENDORS.</h1>
+            <div class="label">3 LABS / 7 SURFACES</div>
+          </div>
+          <div class="grid-3" style="flex: 1; margin-top: clamp(0.5rem, 1.2vw, 1rem);">
+            <div class="card">
+              <img class="vendor-logo" src="./assets/logos/gemini.png" alt="Gemini" />
+              <div class="c-num">— 01 / GOOGLE</div>
+              <div class="c-title">Gemini</div>
+              <div class="c-body">멀티모달 강세, 긴 컨텍스트.</div>
+              <div class="tags"><span class="tag">Chat</span><span class="tag">Gemini CLI</span></div>
+            </div>
+            <div class="card">
+              <img class="vendor-logo" src="./assets/logos/claude.png" alt="Claude" />
+              <div class="c-num">— 02 / ANTHROPIC</div>
+              <div class="c-title">Claude</div>
+              <div class="c-body">에이전트/코드 작업의 강력한 파트너.</div>
+              <div class="tags"><span class="tag">Chat</span><span class="tag">Cowork</span><span class="tag solid">Claude Code</span></div>
+            </div>
+            <div class="card">
+              <img class="vendor-logo" src="./assets/logos/openai.png" alt="OpenAI" />
+              <div class="c-num">— 03 / OPENAI</div>
+              <div class="c-title">OpenAI</div>
+              <div class="c-body">가장 빠른 온도 변화, 대중적 도달률.</div>
+              <div class="tags"><span class="tag">Chat</span><span class="tag">Codex</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>10</div>
+      </div>
+    </section>
+
+    <!-- ===== 10 / 1황은 계속 바뀐다 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>VOLATILITY</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=1400&q=80" alt="Mountains" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">VOLATILITY</div>
+          </div>
+          <div class="col center">
+            <div class="label">FRONTIER VS OPEN-SOURCE</div>
+            <h1 class="quote-block">1황은<br/>계속해서<br/><span class="accent">바뀐다.</span></h1>
+            <p class="body-text">미국 프론티어 모델의 패권 안에서, 중국 오픈소스 진영이 빠르게 따라붙고 있습니다.</p>
+            <ul class="num-list" style="margin-top: 0.4rem;">
+              <li><span class="num">01</span><span class="text"><img class="inline-logo" src="./assets/logos/deepseek.png" alt="DeepSeek" />DeepSeek<span class="sub">추론 비용을 한 자릿수로</span></span></li>
+              <li><span class="num">02</span><span class="text"><img class="inline-logo" src="./assets/logos/kimi.png" alt="Kimi" />Kimi<span class="sub">초장문 컨텍스트 + 에이전트</span></span></li>
+              <li><span class="num">03</span><span class="text"><img class="inline-logo" src="./assets/logos/zai.png" alt="Z.ai" />Z.ai (GLM)<span class="sub">코드/에이전트 가성비</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>11</div>
+      </div>
+    </section>
+
+    <!-- ===== 11 / 우리는 무엇을 할 것인가 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>OUR MISSION</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">우리는 무엇을 할 것인가</div>
+            <h1 class="ko-display display-lg">정의하고,<br/>상상하고,<br/><span style="color: var(--accent);">만들기.</span></h1>
+          </div>
+          <div class="col center">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">AI를 나의 '무엇'인지 정의하고,</span></li>
+              <li><span class="num">02</span><span class="text">어떻게 사용해 볼 수 있을지 상상하고,</span></li>
+              <li><span class="num">03</span><span class="text">직접 작은 AI 기반 도구를 만들어 봅니다.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>12</div>
+      </div>
+    </section>
+
+    <!-- ===== 12 / 패러다임 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>THE EVOLUTION</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div>
+            <div class="label">AI를 다루는 방식의 흐름</div>
+            <h1 class="en-display display-md" style="margin-top: 0.4rem;">PROMPT → CONTEXT<br/>→ HARNESS.</h1>
+          </div>
+          <div class="flow" style="flex: 1; margin-top: clamp(0.6rem, 1.2vw, 1rem);">
+            <div class="flow-step">
+              <div class="s-num">— 2023</div>
+              <div class="s-title">PROMPT<br/>ENGINEERING</div>
+              <div class="s-quote">"질문을 잘해야 함"</div>
+            </div>
+            <div class="flow-step">
+              <div class="s-num">— 2024-25</div>
+              <div class="s-title">CONTEXT<br/>ENGINEERING</div>
+              <div class="s-quote">"맥락을 잘 주어야 함"</div>
+            </div>
+            <div class="flow-step hi">
+              <div class="s-num">— 2026 ↑</div>
+              <div class="s-title">HARNESS<br/>ENGINEERING</div>
+              <div class="s-quote">"AI라는 야생마에 마구를 잘 만들어 채우기"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>13</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        흐름은 발전하지만 이전 세대가 사라지진 않는다. 다 쌓인다.
+      </div>
+    </section>
+
+    <!-- ===== 13 / AI가 못하는 것: 결정 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>BOTTLENECK</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1400&q=80" alt="Decision" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">DECISION</div>
+          </div>
+          <div class="col center">
+            <div class="label">AI가 못하는 것</div>
+            <h1 class="ko-display display-xl">결정.</h1>
+            <p class="body-text" style="font-size: clamp(0.95rem, 1.4vw, 1.18rem);">
+              결정은 인간이 해야 합니다.<br/>
+              그래서 AI와 함께하는 작업은 <strong>인간이 병목</strong>이 될 수밖에 없죠.
+            </p>
+            <p class="body-text" style="font-size: clamp(0.95rem, 1.4vw, 1.18rem); border-top: 1px solid var(--cream-faint-on-navy); padding-top: clamp(0.6rem, 1vw, 1rem);">
+              병목을 최소화하려면 — 내가 작업할 영역을<br/>
+              <strong style="color: var(--accent);">명확하게 명시</strong>하고, AI에게 정확히 전달해야 합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>14</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        워크숍의 진짜 목표 — 각자의 영역에서 AI가 스스로 잘 결정하고 나아갈 수 있도록 마구를 짜는 것.
+      </div>
+    </section>
+
+    <!-- ===== 14 / PART III 디바이더 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>HANDS-ON BASICS</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 03 / SECTION</div>
+            <h1 class="ko-display display-xl">이해하면<br/>좋을<br/><span style="color: var(--accent);">개념들.</span></h1>
+            <p class="lead">손에 잡히는 단어부터.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1400&q=80" alt="Code" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">CONCEPTS</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>15</div>
+      </div>
+    </section>
+
+    <!-- ===== 15 / 폴더 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>CONCEPT 01 / FOLDER</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">CONCEPT 01</div>
+            <h1 class="ko-display display-lg">폴더는<br/>'격리된'<br/>환경.</h1>
+            <p class="body-text">
+              에이전트는 폴더를 기반으로 활동합니다.<br/>
+              폴더 = 하나의 프로젝트, 하나의 컨텍스트.<br/>
+              <span style="color: var(--accent);">최소한의 격리</span>를 의식해야 작업이 단단해집니다.
+            </p>
+          </div>
+          <div class="col center">
+            <pre class="code"><span style="display:block;">프로젝트 폴더/</span><span style="display:block;">├── docs/</span><span style="display:block;">│   └── 각종 문서들</span><span style="display:block;">├── main/</span><span style="display:block;">│   └── ...</span><span style="display:block;">└── AGENTS.md   <span class="cm">← 에이전트의 지도</span></span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>16</div>
+      </div>
+    </section>
+
+    <!-- ===== 16 / 터미널 vs 앱 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>SETUP</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div>
+            <div class="label">CLAUDE / CODEX 설치하기</div>
+            <h1 class="en-display display-md" style="margin-top: 0.4rem;">TERMINAL<br/>vs APP.</h1>
+          </div>
+          <div class="grid-2" style="flex: 1; margin-top: clamp(0.6rem, 1.2vw, 1rem);">
+            <div class="card">
+              <div class="c-num">— 01 / 추천</div>
+              <div class="c-title">터미널 환경</div>
+              <div class="c-body">
+                빠른 컨텍스트 스위칭. 여러 에이전트를 동시에 굴릴 수 있어요.
+              </div>
+              <div class="tags">
+                <span class="tag solid">Claude Code</span>
+                <span class="tag solid">Codex CLI</span>
+                <span class="tag solid">Gemini CLI</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="c-num">— 02</div>
+              <div class="c-title">앱 환경</div>
+              <div class="c-body">
+                이전 대화창이 사라지지 않음. 프로젝트 하나를 길게 잡고 갈 때 좋습니다.
+              </div>
+              <div class="tags">
+                <span class="tag">Chat (Claude/GPT/Gemini)</span>
+                <span class="tag">Cowork</span>
+              </div>
+            </div>
+          </div>
+          <p class="body-text" style="margin-top: 0.4rem; font-size: clamp(0.85rem, 1.15vw, 1.02rem);">
+            앱 환경이 빠르게 좋아지고 있어 무엇을 써도 OK — 다만 <strong>터미널 환경</strong>이 주류입니다.
+          </p>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>17</div>
+      </div>
+    </section>
+
+    <!-- ===== 17 / 터미널 명령어 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>SHELL 101</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div>
+            <div class="label">간단한 터미널 명령어</div>
+            <h1 class="en-display display-md" style="margin-top: 0.4rem;">3 COMMANDS<br/>TO START.</h1>
+          </div>
+          <div class="grid-3" style="flex: 1; margin-top: clamp(0.6rem, 1.2vw, 1rem);">
+            <div class="card">
+              <div class="c-num">CMD 01</div>
+              <div class="c-title" style="font-family: var(--font-mono);">pwd</div>
+              <div class="c-body">현재 어느 폴더에 있는지<br/><span style="opacity:0.7">— print working directory</span></div>
+            </div>
+            <div class="card">
+              <div class="c-num">CMD 02</div>
+              <div class="c-title" style="font-family: var(--font-mono);">cd</div>
+              <div class="c-body">폴더 이동<br/><span style="opacity:0.7">— change directory</span></div>
+            </div>
+            <div class="card">
+              <div class="c-num">CMD 03</div>
+              <div class="c-title" style="font-family: var(--font-mono);">ls</div>
+              <div class="c-body">현재 폴더에 무엇이 있는지<br/><span style="opacity:0.7">— list</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>18</div>
+      </div>
+    </section>
+
+    <!-- ===== 18 / 실습 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>HANDS-ON</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=1400&q=80" alt="Web" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">YOUR FIRST WEB</div>
+          </div>
+          <div class="col center">
+            <div class="label">실습 / HANDS-ON</div>
+            <h1 class="ko-display display-lg">내 기분을<br/>보여주는<br/>웹 만들기.</h1>
+            <p class="body-text">
+              AI가 가장 잘하는 것 — 웹.<br/>
+              SaaS의 시대가 저물기 시작했습니다.<br/>
+              이해만 있으면, 누구나 작은 웹을 복제할 수 있죠.
+            </p>
+            <pre class="code">
+<span style="display:block;">"HTML 한 장으로 인터랙티브</span><span style="display:block;">웹 만들어줘 — [구체적 의도]"</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>19</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        실습 약 30분. 자기 기분/취향을 시각화하는 한 장짜리 HTML.
+      </div>
+    </section>
+
+    <!-- ===== 19 / 공유 회고 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>SHOW &amp; TELL</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">공유 &amp; 회고</div>
+            <h1 class="ko-display display-lg">각자의 한 장,<br/>같이<br/><span style="color: var(--accent);">봅시다.</span></h1>
+          </div>
+          <div class="col center">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">의도대로 된 부분</span></li>
+              <li><span class="num">02</span><span class="text">의도와 어긋난 부분</span></li>
+              <li><span class="num">03</span><span class="text">다음에 어떻게 다르게 시도할지</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>20</div>
+      </div>
+    </section>
+
+    <!-- ===== 20 / 다음 주 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>END OF WK01</div>
+      </div>
+      <div class="body" style="justify-content: space-between;">
+        <div class="col">
+          <div class="label">NEXT — WEEK 02</div>
+          <h1 class="ko-display display-xl">AI 설계의<br/><span style="color: var(--accent);">주요 문서.</span></h1>
+        </div>
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+          <p class="lead" style="max-width: 40ch;">
+            AGENTS.md / CLAUDE.md / Rules — 다음 주에는 직접 함께 작성해 봅니다.
+          </p>
+          <div class="datestack">
+            <span>WK</span><span class="slash">\</span><span>02</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>END / 21</div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Help overlay -->
+  <div class="help" id="help">
+    <div class="help-content">
+      <h3>KEYBOARD SHORTCUTS</h3>
+      <ul>
+        <li><kbd>→</kbd> <kbd>Space</kbd> 다음 슬라이드</li>
+        <li><kbd>←</kbd> 이전 슬라이드</li>
+        <li><kbd>Home</kbd> 처음으로</li>
+        <li><kbd>End</kbd> 마지막으로</li>
+        <li><kbd>N</kbd> 발표자 노트 토글</li>
+        <li><kbd>F</kbd> 전체화면</li>
+        <li><kbd>?</kbd> 이 도움말</li>
+        <li><kbd>Esc</kbd> 닫기</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    const help = document.getElementById('help');
+    let current = 0;
+    let notesVisible = false;
+
+    function go(idx) {
+      idx = Math.max(0, Math.min(slides.length - 1, idx));
+      slides[current].classList.remove('active');
+      slides[idx].classList.add('active');
+      current = idx;
+      progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+      const hash = '#' + (idx + 1);
+      if (location.hash !== hash) history.replaceState(null, '', hash);
+      applyNotes();
+    }
+    function applyNotes() {
+      slides.forEach(s => {
+        const n = s.querySelector('.speaker-note');
+        if (!n) return;
+        n.classList.toggle('visible', notesVisible && s.classList.contains('active'));
+      });
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown':
+          e.preventDefault(); go(current + 1); break;
+        case 'ArrowLeft': case 'PageUp':
+          e.preventDefault(); go(current - 1); break;
+        case 'Home': e.preventDefault(); go(0); break;
+        case 'End': e.preventDefault(); go(slides.length - 1); break;
+        case 'n': case 'N': notesVisible = !notesVisible; applyNotes(); break;
+        case 'f': case 'F':
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+          else document.exitFullscreen();
+          break;
+        case '?': help.classList.toggle('visible'); break;
+        case 'Escape': help.classList.remove('visible'); break;
+      }
+    });
+    help.addEventListener('click', () => help.classList.remove('visible'));
+
+    const initial = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(initial) && initial >= 1 && initial <= slides.length) go(initial - 1);
+    else progress.style.width = (1 / slides.length * 100) + '%';
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+    });
+
+    // ───── Hamster orb mouse-rotation (cover) ─────
+    (function() {
+      const orb = document.querySelector('.hero-orb');
+      if (!orb) return;
+      let targetX = 60, targetY = 18;
+      let curX = 60, curY = 18;
+      let rafId = null;
+
+      function tick() {
+        curX += (targetX - curX) * 0.08;
+        curY += (targetY - curY) * 0.08;
+        orb.style.backgroundPosition = `${curX}% ${curY}%`;
+        if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          rafId = null;
+        }
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        targetX = 60 + (x - 0.5) * 220;  // wraps; centered on text region
+        targetY = -5 + y * 60;           // -5% → 55% (wider vertical pan)
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      }, { passive: true });
+    })();
+
+    // ───── Self-diagnostic form (slide 02) ─────
+    (function() {
+      const KEY = 'papri-wk01-diag';
+      const QUESTIONS = [
+        "나는 AI를 일상적인 검색이나 정보 정리보다 더 적극적으로 사용하고 있다.",
+        "나는 작업 아이디어를 떠올릴 때 AI와 대화해본다.",
+        "나는 리서치, 레퍼런스 수집, 자료 요약에 AI를 자주 쓴다.",
+        "나는 작가노트, 기획서, 지원서, 소개글 같은 글쓰기에 AI를 활용한다.",
+        "나는 이미지, 영상, 사운드, 텍스트 등 작업 재료를 만들 때 AI를 실험적으로 사용한다.",
+        "나는 AI에게 한 번 질문하고 끝내기보다, 여러 번 수정 요청을 하며 결과를 다듬는다.",
+        "나는 프롬프트를 쓸 때 원하는 분위기, 조건, 금지사항, 참고 맥락을 구체적으로 적는 편이다.",
+        "나는 AI가 만든 결과물을 그대로 쓰기보다, 내 기준으로 판단하고 편집한다.",
+        "나는 여러 AI 도구의 차이를 어느 정도 알고 상황에 따라 바꿔 쓴다.",
+        "나는 반복되는 작업을 AI로 줄이거나 자동화해본 적이 있다.",
+        "나는 AI를 단순한 답변 도구가 아니라, 함께 사고하거나 제작하는 협업자로 느낀 적이 있다.",
+        "나는 AI를 활용해 나만의 작은 도구, 웹페이지, 자동화, 봇, 워크플로우를 만들어보고 싶다.",
+      ];
+      const TYPES = [
+        { min: -60, max: -31, name: "순혈 인간 작가",     desc: "AI와 아직 거리를 두는 편. 기술보다 감각, 몸, 직접성이 중요하다." },
+        { min: -30, max: -11, name: "신중한 관망러",     desc: "AI가 궁금하긴 하지만 아직 작업 안으로 들이진 않았다." },
+        { min: -10, max:  10, name: "AI 찍먹러",         desc: "몇 번 써봤고 가능성은 느끼지만, 아직 습관은 아니다." },
+        { min:  11, max:  30, name: "작업 보조형 사용자", desc: "글쓰기, 리서치, 정리, 아이디어 확장에 꽤 활용한다." },
+        { min:  31, max:  45, name: "컨텍스트 빌더",     desc: "AI에게 맥락을 주고, 결과를 비교하고, 작업 과정에 끼워 넣을 줄 안다." },
+        { min:  46, max:  60, name: "딸깍술사",          desc: "AI를 도구라기보다 작업 환경의 일부로 다룬다. 슬슬 에이전트 조련사 영역이다." },
+      ];
+
+      const form = document.getElementById('diag-form');
+      const saved = document.getElementById('diag-saved');
+      const submitBtn = document.getElementById('diag-submit');
+      const resetBtn = document.getElementById('diag-reset');
+      const dlBtn = document.getElementById('diag-download');
+      const progressText = document.getElementById('diag-progress-text');
+      const progressBar = document.querySelector('#diag-progress .bar');
+      const result = document.getElementById('diag-result');
+      const resScore = document.getElementById('diag-result-score');
+      const resType = document.getElementById('diag-result-type');
+      const resDesc = document.getElementById('diag-result-desc');
+      if (!form) return;
+
+      // ── Render questions ──
+      const answers = new Array(QUESTIONS.length).fill(0);
+      const touched = new Array(QUESTIONS.length).fill(false);
+
+      form.innerHTML = QUESTIONS.map((q, i) => `
+        <div class="diag-q">
+          <div class="diag-q-head">
+            <span class="diag-q-num">${String(i + 1).padStart(2, '0')}</span>
+            <span class="diag-q-text">${q}</span>
+          </div>
+          <div class="diag-q-control">
+            <input type="range" min="-5" max="5" step="1" value="0" data-i="${i}" aria-label="${q}" />
+            <div class="diag-q-value" data-i="${i}">0</div>
+          </div>
+          <div class="diag-q-scale"><span>−5</span><span>+5</span></div>
+        </div>
+      `).join('') + `
+        <div class="diag-textarea-row">
+          <div class="diag-q-head">
+            <span class="diag-q-num">A</span>
+            <span class="diag-q-text">평소 AI를 어떻게 쓰는가 — 상황과 목적</span>
+          </div>
+          <textarea id="f-daily" rows="2" placeholder="예: 글 다듬기, 자료 정리, 코드 리뷰..."></textarea>
+        </div>
+        <div class="diag-textarea-row">
+          <div class="diag-q-head">
+            <span class="diag-q-num">B</span>
+            <span class="diag-q-text">자신의 작업에 어떻게 적용했는가 — 성공 / 실패 모두 환영</span>
+          </div>
+          <textarea id="f-applied" rows="2" placeholder="예: 작품 컨셉 발산, 비주얼 레퍼런스 수집..."></textarea>
+        </div>
+      `;
+      const dailyEl = form.querySelector('#f-daily');
+      const appliedEl = form.querySelector('#f-applied');
+
+      // ── Restore ──
+      try {
+        const data = JSON.parse(localStorage.getItem(KEY) || '{}');
+        if (Array.isArray(data.answers) && data.answers.length === QUESTIONS.length) {
+          data.answers.forEach((v, i) => {
+            answers[i] = Number(v) || 0;
+            touched[i] = !!data.touched?.[i];
+            const r = form.querySelector(`input[data-i="${i}"]`);
+            const val = form.querySelector(`.diag-q-value[data-i="${i}"]`);
+            if (r) r.value = answers[i];
+            if (val) {
+              val.textContent = (answers[i] > 0 ? '+' : '') + answers[i];
+              val.classList.toggle('touched', touched[i]);
+            }
+          });
+          if (data.completed) showResult(true);
+          if (data.answers.some(v => v !== 0) || touched.some(t => t) || data.daily || data.applied) {
+            saved.textContent = '저장된 답안 불러옴';
+            saved.classList.add('active');
+          }
+        }
+        if (data.daily && dailyEl) dailyEl.value = data.daily;
+        if (data.applied && appliedEl) appliedEl.value = data.applied;
+      } catch (e) {}
+
+      // ── Persist ──
+      let saveTimer;
+      function persist(extra = {}) {
+        const data = {
+          answers, touched,
+          daily: dailyEl ? dailyEl.value : '',
+          applied: appliedEl ? appliedEl.value : '',
+          updatedAt: new Date().toISOString(),
+          ...extra,
+        };
+        localStorage.setItem(KEY, JSON.stringify(data));
+        saved.textContent = '저장됨';
+        saved.classList.add('active');
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => { saved.textContent = '자동 저장됨'; }, 1200);
+      }
+
+      if (dailyEl) dailyEl.addEventListener('input', persist);
+      if (appliedEl) appliedEl.addEventListener('input', persist);
+
+      // ── Progress ──
+      function updateProgress() {
+        const n = touched.filter(Boolean).length;
+        progressText.textContent = `${n} / ${QUESTIONS.length} 응답`;
+        progressBar.style.setProperty('--p', `${(n / QUESTIONS.length) * 100}%`);
+      }
+      updateProgress();
+
+      // ── Slider input ──
+      form.addEventListener('input', (e) => {
+        const r = e.target;
+        if (r.tagName !== 'INPUT' || r.type !== 'range') return;
+        const i = Number(r.dataset.i);
+        const v = Number(r.value);
+        answers[i] = v;
+        touched[i] = true;
+        const val = form.querySelector(`.diag-q-value[data-i="${i}"]`);
+        if (val) {
+          val.textContent = (v > 0 ? '+' : '') + v;
+          val.classList.add('touched');
+        }
+        updateProgress();
+        persist();
+      });
+
+      // Don't let slide nav steal arrow keys when slider is focused
+      form.addEventListener('keydown', (e) => e.stopPropagation());
+
+      // ── Compute / show result ──
+      function findType(total) {
+        return TYPES.find(t => total >= t.min && total <= t.max) || TYPES[2];
+      }
+      function showResult(skipScroll) {
+        const total = answers.reduce((s, v) => s + v, 0);
+        const type = findType(total);
+        resScore.textContent = (total > 0 ? '+' : '') + total;
+        resType.textContent = type.name;
+        resDesc.textContent = type.desc;
+        result.classList.add('visible');
+        persist({ completed: true, total, type: type.name });
+        if (!skipScroll) result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      submitBtn.addEventListener('click', () => showResult(false));
+
+      // ── Reset ──
+      resetBtn.addEventListener('click', () => {
+        if (!confirm('답안을 모두 초기화할까요?')) return;
+        for (let i = 0; i < QUESTIONS.length; i++) {
+          answers[i] = 0;
+          touched[i] = false;
+          const r = form.querySelector(`input[data-i="${i}"]`);
+          const val = form.querySelector(`.diag-q-value[data-i="${i}"]`);
+          if (r) r.value = 0;
+          if (val) { val.textContent = '0'; val.classList.remove('touched'); }
+        }
+        if (dailyEl) dailyEl.value = '';
+        if (appliedEl) appliedEl.value = '';
+        result.classList.remove('visible');
+        localStorage.removeItem(KEY);
+        saved.textContent = '초기화됨';
+        saved.classList.remove('active');
+        updateProgress();
+      });
+
+      // ── Download ──
+      dlBtn.addEventListener('click', () => {
+        const total = answers.reduce((s, v) => s + v, 0);
+        const type = findType(total);
+        const data = {
+          answers, total,
+          type: type.name,
+          description: type.desc,
+          questions: QUESTIONS.map((q, i) => ({ q, score: answers[i] })),
+          daily: dailyEl ? dailyEl.value : '',
+          applied: appliedEl ? appliedEl.value : '',
+          exportedAt: new Date().toISOString(),
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `papri-diag-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    })();
+  </script>
+</body>
+</html>

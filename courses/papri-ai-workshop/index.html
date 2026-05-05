@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Papri AI Workshop</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <span style="color: var(--color-text-muted);">Papri AI Workshop</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-orange sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-orange"></span>
+          <span class="sig-led sig-led-blue sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-blue"></span>
+          <span class="sig-led sig-led-purple sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">Workshop — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          Papri AI Workshop
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          AI를 이해하며 쓴다는 것 — 4주간의 워크숍
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-orange), var(--color-accent-blue), var(--color-accent-purple), transparent);"></div>
+      </header>
+
+      <!-- Chapter List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">챕터 목록</h2>
+          <div class="sig-cable sig-cable-orange" style="max-width: 40px;"></div>
+          <span class="sig-label" style="margin-left: auto;">04 weeks</span>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <a href="week-01.html" class="course-panel">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-orange sig-led-pulse"></span>
+              <span class="sig-label">Week 01</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">AI를 이해하며 쓴다는 것</h3>
+            <p style="color: var(--color-text-muted);" class="text-sm">
+              최신 흐름을 훑고, 도구를 살펴보고, 한 번 직접 써본다
+            </p>
+          </a>
+
+          <div class="course-panel" style="opacity: 0.5; pointer-events: none;">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-orange"></span>
+              <span class="sig-label">Week 02</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">AI 설계의 주요 문서</h3>
+            <p style="color: var(--color-text-muted);" class="text-sm">
+              AGENTS.md / CLAUDE.md / Rules — 함께 작성해본다
+            </p>
+          </div>
+
+          <div class="course-panel" style="opacity: 0.5; pointer-events: none;">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-orange"></span>
+              <span class="sig-label">Week 03</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">Skill / MCP / Rules</h3>
+            <p style="color: var(--color-text-muted);" class="text-sm">
+              AI를 확장하는 세 가지 인터페이스
+            </p>
+          </div>
+
+          <div class="course-panel" style="opacity: 0.5; pointer-events: none;">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-orange"></span>
+              <span class="sig-label">Week 04</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">나의 도구 제작 / 회고</h3>
+            <p style="color: var(--color-text-muted);" class="text-sm">
+              Try and Error 공유하기, 4주의 회고
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>
