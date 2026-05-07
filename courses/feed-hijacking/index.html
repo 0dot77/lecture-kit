@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FeedHijacking</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <span style="color: var(--color-text-muted);">FeedHijacking</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-pulse" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+          <span class="sig-cable" style="background: linear-gradient(90deg, var(--color-accent-yellow), color-mix(in srgb, var(--color-accent-yellow) 25%, transparent));"></span>
+          <span class="sig-led sig-led-orange sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-orange"></span>
+          <span class="sig-led sig-led-purple sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">뉴아트클럽 — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          FeedHijacking
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          인터페이스가 된 나의 신체와 공간을 재점유하기
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-yellow), var(--color-accent-orange), var(--color-accent-purple), transparent);"></div>
+      </header>
+
+      <!-- Chapter List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">챕터 목록</h2>
+          <div class="sig-cable" style="max-width: 40px; background: linear-gradient(90deg, var(--color-accent-yellow), color-mix(in srgb, var(--color-accent-yellow) 25%, transparent));"></div>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <a href="week-01.html" class="course-panel">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-pulse" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+              <span class="sig-label">Week 01</span>
+            </div>
+            <h3 class="text-base font-semibold">얼굴 : 안티-셀피</h3>
+          </a>
+
+          <a href="week-02.html" class="course-panel">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-pulse" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+              <span class="sig-label">Week 02</span>
+            </div>
+            <h3 class="text-base font-semibold">판정 : 룰렛/점수/유형 테스트</h3>
+          </a>
+
+          <a href="week-03.html" class="course-panel">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-pulse" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+              <span class="sig-label">Week 03</span>
+            </div>
+            <h3 class="text-base font-semibold">몸, 공간</h3>
+          </a>
+
+          <a href="week-04.html" class="course-panel">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="sig-led sig-led-pulse" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+              <span class="sig-label">Week 04</span>
+            </div>
+            <h3 class="text-base font-semibold">피드 정리 및 더 나아가기</h3>
+          </a>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>

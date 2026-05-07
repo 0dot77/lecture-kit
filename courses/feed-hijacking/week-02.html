@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2주차 · 판정 : 룰렛/점수/유형 테스트 — FeedHijacking</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <a href="./" style="color: var(--color-text-muted);" class="hover:text-white transition-colors">FeedHijacking</a>
+        <span style="color: var(--color-text-dim);">/</span>
+        <span style="color: var(--color-text-muted);">Week 02</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-pulse" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+          <span class="sig-cable" style="background: linear-gradient(90deg, var(--color-accent-yellow), color-mix(in srgb, var(--color-accent-yellow) 25%, transparent));"></span>
+          <span class="sig-label">Week 02</span>
+        </div>
+
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          판정 : 룰렛/점수/유형 테스트
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          나를 점수와 유형으로 분류하는 장치를 만들어보고 그 권력을 분해한다
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-yellow), var(--color-accent-orange), transparent);"></div>
+      </header>
+
+      <!-- Placeholder -->
+      <section class="course-panel" style="text-align: center; padding: 4rem 2rem;">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span class="sig-led" style="background: var(--color-accent-yellow); box-shadow: 0 0 6px var(--color-accent-yellow);"></span>
+          <span class="sig-label">Status</span>
+        </div>
+        <h2 class="text-xl font-semibold mb-2">준비 중</h2>
+        <p style="color: var(--color-text-muted);" class="text-sm">
+          2주차 강의 자료가 곧 올라옵니다
+        </p>
+      </section>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>

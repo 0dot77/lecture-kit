@@ -1,0 +1,2753 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEEK 01 — FeedHijacking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=Archivo+Black&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    /* ===========================================
+       THEME — cream paper + red CV bounding-box
+       Reference: forensic / classifier output
+       =========================================== */
+    :root {
+      --cream: #EDE4D3;
+      --cream-light: #F5EFE1;
+      --cream-deep: #E1D6BF;
+      --paper: #2A2520;
+      --paper-deep: #1A1612;
+      --ink: #1B1B1B;
+      --ink-muted: rgba(27, 27, 27, 0.65);
+      --ink-faint: rgba(27, 27, 27, 0.18);
+      --ink-line: rgba(27, 27, 27, 0.32);
+      --cream-dim-on-dark: rgba(237, 228, 211, 0.62);
+      --cream-faint-on-dark: rgba(237, 228, 211, 0.18);
+      --red: #D44530;
+      --red-deep: #B53620;
+      --red-soft: rgba(212, 69, 48, 0.12);
+
+      --font-body: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+      --font-display-en: "Archivo Black", "Bebas Neue", "Pretendard Variable", sans-serif;
+      --font-display-ko: "Black Han Sans", "Pretendard Variable", sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+      --font-serif: Georgia, "Times New Roman", serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      background: #000; color: var(--ink);
+    }
+
+    .deck { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: clamp(1.4rem, 3vw, 2.8rem) clamp(2rem, 5vw, 4.5rem);
+      background: var(--cream);
+      color: var(--ink);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.dark { background: var(--paper); color: var(--cream-light); }
+    .slide.deep { background: var(--paper-deep); color: var(--cream-light); }
+
+    /* paper grain overlay */
+    .slide::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+        radial-gradient(rgba(0,0,0,0.018) 1px, transparent 1px);
+      background-size: 3px 3px, 7px 7px;
+      background-position: 0 0, 1px 2px;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .slide.dark::before, .slide.deep::before {
+      background-image:
+        radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        radial-gradient(rgba(255,255,255,0.008) 1px, transparent 1px);
+      mix-blend-mode: screen;
+    }
+    .slide > * { position: relative; z-index: 1; }
+
+    /* ─── Rails ─── */
+    .rail {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: clamp(0.6rem, 0.8vw, 0.78rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+    }
+    .slide.dark .rail, .slide.deep .rail { color: var(--cream-dim-on-dark); }
+    .rail-bottom { padding-top: 0.9rem; border-top: 1px solid var(--ink-line); }
+    .slide.dark .rail-bottom, .slide.deep .rail-bottom { border-top-color: var(--cream-faint-on-dark); }
+    .rail .rail-mark {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+    }
+    .rail .rail-mark::before {
+      content: ""; width: 7px; height: 7px; background: var(--red);
+      border-radius: 1px;
+    }
+
+    /* ─── Body ─── */
+    .body {
+      flex: 1;
+      display: flex; flex-direction: column;
+      padding: clamp(1.2rem, 2.5vw, 2.5rem) 0;
+      overflow: hidden;
+      justify-content: center;
+    }
+
+    /* ─── Display typography ─── */
+    .ko-display {
+      font-family: var(--font-display-ko);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.015em;
+    }
+    .en-display {
+      font-family: var(--font-display-en);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+    .serif-display {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      font-style: italic;
+    }
+    .display-xl { font-size: clamp(3rem, 11vw, 9.5rem); }
+    .display-lg { font-size: clamp(2.5rem, 8vw, 6.5rem); }
+    .display-md { font-size: clamp(2rem, 6vw, 5rem); }
+    .display-sm { font-size: clamp(1.5rem, 4vw, 3.2rem); }
+
+    /* ─── Labels & body ─── */
+    .label {
+      font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--red);
+      font-family: var(--font-mono);
+    }
+    .lead {
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      line-height: 1.55;
+      max-width: 60ch;
+      opacity: 0.9;
+    }
+    .body-text {
+      font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+      line-height: 1.65;
+      opacity: 0.82;
+    }
+
+    /* ─── Layout helpers ─── */
+    .row { display: flex; gap: clamp(2rem, 4vw, 4rem); height: 100%; }
+    .col { display: flex; flex-direction: column; gap: clamp(1rem, 2vw, 1.5rem); }
+    .col.center { justify-content: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 4vw, 4rem); height: 100%; align-items: center; }
+    .grid-2.lopsided { grid-template-columns: 1.2fr 0.8fr; }
+    .grid-2.image-left { grid-template-columns: 0.95fr 1.05fr; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.2rem, 2.5vw, 2.2rem); height: 100%; }
+    .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(1rem, 2vw, 1.8rem); height: 100%; }
+
+    /* ─── Photo block (face-collage style) ─── */
+    .photo {
+      position: relative;
+      width: 100%; height: 100%;
+      min-height: clamp(220px, 40vh, 460px);
+      background: var(--paper-deep);
+      overflow: hidden;
+      filter: grayscale(75%) contrast(1.1) brightness(0.92);
+    }
+    .slide.cream .photo { filter: grayscale(75%) contrast(1.05) brightness(0.95); }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo .photo-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        repeating-linear-gradient(45deg, transparent 0 12px, rgba(237,228,211,0.06) 12px 13px),
+        var(--paper-deep);
+      color: var(--cream-dim-on-dark);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+    .photo.tinted::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(212, 69, 48, 0.15) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    /* ─── BBOX overlay system — the signature design move ─── */
+    .photo-bbox-layer {
+      position: absolute; inset: 0;
+      pointer-events: none;
+    }
+    .photo-bbox {
+      position: absolute;
+      border: 1.5px solid var(--red);
+      pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+    }
+    .photo-bbox::before {
+      content: attr(data-label);
+      position: absolute;
+      top: 0; left: -1.5px;
+      transform: translateY(-100%);
+      background: var(--red);
+      color: var(--cream-light);
+      font-family: var(--font-mono);
+      font-size: clamp(0.62rem, 0.78vw, 0.74rem);
+      font-weight: 500;
+      padding: 0.2rem 0.5rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+
+    /* Inline bbox tags (off-photo) */
+    .bbox {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.22rem 0.55rem;
+      background: var(--red);
+      color: var(--cream-light);
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.8rem);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .bbox.outline {
+      background: transparent;
+      color: var(--red);
+      border: 1.5px solid var(--red);
+    }
+    .bbox .pct { opacity: 0.85; font-weight: 400; }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+
+    /* ─── Numbered list ─── */
+    .num-list { display: flex; flex-direction: column; gap: clamp(0.6rem, 1.2vw, 1rem); list-style: none; }
+    .num-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: clamp(0.9rem, 1.8vw, 1.5rem);
+      align-items: baseline;
+      padding-bottom: clamp(0.5rem, 0.9vw, 0.85rem);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .slide.dark .num-list li, .slide.deep .num-list li { border-bottom-color: var(--cream-faint-on-dark); }
+    .num-list .num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      letter-spacing: 0.05em;
+      color: var(--red);
+      font-variant-numeric: tabular-nums;
+    }
+    .num-list .text {
+      font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .num-list .sub {
+      display: block; margin-top: 0.25rem;
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      font-weight: 400; opacity: 0.65;
+      letter-spacing: 0; text-transform: none;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      border: 1px solid var(--ink-faint);
+      padding: clamp(1.1rem, 1.8vw, 1.7rem);
+      display: flex; flex-direction: column;
+      gap: 0.55rem;
+      height: 100%;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .slide.dark .card, .slide.deep .card { border-color: var(--cream-faint-on-dark); }
+    .card.link:hover { border-color: var(--red); transform: translateY(-2px); }
+    .card .c-num {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      letter-spacing: 0.12em;
+      color: var(--red);
+      text-transform: uppercase;
+    }
+    .card .c-title {
+      font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      font-family: var(--font-display-ko);
+    }
+    .card .c-title.serif {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 700;
+    }
+    .card .c-body {
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      line-height: 1.55;
+      opacity: 0.78;
+    }
+    .card a { color: inherit; text-decoration: none; display: contents; }
+
+    /* ─── Tags (small) ─── */
+    .tag {
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.8rem);
+      padding: 0.22rem 0.6rem;
+      border: 1px solid var(--ink-faint);
+      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+    .slide.dark .tag, .slide.deep .tag { border-color: var(--cream-faint-on-dark); }
+    .tag.solid { background: var(--red); color: var(--cream-light); border-color: var(--red); }
+
+    /* ─── Pull quote ─── */
+    .quote-block {
+      font-family: var(--font-display-ko);
+      font-size: clamp(2rem, 5.5vw, 4.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .quote-block .accent { color: var(--red); }
+
+    /* ─── Year row (timeline) ─── */
+    .year-row {
+      display: grid;
+      grid-template-columns: minmax(78px, auto) clamp(64px, 8vw, 96px) minmax(0, 1fr);
+      column-gap: clamp(1.4rem, 2.8vw, 2.6rem);
+      align-items: center;
+      padding: clamp(0.7rem, 1.4vw, 1.2rem) 0;
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .slide.dark .year-row, .slide.deep .year-row { border-bottom-color: var(--cream-faint-on-dark); }
+    .year-row:last-child { border-bottom: none; }
+    .year-row .y {
+      font-family: var(--font-display-en);
+      font-size: clamp(1.8rem, 4.4vw, 3.6rem);
+      line-height: 0.9;
+      color: var(--red);
+    }
+    .year-row .y-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: var(--paper-deep);
+      border: 1px solid var(--ink-faint);
+      filter: grayscale(20%) contrast(1.02);
+    }
+    .slide.dark .y-img, .slide.deep .y-img { border-color: var(--cream-faint-on-dark); }
+    .year-row .y-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .year-row .y-img .y-img-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        repeating-linear-gradient(45deg, transparent 0 8px, rgba(212,69,48,0.08) 8px 9px),
+        var(--paper-deep);
+      color: var(--cream-light);
+      font-family: var(--font-mono);
+      font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+      letter-spacing: 0.16em;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .year-row .y-img::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(212, 69, 48, 0.08) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .year-row .y-title {
+      font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      font-family: var(--font-display-ko);
+    }
+    .year-row .y-sub {
+      font-size: clamp(0.85rem, 1.1vw, 1.02rem);
+      opacity: 0.72;
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Flow strip ─── */
+    .flow { display: flex; width: 100%; }
+    .flow-step {
+      flex: 1;
+      padding: clamp(1.1rem, 2vw, 1.7rem);
+      border: 1px solid var(--ink-faint);
+      border-right: none;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .flow-step:last-child { border-right: 1px solid var(--ink-faint); }
+    .slide.dark .flow-step, .slide.deep .flow-step { border-color: var(--cream-faint-on-dark); }
+    .slide.dark .flow-step:last-child, .slide.deep .flow-step:last-child { border-right-color: var(--cream-faint-on-dark); }
+    .flow-step.hi { background: var(--red); color: var(--cream-light); border-color: var(--red); }
+    .flow-step.hi + .flow-step { border-left-color: var(--red); }
+    .flow-step .s-num { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.15em; opacity: 0.7; text-transform: uppercase; }
+    .flow-step .s-title {
+      font-family: var(--font-display-ko);
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      letter-spacing: -0.01em; line-height: 1.15;
+    }
+    .flow-step .s-quote { font-size: clamp(0.78rem, 1vw, 0.95rem); line-height: 1.45; opacity: 0.85; }
+    .flow-logo {
+      flex: 1; min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(0.4rem, 1vw, 1rem) 0;
+      opacity: 0.85;
+    }
+    .flow-logo svg {
+      width: clamp(56px, 9vw, 110px);
+      height: auto;
+      max-height: clamp(56px, 9vw, 110px);
+      color: var(--ink);
+    }
+    .flow-step.hi .flow-logo svg { color: var(--cream-light); }
+
+    /* ─── Host card ─── */
+    .host-card {
+      width: 100%; height: 100%;
+      min-height: clamp(220px, 42vh, 480px);
+      background:
+        linear-gradient(160deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.18) 100%),
+        var(--cream-deep);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: clamp(1.4rem, 3vw, 2.4rem);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--ink-faint);
+    }
+    .host-card::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,0.05) 3px 4px);
+      pointer-events: none;
+    }
+    .host-card > * { position: relative; z-index: 1; }
+    .host-handle {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 0.98vw, 0.95rem);
+      letter-spacing: 0.16em;
+      color: var(--red);
+    }
+    .host-mark {
+      font-family: var(--font-display-en);
+      font-size: clamp(4rem, 12vw, 9rem);
+      line-height: 0.85;
+      letter-spacing: -0.05em;
+      color: var(--ink);
+    }
+    .host-mark span { color: var(--red); }
+    .host-name {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.85rem, 1.15vw, 1.05rem);
+      letter-spacing: 0.2em;
+      opacity: 0.7;
+      color: var(--ink);
+    }
+    .host-meta {
+      display: flex; flex-direction: column;
+      gap: clamp(0.45rem, 0.8vw, 0.65rem);
+      font-size: clamp(0.85rem, 1.13vw, 1rem);
+      color: var(--ink-muted);
+    }
+    .host-meta-row {
+      display: grid;
+      grid-template-columns: clamp(64px, 7vw, 84px) 1fr;
+      gap: clamp(0.7rem, 1.4vw, 1.1rem);
+      align-items: baseline;
+      padding-bottom: clamp(0.35rem, 0.7vw, 0.55rem);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .host-meta-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .host-meta-key {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.74rem, 0.9vw, 0.85rem);
+      letter-spacing: 0.16em;
+      color: var(--ink);
+    }
+    .host-meta-val { line-height: 1.5; }
+    .host-quote {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      line-height: 1.4;
+      color: var(--ink);
+      border-left: 3px solid var(--red);
+      padding: clamp(0.3rem, 0.6vw, 0.5rem) 0 clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.7rem, 1.2vw, 1rem);
+    }
+
+    /* ─── Datestack ─── */
+    .datestack {
+      font-family: var(--font-display-en);
+      font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .datestack .slash { color: var(--red); margin: 0 0.05em; }
+
+    /* ─── Cover hero — fragmented face mosaic ─── */
+    .face-mosaic {
+      position: relative;
+      width: clamp(260px, 45vw, 580px);
+      aspect-ratio: 4/3;
+    }
+    .face-frag {
+      position: absolute;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(80%) contrast(1.1);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.4) inset,
+        0 4px 14px rgba(0,0,0,0.18),
+        0 1px 3px rgba(0,0,0,0.10);
+      border: 1px solid rgba(0,0,0,0.4);
+    }
+    .face-bbox {
+      position: absolute;
+      border: 1.5px solid var(--red);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
+    }
+    .face-bbox-label {
+      position: absolute;
+      background: var(--red);
+      color: var(--cream-light);
+      font-family: var(--font-mono);
+      font-size: clamp(0.55rem, 0.7vw, 0.7rem);
+      font-weight: 500;
+      padding: 0.18rem 0.45rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+
+    /* ─── Big section title ─── */
+    .section-title {
+      font-family: var(--font-display-ko);
+      font-size: clamp(2.5rem, 8vw, 7rem);
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+    }
+    .section-title .accent { color: var(--red); }
+
+    /* ─── Speaker note ─── */
+    .speaker-note {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-height: 38vh; overflow-y: auto;
+      background: var(--paper-deep);
+      border-top: 2px solid var(--red);
+      color: var(--cream-light);
+      padding: 1.1rem 2rem;
+      font-size: 0.92rem; line-height: 1.6;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .speaker-note.visible { transform: translateY(0); }
+    .speaker-note .sn-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--red);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    /* ─── Progress bar ─── */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(0,0,0,0.08);
+      z-index: 50;
+    }
+    .progress::after {
+      content: ""; position: absolute; inset: 0;
+      width: var(--p, 0%);
+      background: var(--red);
+      transition: width 0.3s ease;
+    }
+    .progress::after { width: var(--w, 0%); }
+
+    /* ─── Help overlay ─── */
+    .help {
+      position: fixed; inset: 0;
+      background: rgba(26, 22, 18, 0.92);
+      color: var(--cream-light);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200;
+    }
+    .help.visible { display: flex; }
+    .help-content {
+      background: var(--paper-deep);
+      border: 1px solid var(--cream-faint-on-dark);
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      max-width: 28rem;
+    }
+    .help h3 {
+      font-family: var(--font-display-en);
+      font-size: 1rem; letter-spacing: 0.18em;
+      margin-bottom: 1.2rem; color: var(--red);
+    }
+    .help ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .help kbd {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      padding: 0.15rem 0.45rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      margin-right: 0.5rem;
+    }
+
+    /* ─── Back link ─── */
+    .back-link {
+      position: fixed; top: 0.6rem; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      text-decoration: none;
+      z-index: 60;
+      padding: 0.3rem 0.7rem;
+      mix-blend-mode: multiply;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    /* ─── AR Art Interactive (slide 16) ─── */
+    .ar-concepts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+      margin-top: 0.2rem;
+    }
+    .ar-concept {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--ink-faint);
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      color: inherit;
+      transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    }
+    .ar-concept:hover { border-color: var(--ink-line); transform: translateY(-1px); }
+    .ar-concept.active {
+      border-color: var(--red);
+      background: var(--red-soft);
+    }
+    .ar-concept-num {
+      font-family: var(--font-mono);
+      font-size: clamp(0.62rem, 0.78vw, 0.72rem);
+      color: var(--red);
+      letter-spacing: 0.08em;
+    }
+    .ar-concept-name {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 700;
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .ar-def {
+      border-left: 3px solid var(--red);
+      padding: 0.55rem 0 0.55rem 0.9rem;
+      background: rgba(212, 69, 48, 0.04);
+      max-width: 44ch;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .ar-def-label {
+      font-family: var(--font-mono);
+      font-size: clamp(0.66rem, 0.84vw, 0.74rem);
+      color: var(--red);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .ar-def-body {
+      font-size: clamp(0.82rem, 1.02vw, 0.95rem);
+      line-height: 1.5;
+      color: var(--ink-muted);
+    }
+    .ar-def-body em { font-style: italic; color: var(--red); }
+    .ar-stage-hint {
+      position: absolute;
+      bottom: 0.6rem; left: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.62rem, 0.78vw, 0.72rem);
+      letter-spacing: 0.08em;
+      color: var(--cream-light);
+      background: rgba(26, 22, 18, 0.7);
+      padding: 0.25rem 0.55rem;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .ar-stage {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: clamp(280px, 50vh, 540px);
+      background: var(--paper-deep);
+      overflow: hidden;
+      border: 1px solid var(--ink-faint);
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    .ar-stage.dragging { cursor: grabbing; }
+    .world {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=1600&q=80');
+      background-size: cover;
+      background-position: center;
+    }
+    .world-real { filter: grayscale(95%) contrast(1.05) brightness(0.88); }
+    .world-aug {
+      filter: saturate(1.4) hue-rotate(-12deg) contrast(1.2) brightness(0.95);
+      clip-path: var(--vp-clip, inset(50% 50% 50% 50%));
+      -webkit-clip-path: var(--vp-clip, inset(50% 50% 50% 50%));
+      transition: clip-path 0.05s linear, -webkit-clip-path 0.05s linear;
+    }
+    .world-aug::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(212, 69, 48, 0.22), rgba(212, 69, 48, 0.06));
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .ar-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-mono);
+      font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+      background: var(--red);
+      color: var(--cream-light);
+      padding: 0.2rem 0.5rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      line-height: 1.2;
+      font-weight: 500;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+    }
+    .ar-label::before {
+      content: ""; position: absolute;
+      left: 50%; top: 100%; transform: translateX(-50%);
+      width: 1px; height: 8px; background: var(--red);
+    }
+    .ar-label::after {
+      content: ""; position: absolute;
+      left: 50%; top: calc(100% + 8px); transform: translate(-50%, -50%);
+      width: 7px; height: 7px; background: var(--red); border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+    }
+    .viewport-frame {
+      position: absolute;
+      width: 32%; height: 42%;
+      top: 0; left: 0;
+      border: 2px solid var(--red);
+      cursor: grab;
+      will-change: transform;
+      pointer-events: auto;
+    }
+    .viewport-frame.dragging { cursor: grabbing; }
+    .viewport-corner {
+      position: absolute;
+      width: 12px; height: 12px;
+      border: 2px solid var(--red);
+      background: var(--cream-light);
+    }
+    .viewport-corner.tl { top: -7px; left: -7px; }
+    .viewport-corner.tr { top: -7px; right: -7px; }
+    .viewport-corner.bl { bottom: -7px; left: -7px; }
+    .viewport-corner.br { bottom: -7px; right: -7px; }
+    .viewport-label {
+      position: absolute;
+      top: -22px; left: -2px;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      background: var(--red);
+      color: var(--cream-light);
+      padding: 0.18rem 0.45rem;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .ar-status {
+      display: flex; align-items: center; gap: 0.7rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.78rem);
+      color: var(--ink-muted);
+      letter-spacing: 0.04em;
+      flex-wrap: wrap;
+    }
+    .ar-status-label {
+      color: var(--red);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Reel rows (slide 11) ─── */
+    .reel-row {
+      display: grid;
+      grid-template-columns: clamp(2.4rem, 4vw, 3.4rem) 1fr auto;
+      gap: clamp(0.8rem, 1.5vw, 1.2rem);
+      align-items: baseline;
+      padding: clamp(0.85rem, 1.6vw, 1.2rem) clamp(1rem, 1.8vw, 1.4rem);
+      border: 1px solid var(--ink-faint);
+      background: var(--cream-light);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, transform 0.15s, background 0.15s;
+    }
+    .reel-row:hover {
+      border-color: var(--red);
+      transform: translateX(2px);
+      background: var(--cream);
+    }
+    .reel-row .reel-num {
+      font-family: var(--font-display-en);
+      font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+      color: var(--red);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .reel-row .reel-body {
+      font-size: clamp(0.92rem, 1.2vw, 1.08rem);
+      line-height: 1.45;
+      color: var(--ink);
+    }
+    .reel-row .reel-body strong { font-weight: 700; }
+    .reel-row .reel-arrow {
+      font-family: var(--font-mono);
+      font-size: clamp(0.85rem, 1.1vw, 1rem);
+      color: var(--ink-muted);
+      letter-spacing: 0;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .reel-row:hover .reel-arrow { color: var(--red); transform: translate(2px, -2px); }
+
+    /* Artist row variant — name + tag + body stacked in middle column */
+    .reel-row.artist-row { align-items: center; }
+    .artist-meta {
+      display: flex; flex-direction: column;
+      gap: 0.2rem;
+    }
+    .artist-meta .artist-name {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 700;
+      font-size: clamp(1.05rem, 1.6vw, 1.4rem);
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .artist-meta .artist-tag {
+      font-family: var(--font-mono);
+      font-size: clamp(0.65rem, 0.78vw, 0.74rem);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+    .artist-meta .artist-body {
+      font-size: clamp(0.85rem, 1.08vw, 0.98rem);
+      line-height: 1.4;
+      color: var(--ink-muted);
+      margin-top: 0.15rem;
+    }
+
+    /* ─── Interactive Survey (slide 09) ─── */
+    .survey-progress {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1vw, 0.9rem);
+      letter-spacing: 0.16em;
+      color: var(--ink-muted);
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      text-transform: uppercase;
+    }
+    .survey-progress .bar {
+      width: clamp(60px, 8vw, 110px);
+      height: 4px;
+      background: var(--ink-faint);
+      position: relative; overflow: hidden;
+    }
+    .survey-progress .bar::after {
+      content: ""; position: absolute; inset: 0;
+      width: var(--p, 0%);
+      background: var(--red);
+      transition: width 0.25s;
+    }
+
+    .survey-saved {
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.78rem);
+      letter-spacing: 0.12em;
+      color: var(--ink-muted);
+      opacity: 0.55;
+      transition: opacity 0.2s, color 0.2s;
+      text-transform: uppercase;
+    }
+    .survey-saved.active { opacity: 1; color: var(--red); }
+
+    .survey-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .survey-btn {
+      font-family: var(--font-mono);
+      font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+      letter-spacing: 0.14em;
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--ink-faint);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .survey-btn:hover { border-color: var(--red); color: var(--red); }
+    .survey-btn.primary {
+      background: var(--red); color: var(--cream-light); border-color: var(--red);
+    }
+    .survey-btn.primary:hover { background: var(--red-deep); border-color: var(--red-deep); color: var(--cream-light); }
+
+    .survey-form-wrap {
+      flex: 1; min-height: 0;
+      overflow-y: auto;
+      padding-right: clamp(0.4rem, 1vw, 0.7rem);
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-faint) transparent;
+    }
+    .survey-form-wrap::-webkit-scrollbar { width: 6px; }
+    .survey-form-wrap::-webkit-scrollbar-track { background: transparent; }
+    .survey-form-wrap::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 3px; }
+
+    .survey-form { display: flex; flex-direction: column; gap: clamp(0.85rem, 1.4vw, 1.2rem); }
+
+    .survey-q {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      padding-bottom: clamp(0.7rem, 1.2vw, 1rem);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .survey-q:last-child { border-bottom: none; }
+    .survey-q-head { display: flex; align-items: baseline; gap: 0.65rem; }
+    .survey-q-num {
+      font-family: var(--font-mono);
+      font-size: clamp(0.74rem, 0.95vw, 0.85rem);
+      color: var(--red);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .survey-q-text {
+      font-size: clamp(0.92rem, 1.18vw, 1.05rem);
+      line-height: 1.4;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+    }
+    .survey-q-hint {
+      margin-left: clamp(2rem, 3vw, 2.6rem);
+      font-family: var(--font-body);
+      font-size: clamp(0.78rem, 0.98vw, 0.9rem);
+      color: var(--ink-muted);
+      opacity: 0.78;
+      line-height: 1.45;
+      font-weight: 400;
+    }
+
+    /* radio / checkbox option list */
+    .opt-list {
+      display: flex; flex-direction: column;
+      gap: 0.4rem;
+      margin-left: clamp(2rem, 3vw, 2.6rem);
+      list-style: none;
+    }
+    .opt-list label {
+      display: flex; align-items: flex-start; gap: 0.65rem;
+      padding: 0.55rem 0.8rem;
+      border: 1px solid var(--ink-faint);
+      cursor: pointer;
+      font-size: clamp(0.85rem, 1.08vw, 0.98rem);
+      line-height: 1.4;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .opt-list label:hover { border-color: var(--ink-line); }
+    .opt-list label.checked {
+      border-color: var(--red);
+      background: var(--red-soft);
+    }
+    .opt-list input[type="radio"], .opt-list input[type="checkbox"] {
+      -webkit-appearance: none; appearance: none;
+      width: 14px; height: 14px;
+      border: 1.5px solid var(--ink-line);
+      background: transparent;
+      flex-shrink: 0;
+      margin-top: 0.18rem;
+      cursor: pointer;
+      position: relative;
+    }
+    .opt-list input[type="radio"] { border-radius: 50%; }
+    .opt-list input[type="radio"]:checked,
+    .opt-list input[type="checkbox"]:checked {
+      border-color: var(--red); background: var(--red);
+    }
+    .opt-list input[type="radio"]:checked::after {
+      content: ""; position: absolute;
+      inset: 3px; background: var(--cream-light); border-radius: 50%;
+    }
+    .opt-list input[type="checkbox"]:checked::after {
+      content: "×"; position: absolute;
+      inset: 0; display: flex; align-items: center; justify-content: center;
+      color: var(--cream-light); font-size: 14px; font-weight: 700;
+      line-height: 1;
+    }
+    .opt-list .opt-tag {
+      font-family: var(--font-mono);
+      font-size: clamp(0.65rem, 0.78vw, 0.74rem);
+      color: var(--red);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-left: auto;
+      align-self: center;
+      opacity: 0.6;
+    }
+
+    /* free-text textarea + multi-field */
+    .survey-textarea-row {
+      display: flex; flex-direction: column;
+      gap: 0.4rem;
+      margin-left: clamp(2rem, 3vw, 2.6rem);
+    }
+    .survey-fields {
+      display: flex; flex-direction: column;
+      gap: 0.5rem;
+      margin-left: clamp(2rem, 3vw, 2.6rem);
+    }
+    .survey-field {
+      display: grid;
+      grid-template-columns: clamp(80px, 11vw, 130px) 1fr;
+      gap: 0.7rem;
+      align-items: baseline;
+      padding: 0.4rem 0;
+      border-bottom: 1px dashed rgba(27, 27, 27, 0.18);
+    }
+    .survey-field:last-child { border-bottom: none; }
+    .survey-field-key {
+      font-family: var(--font-mono);
+      font-size: clamp(0.72rem, 0.92vw, 0.82rem);
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      padding-top: 0.5rem;
+    }
+    .survey-form textarea, .survey-form input[type="text"] {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: clamp(0.88rem, 1.12vw, 1rem);
+      line-height: 1.5;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.45);
+      border: none;
+      border-bottom: 1.5px solid var(--ink-line);
+      padding: 0.5rem 0.7rem;
+      resize: none;
+      outline: none;
+      transition: border-bottom-color 0.2s, background 0.2s;
+      font-family: var(--font-body);
+    }
+    .survey-form textarea:focus, .survey-form input[type="text"]:focus {
+      border-bottom-color: var(--red);
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .survey-form textarea::placeholder, .survey-form input[type="text"]::placeholder {
+      color: var(--ink-muted);
+      opacity: 0.45;
+    }
+    .opt-etc {
+      margin-left: clamp(2rem, 3vw, 2.6rem);
+      margin-top: 0.5rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .opt-etc-label {
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.78rem);
+      color: var(--ink-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* live response panel (left col) */
+    .live-panel {
+      border: 1px solid var(--ink-faint);
+      padding: clamp(0.9rem, 1.6vw, 1.3rem);
+      background: var(--cream-light);
+      display: flex; flex-direction: column; gap: 0.6rem;
+      max-height: 32vh; overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-faint) transparent;
+    }
+    .live-panel-label {
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.78rem);
+      letter-spacing: 0.16em;
+      color: var(--red);
+      text-transform: uppercase;
+    }
+    .live-panel-empty {
+      font-family: var(--font-body);
+      font-size: clamp(0.82rem, 1vw, 0.92rem);
+      color: var(--ink-muted);
+      opacity: 0.6;
+      font-style: italic;
+    }
+    .live-row {
+      display: grid;
+      grid-template-columns: clamp(28px, 4vw, 36px) 1fr;
+      gap: 0.65rem;
+      align-items: baseline;
+    }
+    .live-row .live-num {
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.88vw, 0.78rem);
+      color: var(--red);
+      letter-spacing: 0.06em;
+    }
+    .live-row .live-val {
+      font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+      line-height: 1.4;
+      color: var(--ink);
+    }
+    .live-row .live-val em {
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 720px) {
+      .grid-2, .grid-2.lopsided, .grid-2.image-left, .grid-3, .grid-4 { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .face-mosaic { width: 90vw; }
+    }
+    @media print {
+      .slide { position: relative; opacity: 1; page-break-after: always; height: 100vh; }
+      .progress, .speaker-note, .help, .back-link { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a href="./" class="back-link">← FeedHijacking</a>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <!-- ===== 01 / COVER ===== -->
+    <section class="slide active">
+      <div class="rail">
+        <div class="rail-mark">FEED HIJACKING · 뉴아트클럽</div>
+        <div>WK 01 / 19</div>
+      </div>
+      <div class="body" style="justify-content: center; align-items: center;">
+        <div style="display: flex; align-items: center; gap: clamp(2rem, 6vw, 5rem); flex-wrap: wrap; justify-content: center; width: 100%;">
+          <!-- Face mosaic with bbox labels -->
+          <div class="face-mosaic">
+            <div class="face-frag" style="left: 4%; top: 0%; width: 26%; height: 75%; background-image: url('https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&q=80');" onerror="this.style.background='var(--paper)'"></div>
+            <div class="face-frag" style="left: 32%; top: 6%; width: 38%; height: 88%; background-image: url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80');"></div>
+            <div class="face-frag" style="left: 70%; top: 0%; width: 26%; height: 60%; background-image: url('https://images.unsplash.com/photo-1604004555489-723a93d6ce74?w=500&q=80');"></div>
+            <div class="face-frag" style="left: 60%; top: 55%; width: 36%; height: 40%; background-image: url('https://images.unsplash.com/photo-1503467913725-e8d1a59b6090?w=500&q=80');"></div>
+            <!-- bboxes -->
+            <div class="face-bbox" style="left: 6%; top: 5%; width: 22%; height: 18%;"></div>
+            <div class="face-bbox-label" style="left: 6%; top: 1%;">Hair: Natural <span style="opacity:0.85;">93%</span></div>
+            <div class="face-bbox" style="left: 36%; top: 22%; width: 30%; height: 26%;"></div>
+            <div class="face-bbox-label" style="left: 36%; top: 18%;">Gaze: Strong 60%</div>
+            <div class="face-bbox" style="left: 64%; top: 12%; width: 22%; height: 22%;"></div>
+            <div class="face-bbox-label" style="left: 64%; top: 8%;">Intricate 68%</div>
+            <div class="face-bbox" style="left: 50%; top: 60%; width: 22%; height: 22%;"></div>
+            <div class="face-bbox-label" style="left: 50%; top: 55%;">Neutral 88%</div>
+            <div class="face-bbox" style="left: 8%; top: 60%; width: 18%; height: 22%;"></div>
+            <div class="face-bbox-label" style="left: 8%; top: 55%;">Curly 44%</div>
+            <div class="face-bbox" style="left: 76%; top: 55%; width: 20%; height: 18%;"></div>
+            <div class="face-bbox-label" style="left: 76%; top: 50%;">Out of focus 33%</div>
+          </div>
+
+          <!-- Title block -->
+          <div style="flex: 1; min-width: 280px; max-width: 480px;">
+            <div class="datestack" style="margin-bottom: 1.2rem;"><span>2026</span><span class="slash">/</span><span>05</span></div>
+            <div class="label" style="margin-bottom: 0.8rem;">Week 01 — Today</div>
+            <h1 class="ko-display display-lg" style="font-size: clamp(2.2rem, 6.5vw, 5.5rem);">
+              얼굴<span style="color: var(--red);">:</span><br/>
+              <span class="serif-display" style="color: var(--red);">안티-셀피.</span>
+            </h1>
+            <div class="tags" style="margin-top: 1.4rem;">
+              <span class="bbox">Face <span class="pct">98%</span></span>
+              <span class="bbox outline">Interface 87%</span>
+              <span class="bbox outline">Reclaim 100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div>인터페이스가 된 신체와 공간을 재점유하기</div>
+        <div>PRESENTED BY YOO TAEYANG</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        오리엔테이션 + 자기소개 + 1주차 본론. 약 2시간 분량. 분위기는 가볍게, 그러나 핵심 질문은 또렷하게.
+      </div>
+    </section>
+
+    <!-- ===== 02 / HOST INTRO ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">CLUB LEAD</div>
+        <div>02</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="host-card">
+            <div class="host-handle">@0dot77</div>
+            <div class="host-mark">0<span>.</span>77</div>
+            <div class="host-name">TAEYANG YOO</div>
+          </div>
+          <div class="col center">
+            <div class="label">— HOST / 클럽장 소개</div>
+            <h1 class="ko-display display-md" style="font-size: clamp(1.8rem, 4.6vw, 3.6rem);">유태양<br/>TAEYANG<br/>YOO.</h1>
+            <p class="host-quote">
+              "I make tools for artists.<br/>I make art with tools."
+            </p>
+            <div class="host-meta">
+              <div class="host-meta-row">
+                <span class="host-meta-key">ROLE</span>
+                <span class="host-meta-val">파프리스튜디오 Technical Director · XR / Immersive</span>
+              </div>
+              <div class="host-meta-row">
+                <span class="host-meta-key">TEACH</span>
+                <span class="host-meta-val">한예종 무용원 · 영상원 / 성남업스케일링 1–2기 멘토</span>
+              </div>
+              <div class="host-meta-row">
+                <span class="host-meta-key">RECENT</span>
+                <span class="host-meta-val">문문문 · XR 뮤지컬 〈문을 넘어〉 · Imagine Your Heart</span>
+              </div>
+            </div>
+            <div class="tags" style="margin-top: 0.2rem;">
+              <span class="tag">Unity</span>
+              <span class="tag">TouchDesigner</span>
+              <span class="tag">Three.js</span>
+              <span class="tag">Lens Studio</span>
+              <span class="tag solid">XR · AR</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>02</div>
+      </div>
+    </section>
+
+    <!-- ===== 03 / ORIGIN STORY DIVIDER ===== -->
+    <section class="slide dark">
+      <div class="rail">
+        <div class="rail-mark">SECTION 01</div>
+        <div>WHY THIS CLUB</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1400&q=80" alt="Algorithm" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">ORIGIN STORY</div>
+            <div class="photo-bbox-layer">
+              <div class="photo-bbox" data-label="Feed: Sorted 99%" style="left: 18%; top: 28%; width: 46%; height: 38%;"></div>
+            </div>
+          </div>
+          <div class="col center">
+            <div class="label">— 00 / ORIGIN STORY</div>
+            <h1 class="ko-display display-xl" style="color: var(--cream-light);">
+              왜<br/>이 클럽<br/><span style="color: var(--red);">인가.</span>
+            </h1>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>03</div>
+      </div>
+    </section>
+
+    <!-- ===== 04 / 2019 알고리즘 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">2019 — A PROVOCATION</div>
+        <div>04</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">2019 / 첫 번째 자극</div>
+            <h1 class="ko-display display-lg" style="font-size: clamp(2rem, 5.5vw, 4.5rem);">
+              유튜브 알고리즘은<br/>
+              어떻게 이토록<br/>
+              <span style="color: var(--red);">치밀</span>하고 <span style="color: var(--red);">첨예</span>한가?
+            </h1>
+            <p class="lead" style="max-width: 50ch;">
+              <strong>나의 데이터</strong>에 의해서 정렬되는 유튜브의 피드.<br/>
+              나를 보고 나에게 맞춰준다는 자비로움 뒤에,<br/>
+              나를 분류하고 묶어두는 장치가 작동한다.
+            </p>
+            <div class="tags">
+              <span class="bbox">My Data <span class="pct">collected</span></span>
+              <span class="bbox outline">Feed: sorted by me · for me</span>
+            </div>
+          </div>
+          <div class="col" style="justify-content: center;">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">취향 · 의견 · 정치성<span class="sub">한 사람의 시청 패턴이 곧 한 사람의 좌표가 된다.</span></span></li>
+              <li><span class="num">02</span><span class="text">시간 · 에너지 · 감정<span class="sub">가장 효율적으로 머무르게 만드는 콘텐츠 순으로 줄세움.</span></span></li>
+              <li><span class="num">03</span><span class="text">출구 없음<span class="sub">피드 안에 있는 나는, 피드 밖의 나를 잊는다.</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>04</div>
+      </div>
+    </section>
+
+    <!-- ===== 05 / TIKTOK EFFECT HOUSE ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">2022 — A TOOL</div>
+        <div>05</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div class="label">두 번째 자극</div>
+              <h1 class="ko-display display-md" style="margin-top: 0.4rem;">TikTok Effect House.</h1>
+            </div>
+            <div class="serif-display" style="font-size: clamp(1.2rem, 2.4vw, 2rem); color: var(--ink-muted); font-style: italic;">"단순한 앱 수준이 아님."</div>
+          </div>
+          <p class="lead" style="margin-top: 0.6rem;">
+            게임을 만들고, 이펙트를 만들고, <strong>유니티 급의… 무언가?</strong><br/>
+            카메라 앞에 서 있는 평범한 사용자를 위한 노드 기반 게임 엔진.
+          </p>
+          <div class="grid-3" style="flex: 1; margin-top: clamp(0.8rem, 1.5vw, 1.4rem);">
+            <div class="card">
+              <div class="c-num">— 01 / Engine</div>
+              <div class="c-title">스크립팅 가능</div>
+              <div class="c-body">JavaScript 기반의 비주얼 스크립팅. 조건문도, 상태 머신도, 가능하다.</div>
+              <div class="tags" style="margin-top: auto;"><span class="tag">Visual Scripting</span></div>
+            </div>
+            <div class="card">
+              <div class="c-num">— 02 / Render</div>
+              <div class="c-title">Game-grade 렌더</div>
+              <div class="c-body">3D 메시, 셰이더, 파티클, 물리. 게임 엔진과 동일한 그래픽 파이프라인.</div>
+              <div class="tags" style="margin-top: auto;"><span class="tag">Shader</span><span class="tag">Particle</span></div>
+            </div>
+            <div class="card">
+              <div class="c-num">— 03 / Sensor</div>
+              <div class="c-title">Body · Face · World</div>
+              <div class="c-body">실시간 추적이 기본 입력. 그 위에 무엇이든 합성할 수 있다.</div>
+              <div class="tags" style="margin-top: auto;"><span class="tag">Tracking</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>05</div>
+      </div>
+    </section>
+
+    <!-- ===== 06 / 결심 ===== -->
+    <section class="slide deep">
+      <div class="rail">
+        <div class="rail-mark">DECISION</div>
+        <div>06</div>
+      </div>
+      <div class="body" style="justify-content: center;">
+        <div class="col" style="gap: clamp(1.2rem, 2.5vw, 2rem); align-items: flex-start;">
+          <div class="label">— SO,</div>
+          <h2 class="quote-block" style="color: var(--cream-light); max-width: 22ch;">
+            "이거 같이<br/>
+            <span class="accent">연구해보고 사용해보면</span><br/>
+            재밌겠다."
+          </h2>
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem;">
+            <span style="color: var(--red); font-family: var(--font-display-en); font-size: clamp(1.5rem, 3vw, 2.4rem);">→</span>
+            <span class="ko-display" style="font-size: clamp(1.4rem, 3vw, 2.4rem); color: var(--cream-light);">클럽 개설.</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>06</div>
+      </div>
+    </section>
+
+    <!-- ===== 07 / CLUB MANIFESTO ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">SECTION 02</div>
+        <div>07</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— THE CLUB</div>
+            <h1 class="en-display display-lg" style="font-size: clamp(2.4rem, 7.5vw, 5.5rem); line-height: 0.9;">
+              FEED<br/><span style="color: var(--red);">HIJACK</span><br/>ING.
+            </h1>
+            <div class="tags" style="margin-top: 0.4rem;">
+              <span class="bbox">Body as UI</span>
+              <span class="bbox">Space as UI</span>
+              <span class="bbox outline">Reoccupy.</span>
+            </div>
+          </div>
+          <div class="col center">
+            <div class="serif-display" style="font-size: clamp(1.4rem, 3.6vw, 3rem); color: var(--ink); font-style: italic; line-height: 1.15;">
+              인터페이스가 된<br/>
+              나의 <span style="color: var(--red);">신체</span>와 <span style="color: var(--red);">공간</span>을<br/>
+              다시 점유하기.
+            </div>
+            <p class="body-text" style="max-width: 44ch; margin-top: 0.8rem;">
+              알고리즘이 정한 <em>나</em>를, 4주 동안 우리가 다시 정해본다.<br/>
+              그리고 — 직접 만들어본다.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>07</div>
+      </div>
+    </section>
+
+    <!-- ===== 08 / 4-WEEK ROADMAP ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">CURRICULUM</div>
+        <div>08</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <h1 class="en-display display-md">CURRICULUM<br/>4 WEEKS</h1>
+            <div class="label">WK01 → WK04</div>
+          </div>
+          <div class="grid-4" style="flex: 1; margin-top: clamp(0.6rem, 1.5vw, 1.2rem);">
+            <div class="card" style="background: var(--red); color: var(--cream-light); border-color: var(--red);">
+              <div class="c-num" style="color: var(--cream-light); opacity: 0.85;">— WK 01 / TODAY</div>
+              <div class="c-title">얼굴 :<br/>안티-셀피</div>
+              <div class="c-body" style="color: var(--cream-light); opacity: 0.85;">AR 필터가 얼굴을 인터페이스화하는 방식을 분해한다.</div>
+              <div class="tags" style="margin-top: auto;"><span class="tag" style="border-color: rgba(245,239,225,0.4);">NOW</span></div>
+            </div>
+            <div class="card">
+              <div class="c-num">— WK 02</div>
+              <div class="c-title">판정 :<br/>룰렛 / 점수 / 유형</div>
+              <div class="c-body">나를 점수와 유형으로 분류하는 장치를 직접 만들어본다.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— WK 03</div>
+              <div class="c-title">몸,<br/>공간</div>
+              <div class="c-body">피드 바깥으로 몸을 꺼내, 물리 공간에서 알고리즘을 다시 협상한다.</div>
+            </div>
+            <div class="card">
+              <div class="c-num">— WK 04</div>
+              <div class="c-title">피드 정리 &amp;<br/>더 나아가기</div>
+              <div class="c-body">4주를 갈무리하고 각자의 다음 작업을 향한 출구를 만든다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>08</div>
+      </div>
+    </section>
+
+    <!-- ===== 09 / 참여자 소개 — INTERACTIVE SURVEY ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">ROUND TABLE · INTERACTIVE</div>
+        <div>09</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided" style="height: 100%;">
+          <div class="col" style="justify-content: center; gap: clamp(0.7rem, 1.4vw, 1.1rem); height: 100%;">
+            <div class="label">— 1주차 자기소개 카드</div>
+            <h1 class="ko-display display-md" style="font-size: clamp(1.6rem, 4vw, 3rem);">
+              나와 <span style="color: var(--red);">AR / 필터.</span>
+            </h1>
+            <p class="body-text" style="max-width: 38ch; opacity: 0.78;">
+              7문항. 짧게 적어두고, 한 사람씩 골라 이야기를 풀어봅시다.<br/>
+              <span style="color: var(--red);">자동 저장</span>됩니다.
+            </p>
+
+            <div class="survey-progress" id="survey-progress">
+              <span id="survey-progress-text">0 / 7 응답</span>
+              <div class="bar" style="--p: 0%;"></div>
+            </div>
+
+            <!-- Live response summary -->
+            <div class="live-panel" id="live-panel">
+              <div class="live-panel-label">— YOUR RESPONSES</div>
+              <div class="live-panel-empty" id="live-panel-empty">
+                아직 응답이 없습니다. 우측 폼에 적어보세요.
+              </div>
+              <div id="live-panel-rows"></div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+              <span class="survey-saved" id="survey-saved">자동 저장 대기</span>
+              <div class="survey-actions">
+                <button type="button" class="survey-btn" id="survey-reset">RESET</button>
+                <button type="button" class="survey-btn" id="survey-download">↓ JSON</button>
+                <button type="button" class="survey-btn primary" id="survey-share">공유 →</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col" style="height: 100%; min-height: 0; gap: clamp(0.5rem, 1vw, 0.8rem);">
+            <div class="survey-form-wrap">
+              <form class="survey-form" id="survey-form" autocomplete="off"></form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>09</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        설문 작성 5–7분. 그 다음 한 명씩 호명해서 화면 띄우고 1–2분씩 풀어보기. JSON 다운로드는 본인 기록용.
+      </div>
+    </section>
+
+    <!-- ===== 10 / SECTION DIVIDER — AR ATLAS ===== -->
+    <section class="slide deep">
+      <div class="rail">
+        <div class="rail-mark">SECTION 03</div>
+        <div>AR ATLAS</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 02 / SECTION</div>
+            <h1 class="ko-display display-xl" style="color: var(--cream-light);">
+              AR<br/>
+              생태계,<br/>
+              <span style="color: var(--red);">지형도.</span>
+            </h1>
+          </div>
+          <div class="col center">
+            <p class="serif-display" style="font-size: clamp(1.2rem, 2.4vw, 2rem); color: var(--cream-light); line-height: 1.3; max-width: 28ch;">
+              Augmented Reality —<br/>
+              현실 공간 위에<br/>
+              <span style="color: var(--red);">하나의 레이어</span>를<br/>
+              덧씌우는 작업.
+            </p>
+            <div class="tags">
+              <span class="bbox">Big Tech</span>
+              <span class="bbox outline" style="border-color: var(--red); color: var(--red);">Creative Coding</span>
+              <span class="bbox">Consumer Glass</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>10</div>
+      </div>
+    </section>
+
+    <!-- ===== 11 / BIG TECH — INSTAGRAM ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">03 · BIG TECH</div>
+        <div>11</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided" style="height: 100%; align-items: stretch;">
+          <div class="col" style="justify-content: center; gap: clamp(0.8rem, 1.5vw, 1.2rem);">
+            <div class="label">— BIG TECH 흐름</div>
+            <h1 class="ko-display display-md" style="font-size: clamp(2rem, 5vw, 4rem);">
+              MediaPipe<br/>
+              → <span style="color: var(--red);">Instagram Reels.</span>
+            </h1>
+          </div>
+
+          <div class="col" style="justify-content: center; gap: clamp(0.6rem, 1vw, 0.9rem);">
+            <a class="reel-row" href="https://www.instagram.com/reel/DUpCaONDAdK/" target="_blank" rel="noopener">
+              <span class="reel-num">01</span>
+              <span class="reel-body">Face mesh 기반 합성 — 머리카락에 반응하는 파티클.</span>
+              <span class="reel-arrow">↗</span>
+            </a>
+            <a class="reel-row" href="https://www.instagram.com/reel/DWOnsb0kb0R/" target="_blank" rel="noopener">
+              <span class="reel-num">02</span>
+              <span class="reel-body">표정 인식 → 감정 라벨 → 비주얼 트리거.</span>
+              <span class="reel-arrow">↗</span>
+            </a>
+            <a class="reel-row" href="https://www.instagram.com/reel/DVTr63sjDLw/" target="_blank" rel="noopener">
+              <span class="reel-num">03</span>
+              <span class="reel-body">손가락 키포인트 트래킹 위에 그래픽 오버레이.</span>
+              <span class="reel-arrow">↗</span>
+            </a>
+            <a class="reel-row" href="https://www.instagram.com/reel/DT73kM0kbnM/" target="_blank" rel="noopener">
+              <span class="reel-num">04</span>
+              <span class="reel-body">전신 포즈 추적 → 의상 합성 / 배경 분리.</span>
+              <span class="reel-arrow">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>11</div>
+      </div>
+    </section>
+
+    <!-- ===== 12 / CREATIVE PROGRAMMING ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">03 · CREATIVE CODING</div>
+        <div>12</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided" style="height: 100%; align-items: stretch;">
+          <div class="col" style="justify-content: center; gap: clamp(0.8rem, 1.5vw, 1.2rem);">
+            <div class="label">— ARTIST FIELD</div>
+            <h1 class="ko-display display-md" style="font-size: clamp(2rem, 5vw, 4rem);">
+              예술 쪽<br/>
+              에서의 <span style="color: var(--red);">AR.</span>
+            </h1>
+          </div>
+
+          <div class="col" style="justify-content: center; gap: clamp(0.6rem, 1vw, 0.9rem);">
+            <a class="reel-row artist-row" href="https://research.rhizomatiks.com/s/works/fencing_tracking/en.html" target="_blank" rel="noopener">
+              <span class="reel-num">01</span>
+              <span class="artist-meta">
+                <span class="artist-name">Rhizomatiks</span>
+                <span class="artist-tag">STUDIO · TOKYO</span>
+                <span class="artist-body">펜싱 검 끝까지 추적해 경기 위에 실시간 그래픽을 덧씌운다.</span>
+              </span>
+              <span class="reel-arrow">↗</span>
+            </a>
+            <a class="reel-row artist-row" href="https://experiments.withgoogle.com/weird-cuts" target="_blank" rel="noopener">
+              <span class="reel-num">02</span>
+              <span class="artist-meta">
+                <span class="artist-name">Zach Liberman</span>
+                <span class="artist-tag">ARTIST · NYC</span>
+                <span class="artist-body">얼굴·문자를 잘라내고 다시 짜맞추는 카메라 실험. Weird Cuts · Weird Types.</span>
+              </span>
+              <span class="reel-arrow">↗</span>
+            </a>
+            <a class="reel-row artist-row" href="https://youtu.be/a1hG__i4ems" target="_blank" rel="noopener">
+              <span class="reel-num">03</span>
+              <span class="artist-meta">
+                <span class="artist-name">Elevenplay</span>
+                <span class="artist-tag">GROUP · TOKYO</span>
+                <span class="artist-body">무용수의 몸 자체를 인터페이스로 다시 정의한다. 안무와 트래킹의 결합.</span>
+              </span>
+              <span class="reel-arrow">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>12</div>
+      </div>
+    </section>
+
+    <!-- ===== 13 / GLASS TIMELINE ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">03 · CONSUMER GLASS</div>
+        <div>13</div>
+      </div>
+      <div class="body">
+        <div class="row" style="gap: clamp(2rem, 5vw, 5rem);">
+          <div class="col" style="flex: 0 0 24%; min-width: 0; justify-content: flex-start;">
+            <div class="label">— TIMELINE</div>
+            <h1 class="en-display display-md" style="font-size: clamp(1.8rem, 5vw, 4rem);">PHONE<br/>→<br/>GLASS</h1>
+            <p class="body-text" style="max-width: 22ch;">결국 <strong>안경</strong>으로 흘러간다.<br/>스마트폰 위의 카메라가 얼굴 위로 옮겨가는 10년.</p>
+          </div>
+          <div class="col" style="flex: 1; min-width: 0; justify-content: center; gap: 0;">
+            <div class="year-row">
+              <div class="y">2016</div>
+              <div class="y-img">
+                <img src="./assets/timeline/pokemon-go.png" alt="Pokemon GO — AR Charmander" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="y-img-fallback" style="display: none;">POKÉMON<br/>GO</div>
+              </div>
+              <div>
+                <div class="y-title">Pokémon GO</div>
+                <div class="y-sub">GPS + 카메라 — 일상의 좌표가 게임판이 되다.</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">2021</div>
+              <div class="y-img">
+                <img src="./assets/timeline/pikmin-bloom.png" alt="Pikmin Bloom — AR pikmin" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="y-img-fallback" style="display: none;">PIKMIN<br/>BLOOM</div>
+              </div>
+              <div>
+                <div class="y-title">Pikmin Bloom</div>
+                <div class="y-sub">보행 자체를 게임화 — Niantic의 두 번째 실험.</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">22<sup style="font-size: 0.4em; opacity: 0.7;">→</sup></div>
+              <div class="y-img">
+                <img src="./assets/timeline/effect-house.png" alt="TikTok · Effect House" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="y-img-fallback" style="display: none;">TIKTOK<br/>EFFECT HOUSE</div>
+              </div>
+              <div>
+                <div class="y-title">TikTok · Effect House</div>
+                <div class="y-sub">"누구나 만든다" — 필터 제작이 일반 사용자에게 열림.</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">2024<sup style="font-size: 0.4em; opacity: 0.7;">→</sup></div>
+              <div class="y-img">
+                <img src="./assets/timeline/spectacles.png" alt="Spectacles — Snap AR Glasses" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="y-img-fallback" style="display: none;">SPECTACLES<br/>2024</div>
+              </div>
+              <div>
+                <div class="y-title">Spectacles · Snap AR Glass</div>
+                <div class="y-sub">Snapchat이 가장 멀리 가 있다 — 우리 도구의 종착점.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>13</div>
+      </div>
+    </section>
+
+    <!-- ===== 14 / TOOLS ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">SECTION 04</div>
+        <div>14</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div>
+            <div class="label">— TOOLKIT</div>
+            <h1 class="ko-display display-md" style="margin-top: 0.4rem;">먼저 도구.<br/><span style="color: var(--red);">설치 &amp; 둘러보기.</span></h1>
+          </div>
+          <div class="flow" style="margin-top: clamp(0.8rem, 1.8vw, 1.4rem); flex: 1;">
+            <div class="flow-step hi">
+              <span class="s-num">— SNAPCHAT · MAIN</span>
+              <div class="flow-logo" aria-hidden="true">
+                <!-- Snapchat ghost -->
+                <svg viewBox="0 0 64 64" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M32 4c-9 0-16.5 7-16.5 16v15.4c-1 1.6-2.7 2.5-4.5 3.4-1.5.7-2 2.4-1 3.6.6.7 1.4 1 2.4 1.2 2 .4 4 .8 4.5 2 .3.8.5 1.7 1 2.5.5.9 1.4 1.4 2.4 1.4.7 0 1.4-.2 2.1-.4 1-.3 1.9-.5 3-.5 1.6 0 3.2.4 4.6 1.2 1.6 1 3.7 2.6 6 2.6s4.4-1.6 6-2.6c1.4-.8 3-1.2 4.6-1.2 1.1 0 2 .2 3 .5.7.2 1.4.4 2.1.4 1 0 1.9-.5 2.4-1.4.5-.8.7-1.7 1-2.5.5-1.2 2.5-1.6 4.5-2 1-.2 1.8-.5 2.4-1.2 1-1.2.5-2.9-1-3.6-1.8-.9-3.5-1.8-4.5-3.4V20C48.5 11 41 4 32 4z"/>
+                </svg>
+              </div>
+              <span class="s-title">Lens Studio.</span>
+              <span class="s-quote"><strong>실험적, 기능 풍부.</strong> 이번 4주의 메인 도구.</span>
+              <div class="tags">
+                <span class="tag" style="background: rgba(245,239,225,0.18); border-color: rgba(245,239,225,0.4);">Face</span>
+                <span class="tag" style="background: rgba(245,239,225,0.18); border-color: rgba(245,239,225,0.4);">World</span>
+                <span class="tag" style="background: rgba(245,239,225,0.18); border-color: rgba(245,239,225,0.4);">Body</span>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span class="s-num">— TIKTOK</span>
+              <div class="flow-logo" aria-hidden="true">
+                <!-- TikTok music note -->
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M44 6h-9v34a8 8 0 1 1-8-8 8 8 0 0 1 2 .25V23.1A17 17 0 0 0 27 23a17 17 0 1 0 17 17V21.5a18 18 0 0 0 11 3.7v-9A11 11 0 0 1 44 6z" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="s-title">Effect House.</span>
+              <span class="s-quote"><strong>플랫폼과 딱 붙어있다.</strong> 유통이 빠르지만 자유도는 적다.</span>
+              <div class="tags">
+                <span class="tag">Face</span>
+                <span class="tag">Trend</span>
+                <span class="tag">Reach</span>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span class="s-num">— NIANTIC</span>
+              <div class="flow-logo" aria-hidden="true">
+                <!-- 8th Wall — octagon with "8" -->
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="22,4 42,4 60,22 60,42 42,60 22,60 4,42 4,22" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                  <text x="32" y="44" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="currentColor" font-weight="900" font-style="italic">8</text>
+                </svg>
+              </div>
+              <span class="s-title">8th Wall.</span>
+              <span class="s-quote"><strong>강력한 GPS · WebAR.</strong> 포켓몬 GO를 만든 회사가 운영.</span>
+              <div class="tags">
+                <span class="tag">GPS</span>
+                <span class="tag">WebAR</span>
+                <span class="tag">Browser</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>14</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        설치 시간 10–15분. 핸드폰에서 Easy Lens는 미리 깔고 오라고 공지했지만, 못 깐 사람을 위해 시작 직후 같이 깐다.
+      </div>
+    </section>
+
+    <!-- ===== 15 / KEY QUESTION — ANTI-SELFIE ===== -->
+    <section class="slide deep">
+      <div class="rail">
+        <div class="rail-mark">SECTION 05</div>
+        <div>THE QUESTION</div>
+      </div>
+      <div class="body">
+        <div class="col" style="justify-content: center; gap: clamp(1rem, 2.5vw, 2rem);">
+          <div class="label" style="color: var(--red);">— 안티-셀피</div>
+          <h1 class="ko-display" style="font-size: clamp(2rem, 6.5vw, 5.5rem); color: var(--cream-light); line-height: 1; max-width: 24ch;">
+            AR 필터들은<br/>
+            인간의 얼굴을<br/>
+            어떻게 <span style="color: var(--red);">인터페이스화</span> 하는가?
+          </h1>
+          <h2 class="serif-display" style="font-size: clamp(1.3rem, 3vw, 2.2rem); color: var(--cream-light); opacity: 0.92; max-width: 36ch; line-height: 1.25;">
+            그리고 — 우리가 그 인터페이스를<br/>
+            <span style="color: var(--red);">다르게 전유할</span> 방법은?
+          </h2>
+          <div class="tags" style="margin-top: 0.6rem;">
+            <span class="bbox">Beauty Filter</span>
+            <span class="bbox">Face ID</span>
+            <span class="bbox">Emotion Score</span>
+            <span class="bbox outline" style="border-color: var(--red); color: var(--red);">Anti-Selfie?</span>
+          </div>
+          <p class="body-text" style="color: var(--cream-light); opacity: 0.55; margin-top: 0.8rem; max-width: 50ch;">
+            <span class="serif-display" style="font-style: italic;">읽어볼 거리 — Augmented Reality and Art.</span>
+          </p>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>15</div>
+      </div>
+    </section>
+
+    <!-- ===== 16 / AR ART — INTERACTIVE EXPERIENCE ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">READING · INTERACTIVE</div>
+        <div>16</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided" style="height: 100%; align-items: stretch; gap: clamp(1.5rem, 3vw, 3rem);">
+          <!-- Left: Theory + Concept pills + Definition -->
+          <div class="col" style="justify-content: center; gap: clamp(0.55rem, 1vw, 0.9rem); min-height: 0;">
+            <div class="label">— READING / Ji-Hye Lee, 2018</div>
+            <h1 class="ko-display" style="font-size: clamp(1.6rem, 3.8vw, 2.8rem); line-height: 1;">
+              인터페이스는 표면이 아니라<br/>
+              <span style="color: var(--red);">문이다.</span>
+            </h1>
+
+            <!-- Concept pills -->
+            <div class="ar-concepts">
+              <button type="button" class="ar-concept active" data-concept="framing">
+                <span class="ar-concept-num">01</span>
+                <span class="ar-concept-name">Framing</span>
+              </button>
+              <button type="button" class="ar-concept" data-concept="exploring">
+                <span class="ar-concept-num">02</span>
+                <span class="ar-concept-name">Exploring</span>
+              </button>
+              <button type="button" class="ar-concept" data-concept="threshold">
+                <span class="ar-concept-num">03</span>
+                <span class="ar-concept-name">Threshold</span>
+              </button>
+              <button type="button" class="ar-concept" data-concept="interface">
+                <span class="ar-concept-num">04</span>
+                <span class="ar-concept-name">Interface</span>
+              </button>
+            </div>
+
+            <!-- Definition panel -->
+            <div class="ar-def">
+              <div class="ar-def-label" id="ar-def-label">FRAMING — 프레이밍</div>
+              <div class="ar-def-body" id="ar-def-body">
+                <em>"관객은 모바일 화면으로 현실을 잘라 보고, 그 안에서 가상 이미지를 결합한다."</em> 무엇을 보일지 직접 선택하는 행위 — 르네상스 원근법의 계승, 그러나 이번엔 <strong>몸이 움직인다</strong>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive AR stage -->
+          <div class="col" style="height: 100%; justify-content: center; gap: 0.55rem;">
+            <div class="ar-stage" id="ar-stage">
+              <!-- Real world (greyscale) -->
+              <div class="world world-real"></div>
+              <!-- Augmented layer (clipped by viewport) -->
+              <div class="world world-aug" id="world-aug">
+                <div class="ar-label" style="left: 18%; top: 22%;">Surveillance: 89%</div>
+                <div class="ar-label" style="left: 64%; top: 18%;">Brand: visible</div>
+                <div class="ar-label" style="left: 40%; top: 38%;">Affect: extracted</div>
+                <div class="ar-label" style="left: 78%; top: 44%;">Capital: 73%</div>
+                <div class="ar-label" style="left: 22%; top: 56%;">Worker Body: 41%</div>
+                <div class="ar-label" style="left: 56%; top: 64%;">Algorithm: hidden</div>
+                <div class="ar-label" style="left: 30%; top: 80%;">Attention: harvested</div>
+                <div class="ar-label" style="left: 72%; top: 82%;">Data: streaming</div>
+              </div>
+              <!-- Draggable viewport -->
+              <div class="viewport-frame" id="viewport-frame">
+                <span class="viewport-label">Viewport · 드래그</span>
+                <span class="viewport-corner tl"></span>
+                <span class="viewport-corner tr"></span>
+                <span class="viewport-corner bl"></span>
+                <span class="viewport-corner br"></span>
+              </div>
+              <div class="ar-stage-hint">뷰포트를 드래그하거나 무대 아무 곳이나 클릭해보세요</div>
+            </div>
+            <div class="ar-status">
+              <span class="ar-status-label">— EXPLORING</span>
+              <span id="ar-status-text">탐색 중 · 보이는 라벨 0 / 8</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>16</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        각자 5분 동안 뷰포트를 옮기며 라벨을 읽어본다. 4개 개념 알약을 차례로 눌러보고, 그 다음 "내 작업의 어떤 장면에 이 구조를 가져올 수 있을지"를 한 줄씩 적어본다. 논문 ref: Ji-Hye Lee, 2018, Augmented Reality and Art.
+      </div>
+    </section>
+
+    <!-- ===== 17 / HANDS-ON ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">HANDS-ON · 60 MIN</div>
+        <div>17</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1551817958-c5b51e7b4a33?w=1400&q=80" alt="Lens Studio" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">LENS STUDIO</div>
+            <div class="photo-bbox-layer">
+              <div class="photo-bbox" data-label="Face Mesh: Detected 99%" style="left: 22%; top: 28%; width: 50%; height: 42%;"></div>
+            </div>
+          </div>
+          <div class="col center">
+            <div class="label">실습 / HANDS-ON</div>
+            <h1 class="ko-display display-md">Lens Studio<br/>익혀보기.</h1>
+            <ul class="num-list" style="margin-top: 0.4rem;">
+              <li><span class="num">01</span><span class="text">Face<span class="sub">얼굴 추적 노드 사용 — 카메라 입력에 얼굴이 어떻게 좌표가 되는가.</span></span></li>
+              <li><span class="num">02</span><span class="text">Preview<span class="sub">시뮬레이터로 띄워보기 — 데스크탑에서 즉시 검증.</span></span></li>
+              <li><span class="num">03</span><span class="text">Head Binding<span class="sub">결국엔 <strong>추적</strong>이다 — 머리 위에 붙는 모든 것의 원리.</span></span></li>
+              <li><span class="num">04</span><span class="text">Rendering 순서<span class="sub">순서가 효과를 결정한다 — 레이어 우선순위 실험.</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>17</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        실습 진행 순서 — Face 노드 → Preview → 머리에 무언가 붙이기 → Rendering 순서로 효과 비교. 각 단계별 5–10분.
+      </div>
+    </section>
+
+    <!-- ===== 18 / SHARE & WRAP ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div class="rail-mark">SHOW &amp; TELL</div>
+        <div>18</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">공유 &amp; 회고</div>
+            <h1 class="ko-display display-lg">각자의<br/>한 장면,<br/>같이<br/><span style="color: var(--red);">봅시다.</span></h1>
+          </div>
+          <div class="col center">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">오늘 가장 이상했던 한 장면<span class="sub">스스로 만든 것이든, 남의 것이든, 멈추게 한 한 컷.</span></span></li>
+              <li><span class="num">02</span><span class="text">의도와 어긋난 부분<span class="sub">예상대로 되지 않은 것이 보여주는 단서.</span></span></li>
+              <li><span class="num">03</span><span class="text">다음 주에 들고 오고 싶은 질문<span class="sub">이번 한 주, 머릿속을 떠나지 않을 한 가지.</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING</div>
+        <div>18</div>
+      </div>
+    </section>
+
+    <!-- ===== 19 / NEXT WEEK ===== -->
+    <section class="slide deep">
+      <div class="rail">
+        <div class="rail-mark">END OF WK01</div>
+        <div>19</div>
+      </div>
+      <div class="body" style="justify-content: space-between;">
+        <div class="col">
+          <div class="label">— NEXT / WEEK 02</div>
+          <h1 class="ko-display display-xl" style="color: var(--cream-light);">
+            판정 :<br/>
+            <span style="color: var(--red);">룰렛 / 점수 /</span><br/>
+            <span style="color: var(--red);">유형 테스트.</span>
+          </h1>
+        </div>
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+          <p class="lead" style="max-width: 44ch; color: var(--cream-light); opacity: 0.85;">
+            나를 점수와 유형으로 분류하는 장치를<br/>
+            직접 만들어본다. 그리고 — 그 권력을 분해한다.
+          </p>
+          <div class="datestack" style="color: var(--cream-light);">
+            <span>WK</span><span class="slash">\</span><span>02</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <div class="rail-mark">FEED HIJACKING · 뉴아트클럽 2026</div>
+        <div>END / 19</div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Help overlay -->
+  <div class="help" id="help">
+    <div class="help-content">
+      <h3>KEYBOARD SHORTCUTS</h3>
+      <ul>
+        <li><kbd>→</kbd> <kbd>Space</kbd> 다음 슬라이드</li>
+        <li><kbd>←</kbd> 이전 슬라이드</li>
+        <li><kbd>Home</kbd> 처음으로</li>
+        <li><kbd>End</kbd> 마지막으로</li>
+        <li><kbd>N</kbd> 발표자 노트 토글</li>
+        <li><kbd>F</kbd> 전체화면</li>
+        <li><kbd>?</kbd> 이 도움말</li>
+        <li><kbd>Esc</kbd> 닫기</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    const help = document.getElementById('help');
+    let current = 0;
+    let notesVisible = false;
+
+    function go(idx) {
+      idx = Math.max(0, Math.min(slides.length - 1, idx));
+      slides[current].classList.remove('active');
+      slides[idx].classList.add('active');
+      current = idx;
+      progress.style.setProperty('--w', ((idx + 1) / slides.length * 100) + '%');
+      progress.style.setProperty('--p', ((idx + 1) / slides.length * 100) + '%');
+      const hash = '#' + (idx + 1);
+      if (location.hash !== hash) history.replaceState(null, '', hash);
+      applyNotes();
+    }
+    function applyNotes() {
+      slides.forEach(s => {
+        const n = s.querySelector('.speaker-note');
+        if (!n) return;
+        n.classList.toggle('visible', notesVisible && s.classList.contains('active'));
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown':
+          e.preventDefault(); go(current + 1); break;
+        case 'ArrowLeft': case 'PageUp':
+          e.preventDefault(); go(current - 1); break;
+        case 'Home': e.preventDefault(); go(0); break;
+        case 'End': e.preventDefault(); go(slides.length - 1); break;
+        case 'n': case 'N': notesVisible = !notesVisible; applyNotes(); break;
+        case 'f': case 'F':
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+          else document.exitFullscreen();
+          break;
+        case '?': help.classList.toggle('visible'); break;
+        case 'Escape': help.classList.remove('visible'); break;
+      }
+    });
+    help.addEventListener('click', () => help.classList.remove('visible'));
+
+    const initial = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(initial) && initial >= 1 && initial <= slides.length) go(initial - 1);
+    else { progress.style.setProperty('--w', (1 / slides.length * 100) + '%'); }
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+    });
+
+    // ───── Interactive Survey (slide 09) ─────
+    (function() {
+      const KEY = 'feed-hijacking-wk01-survey';
+      const QUESTIONS = [
+        {
+          id: 'identity',
+          type: 'fields',
+          q: '이름 / 작업하거나 관심 있는 것',
+          hint: '편하게 부르는 이름과, 요즘 머무는 자리.',
+          fields: [
+            { id: 'name',     label: '이름',     placeholder: '예: 김다영',                      input: 'text' },
+            { id: 'interest', label: '관심',     placeholder: '예: 안무 영상, AR 필터, 퍼포먼스 다큐...', input: 'textarea', rows: 2 },
+          ],
+        },
+        {
+          id: 'feeds',
+          type: 'checkbox',
+          q: '자주 보는 피드 또는 플랫폼',
+          hint: '복수 선택. 평일/주말 가리지 말고 솔직하게.',
+          etc: true,
+          options: [
+            { v: 'instagram', label: 'Instagram',     tag: 'IG' },
+            { v: 'tiktok',    label: 'TikTok',        tag: 'TT' },
+            { v: 'shorts',    label: 'YouTube Shorts',tag: 'YT' },
+            { v: 'snapchat',  label: 'Snapchat',      tag: 'SC' },
+            { v: 'x',         label: 'X (Twitter)',   tag: 'X' },
+            { v: 'game',      label: '게임',           tag: 'GAME' },
+            { v: 'show',      label: '전시',           tag: 'SHOW' },
+            { v: 'perf',      label: '공연',           tag: 'PERF' },
+          ],
+        },
+        {
+          id: 'memorable-ar',
+          type: 'fields',
+          q: '최근 기억에 남는 AR / 필터 / 카메라 효과 경험',
+          hint: '있었다면 한 장면을. 없으면 비워두셔도 됩니다.',
+          fields: [
+            { id: 'where', label: '어떤 앱/상황', placeholder: '예: 스냅챗 / 클럽 카메라 / 어떤 전시 입구...', input: 'text' },
+            { id: 'why',   label: '왜 기억',     placeholder: '예: 내 표정에 너무 잘 반응해서 무서웠다 / 단순했지만 분위기가 좋았다...', input: 'textarea', rows: 2 },
+          ],
+        },
+        {
+          id: 'filter-style',
+          type: 'checkbox',
+          q: '내가 좋아하거나 자주 쓰는 필터 / 카메라 효과의 성격',
+          hint: '복수 선택 가능. 가장 가까운 것 위주로.',
+          etc: true,
+          options: [
+            { v: 'beauty',     label: '예뻐지는 것',                       tag: 'Beauty' },
+            { v: 'funny',      label: '웃기게 만드는 것',                    tag: 'Funny' },
+            { v: 'character',  label: '얼굴을 캐릭터처럼 바꾸는 것',          tag: 'Character' },
+            { v: 'gesture',    label: '몸이나 손동작에 반응하는 것',          tag: 'Gesture' },
+            { v: 'space',      label: '공간에 무언가를 놓는 것',             tag: 'Space' },
+            { v: 'judge',      label: '룰렛 / 점수 / 유형 테스트',           tag: 'Judge' },
+            { v: 'rare',       label: '거의 쓰지 않음',                     tag: 'Rare' },
+          ],
+        },
+        {
+          id: 'felt-as',
+          type: 'text',
+          q: '필터를 쓸 때 내 얼굴 / 몸 / 공간이 어떻게 쓰인다고 느끼나요?',
+          hint: '예: 얼굴이 장식된다, 표정이 버튼처럼 쓰인다, 몸이 게임 컨트롤러 같다, 공간이 배경으로만 쓰인다, 별생각 없이 재미로 쓴다.',
+          placeholder: '솔직하게 한두 줄 적어주세요...',
+          rows: 3,
+        },
+        {
+          id: 'directions',
+          type: 'checkbox',
+          q: '예술 / 기술 작업에서 다뤄보고 싶은 것',
+          hint: '4주 동안 또는 그 이후에 — 복수 선택 가능.',
+          options: [
+            { v: 'face',     label: '얼굴',                  tag: 'Face' },
+            { v: 'body',     label: '몸 / 제스처',            tag: 'Body' },
+            { v: 'place',    label: '공간 / 장소',            tag: 'Place' },
+            { v: 'judge',    label: '판정 / 점수 / 알고리즘', tag: 'Judge' },
+            { v: 'feed',     label: '피드 / 공유 방식',       tag: 'Feed' },
+            { v: 'sound',    label: '사운드',                tag: 'Sound' },
+            { v: 'text',     label: '텍스트 / 말',            tag: 'Text' },
+            { v: 'unsure',   label: '아직 모르겠음',          tag: '?' },
+          ],
+        },
+        {
+          id: 'take-question',
+          type: 'text',
+          q: '이번 워크숍에서 가져가고 싶은 질문',
+          hint: '예: "내 얼굴을 예쁘거나 웃기게 만드는 것 말고 다르게 쓸 수 있을까?"',
+          placeholder: '나만의 한 줄짜리 질문을 적어보세요...',
+          rows: 2,
+        },
+      ];
+
+      const form = document.getElementById('survey-form');
+      if (!form) return;
+      const saved = document.getElementById('survey-saved');
+      const progressText = document.getElementById('survey-progress-text');
+      const progressBar = document.querySelector('#survey-progress .bar');
+      const livePanel = document.getElementById('live-panel');
+      const liveEmpty = document.getElementById('live-panel-empty');
+      const liveRows = document.getElementById('live-panel-rows');
+      const resetBtn = document.getElementById('survey-reset');
+      const dlBtn = document.getElementById('survey-download');
+      const shareBtn = document.getElementById('survey-share');
+
+      // ── Render ──
+      const state = {};
+      QUESTIONS.forEach(q => {
+        if (q.type === 'checkbox') {
+          state[q.id] = [];
+          if (q.etc) state[q.id + '__etc'] = '';
+        } else if (q.type === 'fields') {
+          const obj = {};
+          q.fields.forEach(f => { obj[f.id] = ''; });
+          state[q.id] = obj;
+        } else {
+          state[q.id] = '';
+        }
+      });
+
+      form.innerHTML = QUESTIONS.map((q, i) => {
+        const numLabel = String(i + 1).padStart(2, '0');
+        if (q.type === 'text') {
+          return `
+            <div class="survey-q" data-id="${q.id}">
+              <div class="survey-q-head">
+                <span class="survey-q-num">${numLabel}</span>
+                <span class="survey-q-text">${q.q}</span>
+              </div>
+              <div class="survey-q-hint">${q.hint || ''}</div>
+              <div class="survey-textarea-row">
+                <textarea data-id="${q.id}" rows="${q.rows || 2}" placeholder="${q.placeholder || ''}"></textarea>
+              </div>
+            </div>
+          `;
+        }
+        if (q.type === 'fields') {
+          return `
+            <div class="survey-q" data-id="${q.id}">
+              <div class="survey-q-head">
+                <span class="survey-q-num">${numLabel}</span>
+                <span class="survey-q-text">${q.q}</span>
+              </div>
+              <div class="survey-q-hint">${q.hint || ''}</div>
+              <div class="survey-fields">
+                ${q.fields.map(f => `
+                  <div class="survey-field">
+                    <span class="survey-field-key">${f.label}</span>
+                    ${f.input === 'text'
+                      ? `<input type="text" data-qid="${q.id}" data-fid="${f.id}" placeholder="${f.placeholder || ''}" />`
+                      : `<textarea data-qid="${q.id}" data-fid="${f.id}" rows="${f.rows || 2}" placeholder="${f.placeholder || ''}"></textarea>`
+                    }
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+        const inputType = q.type === 'radio' ? 'radio' : 'checkbox';
+        const groupName = q.id;
+        return `
+          <div class="survey-q" data-id="${q.id}">
+            <div class="survey-q-head">
+              <span class="survey-q-num">${numLabel}</span>
+              <span class="survey-q-text">${q.q}</span>
+            </div>
+            <div class="survey-q-hint">${q.hint || ''}</div>
+            <div class="opt-list" data-id="${q.id}">
+              ${q.options.map(opt => `
+                <label data-v="${opt.v}">
+                  <input type="${inputType}" name="${groupName}" value="${opt.v}" data-id="${q.id}" />
+                  <span>${opt.label}</span>
+                  ${opt.tag ? `<span class="opt-tag">${opt.tag}</span>` : ''}
+                </label>
+              `).join('')}
+            </div>
+            ${q.etc ? `
+              <div class="opt-etc">
+                <span class="opt-etc-label">기타</span>
+                <input type="text" data-etc="${q.id}" placeholder="기타 — 직접 적어주세요" />
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // ── Restore ──
+      let restored = false;
+      try {
+        const data = JSON.parse(localStorage.getItem(KEY) || '{}');
+        if (data && typeof data === 'object') {
+          QUESTIONS.forEach(q => {
+            if (q.type === 'text') {
+              const v = data[q.id] || '';
+              state[q.id] = v;
+              const ta = form.querySelector(`textarea[data-id="${q.id}"]`);
+              if (ta) ta.value = v;
+              if (v) restored = true;
+            } else if (q.type === 'fields') {
+              const obj = data[q.id] && typeof data[q.id] === 'object' ? data[q.id] : {};
+              q.fields.forEach(f => {
+                const v = obj[f.id] || '';
+                state[q.id][f.id] = v;
+                const el = form.querySelector(`[data-qid="${q.id}"][data-fid="${f.id}"]`);
+                if (el) el.value = v;
+                if (v) restored = true;
+              });
+            } else if (q.type === 'radio') {
+              const v = data[q.id] || '';
+              state[q.id] = v;
+              if (v) {
+                const r = form.querySelector(`input[name="${q.id}"][value="${v}"]`);
+                if (r) {
+                  r.checked = true;
+                  r.closest('label')?.classList.add('checked');
+                }
+                restored = true;
+              }
+            } else if (q.type === 'checkbox') {
+              const arr = Array.isArray(data[q.id]) ? data[q.id] : [];
+              state[q.id] = arr;
+              arr.forEach(v => {
+                const c = form.querySelector(`input[name="${q.id}"][value="${v}"]`);
+                if (c) {
+                  c.checked = true;
+                  c.closest('label')?.classList.add('checked');
+                }
+              });
+              if (arr.length) restored = true;
+              if (q.etc) {
+                const etcVal = data[q.id + '__etc'] || '';
+                state[q.id + '__etc'] = etcVal;
+                const etcEl = form.querySelector(`input[data-etc="${q.id}"]`);
+                if (etcEl) etcEl.value = etcVal;
+                if (etcVal) restored = true;
+              }
+            }
+          });
+        }
+      } catch (e) {}
+      if (restored) {
+        saved.textContent = '저장된 응답 불러옴';
+        saved.classList.add('active');
+      }
+
+      // ── Persist ──
+      let saveTimer;
+      function persist() {
+        localStorage.setItem(KEY, JSON.stringify({
+          ...state,
+          updatedAt: new Date().toISOString(),
+        }));
+        saved.textContent = '저장됨';
+        saved.classList.add('active');
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => { saved.textContent = '자동 저장됨'; }, 1200);
+      }
+
+      // ── Progress ──
+      function isAnswered(q) {
+        if (q.type === 'checkbox') {
+          const arr = state[q.id];
+          const etc = q.etc ? (state[q.id + '__etc'] || '').trim() : '';
+          return (Array.isArray(arr) && arr.length > 0) || etc.length > 0;
+        }
+        if (q.type === 'text') {
+          return typeof state[q.id] === 'string' && state[q.id].trim().length > 0;
+        }
+        if (q.type === 'fields') {
+          return q.fields.some(f => (state[q.id][f.id] || '').trim().length > 0);
+        }
+        if (q.type === 'radio') return !!state[q.id];
+        return false;
+      }
+      function updateProgress() {
+        const n = QUESTIONS.filter(isAnswered).length;
+        progressText.textContent = `${n} / ${QUESTIONS.length} 응답`;
+        progressBar.style.setProperty('--p', `${(n / QUESTIONS.length) * 100}%`);
+      }
+
+      // ── Live panel ──
+      function renderLive() {
+        const filled = QUESTIONS.filter(isAnswered);
+        if (!filled.length) {
+          liveEmpty.style.display = '';
+          liveRows.innerHTML = '';
+          return;
+        }
+        liveEmpty.style.display = 'none';
+        liveRows.innerHTML = filled.map(q => {
+          const i = QUESTIONS.indexOf(q);
+          const num = String(i + 1).padStart(2, '0');
+          let val = '';
+          if (q.type === 'text') {
+            val = escapeHTML(state[q.id]).replace(/\n/g, '<br/>');
+          } else if (q.type === 'fields') {
+            const parts = q.fields
+              .filter(f => (state[q.id][f.id] || '').trim())
+              .map(f => `<strong>${escapeHTML(f.label)}</strong> ${escapeHTML(state[q.id][f.id])}`);
+            val = parts.join('<br/>');
+          } else if (q.type === 'radio') {
+            const opt = q.options.find(o => o.v === state[q.id]);
+            val = opt ? `<em>${escapeHTML(opt.label)}</em>` : '';
+          } else {
+            const labels = (state[q.id] || []).map(v => {
+              const opt = q.options.find(o => o.v === v);
+              return opt ? opt.tag || opt.label : v;
+            });
+            const etc = q.etc ? (state[q.id + '__etc'] || '').trim() : '';
+            const all = etc ? labels.concat([`기타: ${etc}`]) : labels;
+            val = `<em>${escapeHTML(all.join(' · '))}</em>`;
+          }
+          return `<div class="live-row"><span class="live-num">${num}</span><span class="live-val">${val}</span></div>`;
+        }).join('');
+      }
+      function escapeHTML(s) {
+        return String(s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      // ── Wire inputs ──
+      form.addEventListener('input', (e) => {
+        const t = e.target;
+        // Multi-field text/textarea
+        if (t.dataset.qid && t.dataset.fid) {
+          state[t.dataset.qid][t.dataset.fid] = t.value;
+        }
+        // Etc text input on checkbox question
+        else if (t.dataset.etc) {
+          state[t.dataset.etc + '__etc'] = t.value;
+        }
+        // Single text textarea
+        else if (t.tagName === 'TEXTAREA' && t.dataset.id) {
+          state[t.dataset.id] = t.value;
+        }
+        // Radio / checkbox
+        else if (t.tagName === 'INPUT' && t.dataset.id) {
+          const id = t.dataset.id;
+          if (t.type === 'radio') {
+            state[id] = t.value;
+            form.querySelectorAll(`.opt-list[data-id="${id}"] label`).forEach(l => l.classList.remove('checked'));
+            t.closest('label')?.classList.add('checked');
+          } else if (t.type === 'checkbox') {
+            const cur = new Set(state[id] || []);
+            if (t.checked) cur.add(t.value); else cur.delete(t.value);
+            state[id] = Array.from(cur);
+            t.closest('label')?.classList.toggle('checked', t.checked);
+          }
+        }
+        updateProgress();
+        renderLive();
+        persist();
+      });
+
+      // Don't let slide nav steal arrow keys when textarea/input is focused
+      form.addEventListener('keydown', (e) => e.stopPropagation());
+
+      // ── Reset ──
+      resetBtn.addEventListener('click', () => {
+        if (!confirm('응답을 모두 초기화할까요?')) return;
+        QUESTIONS.forEach(q => {
+          if (q.type === 'checkbox') {
+            state[q.id] = [];
+            if (q.etc) state[q.id + '__etc'] = '';
+          } else if (q.type === 'fields') {
+            q.fields.forEach(f => { state[q.id][f.id] = ''; });
+          } else {
+            state[q.id] = '';
+          }
+        });
+        form.querySelectorAll('textarea').forEach(t => { t.value = ''; });
+        form.querySelectorAll('input[type="text"]').forEach(t => { t.value = ''; });
+        form.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => { i.checked = false; });
+        form.querySelectorAll('label').forEach(l => l.classList.remove('checked'));
+        localStorage.removeItem(KEY);
+        saved.textContent = '초기화됨';
+        saved.classList.remove('active');
+        updateProgress();
+        renderLive();
+      });
+
+      // ── Download JSON ──
+      dlBtn.addEventListener('click', () => {
+        const data = {
+          answeredAt: new Date().toISOString(),
+          questions: QUESTIONS.map(q => {
+            let answer;
+            if (q.type === 'text') answer = state[q.id];
+            else if (q.type === 'fields') {
+              answer = {};
+              q.fields.forEach(f => { answer[f.label] = state[q.id][f.id]; });
+            }
+            else if (q.type === 'radio') answer = q.options.find(o => o.v === state[q.id])?.label || '';
+            else if (q.type === 'checkbox') {
+              const labels = state[q.id].map(v => q.options.find(o => o.v === v)?.label).filter(Boolean);
+              const etc = q.etc ? (state[q.id + '__etc'] || '').trim() : '';
+              answer = etc ? labels.concat([`기타: ${etc}`]) : labels;
+            }
+            return { id: q.id, q: q.q, type: q.type, answer };
+          }),
+          raw: state,
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const name = (state.identity?.name || '').trim().replace(/[^\p{L}\p{N}_-]+/gu, '_') || 'anon';
+        a.download = `feed-hijacking-wk01-${name}-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+
+      // ── Share — focus into talking ──
+      shareBtn.addEventListener('click', () => {
+        const filled = QUESTIONS.filter(isAnswered).length;
+        if (!filled) {
+          alert('아직 응답이 없습니다. 먼저 한 문항이라도 적어보세요.');
+          return;
+        }
+        // scroll the live panel into focus + brief highlight pulse
+        livePanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        livePanel.animate(
+          [
+            { boxShadow: '0 0 0 0 rgba(212, 69, 48, 0)' },
+            { boxShadow: '0 0 0 6px rgba(212, 69, 48, 0.25)' },
+            { boxShadow: '0 0 0 0 rgba(212, 69, 48, 0)' },
+          ],
+          { duration: 1100, easing: 'ease-out' }
+        );
+      });
+
+      updateProgress();
+      renderLive();
+    })();
+
+    // ───── AR Art Interactive (slide 16) ─────
+    (function() {
+      const stage = document.getElementById('ar-stage');
+      const aug = document.getElementById('world-aug');
+      const vp = document.getElementById('viewport-frame');
+      const statusText = document.getElementById('ar-status-text');
+      const defLabel = document.getElementById('ar-def-label');
+      const defBody = document.getElementById('ar-def-body');
+      if (!stage || !vp || !aug) return;
+
+      // Initial position (fraction of stage)
+      let vpX = 0.34, vpY = 0.29;
+      const vpWFrac = () => stage.offsetWidth ? (vp.offsetWidth / stage.offsetWidth) : 0.32;
+      const vpHFrac = () => stage.offsetHeight ? (vp.offsetHeight / stage.offsetHeight) : 0.42;
+
+      function applyPosition() {
+        if (!stage.offsetWidth) return;
+        const x = vpX * stage.offsetWidth;
+        const y = vpY * stage.offsetHeight;
+        vp.style.transform = `translate(${x}px, ${y}px)`;
+        const right = (1 - vpX - vpWFrac()) * 100;
+        const bottom = (1 - vpY - vpHFrac()) * 100;
+        const clip = `inset(${vpY * 100}% ${right}% ${bottom}% ${vpX * 100}%)`;
+        aug.style.setProperty('--vp-clip', clip);
+        updateStatus();
+      }
+
+      function updateStatus() {
+        const labels = aug.querySelectorAll('.ar-label');
+        let visible = 0;
+        const xMin = vpX, xMax = vpX + vpWFrac();
+        const yMin = vpY, yMax = vpY + vpHFrac();
+        labels.forEach(l => {
+          const lx = parseFloat(l.style.left) / 100;
+          const ly = parseFloat(l.style.top) / 100;
+          if (lx >= xMin && lx <= xMax && ly >= yMin && ly <= yMax) visible++;
+        });
+        statusText.textContent = `탐색 중 · 보이는 라벨 ${visible} / ${labels.length}`;
+      }
+
+      // ── Drag handling — works from stage or viewport ──
+      let dragging = false;
+      let dragOffset = { x: 0, y: 0 };
+
+      function startDrag(clientX, clientY, fromViewport) {
+        const rect = stage.getBoundingClientRect();
+        const cx = (clientX - rect.left) / rect.width;
+        const cy = (clientY - rect.top) / rect.height;
+        if (fromViewport) {
+          dragOffset = { x: cx - vpX, y: cy - vpY };
+        } else {
+          // center viewport on click point
+          vpX = Math.max(0, Math.min(1 - vpWFrac(), cx - vpWFrac() / 2));
+          vpY = Math.max(0, Math.min(1 - vpHFrac(), cy - vpHFrac() / 2));
+          dragOffset = { x: vpWFrac() / 2, y: vpHFrac() / 2 };
+          applyPosition();
+        }
+        dragging = true;
+        stage.classList.add('dragging');
+        vp.classList.add('dragging');
+      }
+      function moveDrag(clientX, clientY) {
+        if (!dragging) return;
+        const rect = stage.getBoundingClientRect();
+        const cx = (clientX - rect.left) / rect.width;
+        const cy = (clientY - rect.top) / rect.height;
+        vpX = Math.max(0, Math.min(1 - vpWFrac(), cx - dragOffset.x));
+        vpY = Math.max(0, Math.min(1 - vpHFrac(), cy - dragOffset.y));
+        applyPosition();
+      }
+      function endDrag() {
+        dragging = false;
+        stage.classList.remove('dragging');
+        vp.classList.remove('dragging');
+      }
+
+      vp.addEventListener('mousedown', e => {
+        e.preventDefault(); e.stopPropagation();
+        startDrag(e.clientX, e.clientY, true);
+      });
+      stage.addEventListener('mousedown', e => {
+        if (e.target.closest('.viewport-frame')) return;
+        e.preventDefault();
+        startDrag(e.clientX, e.clientY, false);
+      });
+      window.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
+      window.addEventListener('mouseup', endDrag);
+
+      vp.addEventListener('touchstart', e => {
+        e.preventDefault(); e.stopPropagation();
+        const t = e.touches[0];
+        startDrag(t.clientX, t.clientY, true);
+      }, { passive: false });
+      stage.addEventListener('touchstart', e => {
+        if (e.target.closest('.viewport-frame')) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        startDrag(t.clientX, t.clientY, false);
+      }, { passive: false });
+      window.addEventListener('touchmove', e => {
+        if (!dragging) return;
+        const t = e.touches[0];
+        moveDrag(t.clientX, t.clientY);
+      }, { passive: true });
+      window.addEventListener('touchend', endDrag);
+
+      // ── Concept pills ──
+      const DEFS = {
+        framing: {
+          label: 'FRAMING — 프레이밍',
+          body: '<em>"관객은 모바일 화면으로 현실을 잘라 보고, 그 안에서 가상 이미지를 결합한다."</em> 무엇을 보일지 직접 선택하는 행위 — 르네상스 원근법의 계승, 그러나 이번엔 <strong>몸이 움직인다</strong>.',
+        },
+        exploring: {
+          label: 'EXPLORING — 탐색',
+          body: '<em>"관객의 탐색 행위 자체가 작품의 일부가 된다."</em> 1960년대 플럭서스 이후 관객의 신체적 참여가 작품을 완성한다는 흐름. 가만히 보지 않고, <strong>움직여야만 의미가 발생한다</strong>.',
+        },
+        threshold: {
+          label: 'THRESHOLD — 문턱성',
+          body: '<em>"사용자는 가상에 완전히 몰입하지 않고, 현실과 가상 사이의 문턱에 선다."</em> AR은 한쪽 세계로 데려가지 않는다. 두 세계 사이에 머무르며 의식이 흐르는 <strong>인지적 과정 그 자체</strong>가 작품이 된다.',
+        },
+        interface: {
+          label: 'INTERFACE — 인터페이스',
+          body: '<em>"인터페이스는 단순한 표면이 아니라 다른 현실로 들어가는 문이다."</em> Galloway의 정의를 따라 — 인터페이스는 사용자의 참여를 통해 <strong>효과를 만드는 시스템</strong>이다.',
+        },
+      };
+
+      const pills = document.querySelectorAll('.ar-concept');
+      let tourTimer = null;
+
+      function flashViewport() {
+        if (!vp.animate) return;
+        vp.animate(
+          [
+            { boxShadow: '0 0 0 0 rgba(212, 69, 48, 0.0)' },
+            { boxShadow: '0 0 0 14px rgba(212, 69, 48, 0.45)' },
+            { boxShadow: '0 0 0 0 rgba(212, 69, 48, 0.0)' },
+          ],
+          { duration: 1300, easing: 'ease-out', iterations: 2 }
+        );
+      }
+
+      function autoTour() {
+        clearTimeout(tourTimer);
+        const w = vpWFrac(), h = vpHFrac();
+        const path = [
+          { x: 0.05, y: 0.08 },
+          { x: 1 - w - 0.05, y: 0.08 },
+          { x: 1 - w - 0.05, y: 1 - h - 0.05 },
+          { x: 0.05, y: 1 - h - 0.05 },
+          { x: 0.5 - w / 2, y: 0.5 - h / 2 },
+        ];
+        let i = 0;
+        function step() {
+          const t = path[i];
+          vpX = t.x; vpY = t.y;
+          applyPosition();
+          i++;
+          if (i < path.length) tourTimer = setTimeout(step, 750);
+        }
+        step();
+      }
+
+      pills.forEach(p => {
+        p.addEventListener('click', () => {
+          pills.forEach(x => x.classList.remove('active'));
+          p.classList.add('active');
+          const c = p.dataset.concept;
+          const d = DEFS[c];
+          if (d) { defLabel.textContent = d.label; defBody.innerHTML = d.body; }
+          if (c === 'framing') flashViewport();
+          else if (c === 'exploring') autoTour();
+          else if (c === 'threshold') {
+            // pulse the world-aug edges
+            stage.animate(
+              [
+                { filter: 'brightness(1)' },
+                { filter: 'brightness(1.15)' },
+                { filter: 'brightness(0.95)' },
+                { filter: 'brightness(1)' },
+              ],
+              { duration: 1200, easing: 'ease-in-out' }
+            );
+          }
+        });
+      });
+
+      // Initial paint after layout settles
+      requestAnimationFrame(() => requestAnimationFrame(applyPosition));
+      window.addEventListener('resize', applyPosition);
+    })();
+  </script>
+</body>
+</html>
