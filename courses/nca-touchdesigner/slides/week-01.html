@@ -434,6 +434,201 @@
             font-size: clamp(0.8rem, 1.25vw, 1.05rem);
         }
 
+        .video-frame {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            border: 1.5px solid var(--ink);
+            background: var(--paper-deep);
+            overflow: hidden;
+        }
+        .video-frame::before {
+            content: '+';
+            position: absolute;
+            top: -0.55em;
+            left: -0.45em;
+            font-family: var(--font-bitmap);
+            font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+            color: var(--ink);
+            background: var(--paper);
+            padding: 0 0.18em;
+            line-height: 1;
+            z-index: 2;
+        }
+        .video-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+        .video-meta {
+            display: flex;
+            align-items: baseline;
+            gap: clamp(0.5rem, 1.2vw, 1rem);
+            flex-wrap: wrap;
+            margin-top: clamp(0.5rem, 1vw, 0.85rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 0.95vw, 0.82rem);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+        .video-meta a {
+            color: var(--ink);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .work-num {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.05vw, 0.9rem);
+            letter-spacing: 0.2em;
+            color: var(--ink);
+        }
+
+        .survey-block {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.55rem, 1.2vw, 1rem);
+            width: 100%;
+        }
+        .survey-row {
+            display: grid;
+            grid-template-columns: clamp(5rem, 9vw, 8rem) 1fr;
+            gap: clamp(0.5rem, 1.2vw, 1rem);
+            align-items: start;
+        }
+        .survey-row .survey-key {
+            font-family: var(--font-mono);
+            font-size: clamp(0.62rem, 0.9vw, 0.78rem);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink);
+            padding-top: 0.35em;
+        }
+        .survey-row .survey-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.3rem, 0.6vw, 0.5rem);
+        }
+        .survey-row .survey-textarea {
+            width: 100%;
+            min-height: clamp(2.4rem, 5vw, 4rem);
+            background: var(--paper);
+            border: 1.5px solid var(--ink);
+            padding: clamp(0.4rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 0.75rem);
+            font-family: var(--font-body);
+            font-size: clamp(0.78rem, 1.2vw, 0.95rem);
+            color: var(--ink);
+            resize: vertical;
+            letter-spacing: -0.01em;
+        }
+        .survey-row .survey-textarea:focus {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px;
+        }
+        @media (max-width: 768px) {
+            .survey-row { grid-template-columns: 1fr; }
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: clamp(0.6rem, 1.4vw, 1.2rem);
+            width: 100%;
+        }
+        .category-card {
+            position: relative;
+            background: var(--paper);
+            border: 1.5px solid var(--ink);
+            padding: clamp(0.8rem, 1.6vw, 1.4rem);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.35rem, 0.8vw, 0.6rem);
+            min-height: clamp(120px, 16vw, 180px);
+            text-decoration: none;
+            color: var(--ink);
+            cursor: pointer;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+        }
+        .category-card::before {
+            content: '+';
+            position: absolute;
+            top: -0.55em;
+            left: -0.45em;
+            font-family: var(--font-bitmap);
+            font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+            color: var(--ink);
+            background: var(--paper);
+            padding: 0 0.18em;
+            line-height: 1;
+        }
+        .category-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--ink);
+        }
+        .category-card .cat-num {
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.9vw, 0.78rem);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+        .category-card .cat-name {
+            font-family: var(--font-display);
+            font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+        }
+        .category-card .cat-note {
+            font-size: clamp(0.75rem, 1.1vw, 0.9rem);
+            color: var(--ink);
+            letter-spacing: -0.01em;
+            margin-top: auto;
+        }
+
+        .ref-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.9vw, 0.7rem);
+            width: 100%;
+        }
+        .ref-list li {
+            display: grid;
+            grid-template-columns: 2.5em 1fr auto;
+            gap: clamp(0.5rem, 1vw, 0.9rem);
+            align-items: baseline;
+            padding: clamp(0.4rem, 0.9vw, 0.7rem) 0;
+            border-bottom: 1px solid var(--ink-faint);
+        }
+        .ref-list li:last-child { border-bottom: none; }
+        .ref-list .ref-num {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 0.95vw, 0.82rem);
+            letter-spacing: 0.12em;
+            color: var(--ink);
+        }
+        .ref-list .ref-title {
+            font-family: var(--font-display);
+            font-size: clamp(0.95rem, 1.7vw, 1.25rem);
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+        }
+        .ref-list .ref-artist { display: block; font-family: var(--font-body); font-size: clamp(0.7rem, 1vw, 0.85rem); color: var(--ink); opacity: 0.75; letter-spacing: 0; text-transform: none; margin-top: 0.15em; }
+        .ref-list .ref-link {
+            font-family: var(--font-mono);
+            font-size: clamp(0.62rem, 0.9vw, 0.78rem);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            white-space: nowrap;
+        }
+        @media (max-width: 640px) {
+            .ref-list li { grid-template-columns: 2em 1fr; }
+            .ref-list .ref-link { grid-column: 1 / -1; }
+        }
+
         .agenda-list {
             list-style: none;
             padding: 0;
@@ -977,7 +1172,7 @@
 
     <!-- ========== 01 TITLE ========== -->
     <section class="slide title-slide">
-        <div class="corner-mark">NCA·TD/W01</div>
+        <div class="corner-mark">NCA·TD/W01 · 01</div>
         <canvas class="hero-dither" data-signal="dense"></canvas>
         <div class="slide-content">
             <div class="course-label reveal">NCA TouchDesigner · Week 01</div>
@@ -1027,7 +1222,6 @@
         <div class="slide-content">
             <div class="part-number reveal">Part 01</div>
             <h2 class="reveal">강사 소개</h2>
-            <p class="section-desc reveal">유태양 &mdash; TouchDesigner를 제작 문제 해결 도구로 다루는 사람</p>
             <div class="bitrow section-marks reveal">
                 <span>▮</span><span>▮</span><span>▮</span><span>▮</span><span>·</span><span>·</span><span>+</span><span>+</span><span>+</span>
             </div>
@@ -1048,8 +1242,8 @@
             <div class="label reveal">Instructor</div>
             <h2 class="reveal">유태양</h2>
             <div class="credit-list">
-                <div class="credit-item reveal"><span class="credit-role">강사 / 한예종 무용원</span><span class="credit-val">스테이지디자인</span></div>
-                <div class="credit-item reveal"><span class="credit-role">강사 / 한예종 영상원</span><span class="credit-val">공연예술산업매체 · 디지털미디어비주얼</span></div>
+                <div class="credit-item reveal"><span class="credit-role">강사 / 한예종 무용원</span><span class="credit-val">스테이지디자인 · 공연예술산업매체</span></div>
+                <div class="credit-item reveal"><span class="credit-role">강사 / 한예종 영상원</span><span class="credit-val">디지털미디어비주얼</span></div>
                 <div class="credit-item reveal"><span class="credit-role">기술개발 팀장</span><span class="credit-val">봄랩</span></div>
                 <div class="credit-item reveal"><span class="credit-role">테크니컬 디렉터</span><span class="credit-val">파프리스튜디오</span></div>
                 <div class="credit-item reveal"><span class="credit-role">멘토</span><span class="credit-val">성남업스케일링</span></div>
@@ -1064,32 +1258,9 @@
         </div>
     </section>
 
-    <!-- ========== 05 소개의 초점 ========== -->
-    <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 05</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">Focus</div>
-            <h2 class="reveal">소개의 초점</h2>
-            <div class="flex-col gap-sm">
-                <div class="highlight-box reveal">
-                    <p>TouchDesigner를 <span class="accent-orange">제작 문제 해결 도구</span>로 어떻게 써왔는지.</p>
-                </div>
-                <p class="reveal">개인적으로는 비주얼 자체보다 <strong>전반적인 시스템 제작</strong>에 관심이 많다.</p>
-                <p class="reveal">이 수업은 각자의 배경을 <strong>실시간 제작 구조</strong>로 연결하는 시간이다.</p>
-            </div>
-        </div>
-        <div class="colophon">
-            <span>FOCUS</span>
-            <span class="dot">•</span>
-            <span>PROBLEM-SOLVING TOOL</span>
-            <span class="dot">•</span>
-            <span>WEEK 01</span>
-        </div>
-    </section>
-
-    <!-- ========== 06 SECTION: 참여작 ========== -->
+    <!-- ========== SECTION: 참여작 ========== -->
     <section class="slide section-slide">
-        <div class="corner-mark">NCA·TD/W01 · 06</div>
+        <div class="corner-mark">NCA·TD/W01 · 05</div>
         <div class="slide-content">
             <div class="part-number reveal">Part 02</div>
             <h2 class="reveal">참여작과<br>수업 방향</h2>
@@ -1107,32 +1278,130 @@
         </div>
     </section>
 
-    <!-- ========== 07 주요 참여작 ========== -->
+    <!-- ========== WORK 01 · 문문문 · MOONNOOWMOON ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 07</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">Selected Works</div>
-            <h2 class="reveal">주요 참여작</h2>
-            <div class="two-col">
-                <div class="flex-col gap-sm reveal">
-                    <div class="info-card">
-                        <h3>문문문</h3>
-                        <p>실시간 비주얼 + 공연 시스템</p>
-                    </div>
-                    <div class="info-card">
-                        <h3>XR 뮤지컬 등</h3>
-                        <p>입력 장치 · 센서 · 외부 장비 연동</p>
-                    </div>
-                </div>
-                <div class="reveal">
-                    <p>각 작업에서 TouchDesigner가 어떻게 쓰였는지, <strong>도구로서의 역할</strong>을 중심으로 살펴본다.</p>
-                </div>
+        <div class="corner-mark">NCA·TD/W01 · 06</div>
+        <div class="slide-content flex-col gap-sm" style="justify-content:center;">
+            <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+                <span class="work-num reveal">WORK 01 / 05</span>
+                <div class="label reveal">Selected Work</div>
+            </div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3vw,2.2rem);">문문문 · MOONNOOWMOON</h2>
+            <div class="video-frame reveal">
+                <iframe src="https://www.youtube.com/embed/5EO_eC_t6Y8" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta reveal">
+                <span>실시간 비주얼 · 공연 시스템</span>
+                <span class="dot">·</span>
+                <a href="https://www.youtube.com/watch?v=5EO_eC_t6Y8" target="_blank" rel="noopener">youtube.com/watch?v=5EO_eC_t6Y8</a>
             </div>
         </div>
         <div class="colophon">
-            <span>WORKS</span>
+            <span>WORK 01</span>
             <span class="dot">•</span>
-            <span>MUNMUNMUN · XR MUSICAL</span>
+            <span>MOONNOOWMOON</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== WORK 02 · TRPG ========== -->
+    <section class="slide">
+        <div class="corner-mark">NCA·TD/W01 · 07</div>
+        <div class="slide-content flex-col gap-sm" style="justify-content:center;">
+            <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+                <span class="work-num reveal">WORK 02 / 05</span>
+                <div class="label reveal">Selected Work</div>
+            </div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3vw,2.2rem);">TRPG</h2>
+            <div class="video-frame reveal">
+                <iframe src="https://www.youtube.com/embed/4WVvAtFdl4A" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta reveal">
+                <a href="https://youtu.be/4WVvAtFdl4A" target="_blank" rel="noopener">youtu.be/4WVvAtFdl4A</a>
+            </div>
+        </div>
+        <div class="colophon">
+            <span>WORK 02</span>
+            <span class="dot">•</span>
+            <span>TRPG</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== WORK 03 · P.W.P ========== -->
+    <section class="slide">
+        <div class="corner-mark">NCA·TD/W01 · 08</div>
+        <div class="slide-content flex-col gap-sm" style="justify-content:center;">
+            <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+                <span class="work-num reveal">WORK 03 / 05</span>
+                <div class="label reveal">Selected Work</div>
+            </div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3vw,2.2rem);">P.W.P · Pigeon Wants Peace</h2>
+            <div class="video-frame reveal">
+                <iframe src="https://www.youtube.com/embed/84CwC52A9eM" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta reveal">
+                <a href="https://youtu.be/84CwC52A9eM" target="_blank" rel="noopener">youtu.be/84CwC52A9eM</a>
+            </div>
+        </div>
+        <div class="colophon">
+            <span>WORK 03</span>
+            <span class="dot">•</span>
+            <span>P.W.P</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== WORK 04 · 문을 넘어 ========== -->
+    <section class="slide">
+        <div class="corner-mark">NCA·TD/W01 · 09</div>
+        <div class="slide-content flex-col gap-sm" style="justify-content:center;">
+            <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+                <span class="work-num reveal">WORK 04 / 05</span>
+                <div class="label reveal">Selected Work · XR Musical</div>
+            </div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3vw,2.2rem);">문을 넘어</h2>
+            <div class="video-frame reveal">
+                <iframe src="https://www.youtube.com/embed/B67towDsGc8" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta reveal">
+                <span>입력 장치 · 센서 · 외부 장비 연동</span>
+                <span class="dot">·</span>
+                <a href="https://youtu.be/B67towDsGc8" target="_blank" rel="noopener">youtu.be/B67towDsGc8</a>
+            </div>
+        </div>
+        <div class="colophon">
+            <span>WORK 04</span>
+            <span class="dot">•</span>
+            <span>XR MUSICAL · 문을 넘어</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== WORK 05 · Kitty Phone ========== -->
+    <section class="slide">
+        <div class="corner-mark">NCA·TD/W01 · 10</div>
+        <div class="slide-content flex-col gap-sm" style="justify-content:center;">
+            <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;">
+                <span class="work-num reveal">WORK 05 / 05</span>
+                <div class="label reveal">Selected Work</div>
+            </div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3vw,2.2rem);">The Secret Messages From Kitty Phone</h2>
+            <div class="video-frame reveal">
+                <iframe src="https://www.youtube.com/embed/P69D7CFbPkY" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-meta reveal">
+                <a href="https://youtu.be/P69D7CFbPkY" target="_blank" rel="noopener">youtu.be/P69D7CFbPkY</a>
+            </div>
+        </div>
+        <div class="colophon">
+            <span>WORK 05</span>
+            <span class="dot">•</span>
+            <span>KITTY PHONE</span>
             <span class="dot">•</span>
             <span>WEEK 01</span>
         </div>
@@ -1140,7 +1409,7 @@
 
     <!-- ========== 08 TD가 한 일들 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 08</div>
+        <div class="corner-mark">NCA·TD/W01 · 11</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">What TD Did</div>
             <h2 class="reveal">작업 안에서 TouchDesigner가 한 일</h2>
@@ -1178,7 +1447,7 @@
 
     <!-- ========== 09 요즘 관심사 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 09</div>
+        <div class="corner-mark">NCA·TD/W01 · 12</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Current Interests</div>
             <h2 class="reveal">요즘 관심사와 연구 주제</h2>
@@ -1207,7 +1476,7 @@
 
     <!-- ========== 10 수업의 입장 (quote) ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 10</div>
+        <div class="corner-mark">NCA·TD/W01 · 13</div>
         <div class="slide-content flex-col gap-md" style="justify-content:center;">
             <div class="label reveal">Position</div>
             <p class="quote-block reveal">
@@ -1227,7 +1496,7 @@
 
     <!-- ========== 11 SECTION: 설문 & 자기소개 ========== -->
     <section class="slide section-slide">
-        <div class="corner-mark">NCA·TD/W01 · 11</div>
+        <div class="corner-mark">NCA·TD/W01 · 14</div>
         <div class="slide-content">
             <div class="part-number reveal">Part 03</div>
             <h2 class="reveal">설문 &amp;<br>자기소개</h2>
@@ -1245,114 +1514,67 @@
         </div>
     </section>
 
-    <!-- ========== 12 설문 목적 ========== -->
+    <!-- ========== MERGED INTERACTIVE SURVEY ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 12</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">Survey · Purpose</div>
-            <h2 class="reveal">왜 설문을 받나</h2>
-            <div class="flex-col gap-sm">
-                <p class="reveal">수업의 <strong>난이도와 예제 방향</strong>을 다듬기 위한 참고 자료.</p>
-                <div class="highlight-box reveal">
-                    <p>오늘 답변으로 개인 프로젝트나 수업 방향이 <span class="accent-orange">확정되지는 않는다.</span> 부담 없이.</p>
+        <div class="corner-mark">NCA·TD/W01 · 15</div>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Interactive Survey</div>
+            <h2 class="reveal" style="font-size:clamp(1.5rem,3.4vw,2.4rem);">짧은 설문 &middot; 자기소개</h2>
+            <p class="reveal" style="font-size:clamp(0.78rem,1.2vw,0.95rem);">하나씩 골라보고, 마지막 칸에 한 줄 적어둔 다음 차례대로 읽어봐요.</p>
+            <div class="survey-block reveal">
+                <div class="survey-row">
+                    <span class="survey-key">TD 경험</span>
+                    <div class="survey-chips">
+                        <span class="tag-chip" data-tag="없음">없음</span>
+                        <span class="tag-chip" data-tag="조금">조금</span>
+                        <span class="tag-chip" data-tag="기본기">기본기는 있음</span>
+                        <span class="tag-chip" data-tag="작업">작업으로 사용</span>
+                    </div>
+                </div>
+                <div class="survey-row">
+                    <span class="survey-key">익숙한 영역</span>
+                    <div class="survey-chips">
+                        <span class="tag-chip" data-tag="TOP">TOP</span>
+                        <span class="tag-chip" data-tag="CHOP">CHOP</span>
+                        <span class="tag-chip" data-tag="SOP">SOP</span>
+                        <span class="tag-chip" data-tag="DAT">DAT</span>
+                        <span class="tag-chip" data-tag="COMP">COMP</span>
+                    </div>
+                </div>
+                <div class="survey-row">
+                    <span class="survey-key">관심 분야</span>
+                    <div class="survey-chips" id="tagCloud">
+                        <span class="tag-chip" data-tag="공연">공연</span>
+                        <span class="tag-chip" data-tag="설치">설치</span>
+                        <span class="tag-chip" data-tag="VJ">VJ / 라이브 비주얼</span>
+                        <span class="tag-chip" data-tag="사운드">사운드 / 오디오비주얼</span>
+                        <span class="tag-chip" data-tag="카메라">카메라 / 신체 인터랙션</span>
+                        <span class="tag-chip" data-tag="3D">3D / 파티클 / 인스턴싱</span>
+                        <span class="tag-chip" data-tag="AI">AI / 데이터 / 네트워크</span>
+                        <span class="tag-chip" data-tag="도구">도구 제작</span>
+                        <span class="tag-chip" data-tag="센서">센서 / IMU</span>
+                        <span class="tag-chip" data-tag="공간">공간 / 매핑</span>
+                        <span class="tag-chip" data-tag="실시간">실시간 시스템</span>
+                        <span class="tag-chip" data-tag="협업">협업 / 워크플로</span>
+                    </div>
+                </div>
+                <div class="survey-row">
+                    <span class="survey-key">하고 싶은 것</span>
+                    <textarea class="survey-textarea" placeholder="이 수업에서 해보고 싶은 것 — 한두 줄로"></textarea>
                 </div>
             </div>
+            <div class="tag-counter reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);font-size:clamp(0.62rem,0.95vw,0.78rem);">관심 분야 선택: <strong id="tagCount">0</strong> &nbsp;·&nbsp; <span id="tagList"></span></div>
         </div>
         <div class="colophon">
             <span>SURVEY</span>
             <span class="dot">•</span>
-            <span>WHY WE ASK</span>
+            <span>CLICK + WRITE + READ</span>
             <span class="dot">•</span>
             <span>WEEK 01</span>
         </div>
     </section>
 
-    <!-- ========== 13 설문: 무엇을 묻나 ========== -->
-    <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 13</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">Survey · Items</div>
-            <h2 class="reveal">설문에서 확인할 내용</h2>
-            <div class="two-col">
-                <div class="reveal">
-                    <table class="data-table">
-                        <thead><tr><th>항목</th><th>물어보는 것</th></tr></thead>
-                        <tbody>
-                            <tr><td>TD 경험</td><td>어떻게, 얼마나 활용해보았는지</td></tr>
-                            <tr><td>익숙한 영역</td><td>TOP / CHOP / SOP / DAT / COMP 중 어디</td></tr>
-                            <tr><td>장비 / 설치</td><td>사용 장비와 설치 상태</td></tr>
-                            <tr><td>관심 분야</td><td>아래 슬라이드에서 별도로</td></tr>
-                            <tr><td>하고 싶은 것</td><td>이 수업을 통해 해보고 싶은 것</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="info-card reveal">
-                    <h3>자기소개 톤</h3>
-                    <p>짧게. <strong>관심사와 현재 위치</strong>를 서로 확인하는 정도.</p>
-                </div>
-            </div>
-        </div>
-        <div class="colophon">
-            <span>SURVEY · ITEMS</span>
-            <span class="dot">•</span>
-            <span>FIVE QUESTIONS</span>
-            <span class="dot">•</span>
-            <span>WEEK 01</span>
-        </div>
-    </section>
-
-    <!-- ========== 14 INTERACTIVE: 관심 분야 chips ========== -->
-    <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 14</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">Interactive · Interest Tags</div>
-            <h2 class="reveal">관심 분야 &mdash; 어디에 끌리나요?</h2>
-            <p class="reveal">클릭해서 토글해보세요. 수업 중 이 슬라이드를 보면서 함께 이야기합니다.</p>
-            <div class="tag-cloud reveal" id="tagCloud">
-                <span class="tag-chip" data-tag="공연">공연</span>
-                <span class="tag-chip" data-tag="설치">설치</span>
-                <span class="tag-chip" data-tag="VJ">VJ / 라이브 비주얼</span>
-                <span class="tag-chip" data-tag="사운드">사운드 / 오디오비주얼</span>
-                <span class="tag-chip" data-tag="카메라">카메라 / 신체 인터랙션</span>
-                <span class="tag-chip" data-tag="3D">3D / 파티클 / 인스턴싱</span>
-                <span class="tag-chip" data-tag="AI">AI / 데이터 / 네트워크</span>
-                <span class="tag-chip" data-tag="도구">도구 제작</span>
-                <span class="tag-chip" data-tag="센서">센서 / IMU</span>
-                <span class="tag-chip" data-tag="공간">공간 / 매핑</span>
-                <span class="tag-chip" data-tag="실시간">실시간 시스템</span>
-                <span class="tag-chip" data-tag="협업">협업 / 워크플로</span>
-            </div>
-            <div class="tag-counter reveal">선택됨: <strong id="tagCount">0</strong> &nbsp;·&nbsp; <span id="tagList"></span></div>
-        </div>
-        <div class="colophon">
-            <span>INTERACTIVE</span>
-            <span class="dot">•</span>
-            <span>INTEREST TAGS · CLICK TO TOGGLE</span>
-            <span class="dot">•</span>
-            <span>WEEK 01</span>
-        </div>
-    </section>
-
-    <!-- ========== 15 break / pause ========== -->
-    <section class="slide section-slide">
-        <div class="corner-mark">NCA·TD/W01 · 15</div>
-        <div class="slide-content">
-            <div class="part-number reveal">Pause</div>
-            <h2 class="reveal" style="font-size:clamp(1.8rem,4.5vw,3.2rem);">잠깐 숨 고르고<br>다시 시작합니다.</h2>
-            <div class="bitrow section-marks reveal">
-                <span>·</span><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span>
-            </div>
-        </div>
-        <div class="colophon">
-            <span>PAUSE</span>
-            <span class="dot">•</span>
-            <span>BREATHE</span>
-            <span class="dot">•</span>
-            <span>WEEK 01</span>
-        </div>
-    </section>
-
-    <!-- ========== 16 SECTION: TouchDesigner 소개 ========== -->
+    <!-- ========== SECTION: TouchDesigner 소개 ========== -->
     <section class="slide section-slide">
         <div class="corner-mark">NCA·TD/W01 · 16</div>
         <div class="slide-content">
@@ -1569,7 +1791,7 @@
         <div class="corner-mark">NCA·TD/W01 · 24</div>
         <div class="slide-content">
             <div class="part-number reveal">Part 05</div>
-            <h2 class="reveal">레퍼런스<br>보는 법</h2>
+            <h2 class="reveal">References</h2>
             <p class="section-desc reveal">결과물 너머의 구조를 추측하기</p>
             <div class="bitrow section-marks reveal">
                 <span>▮</span><span>▮</span><span>▮</span><span>·</span><span>·</span><span>+</span><span>+</span><span>×</span><span>×</span>
@@ -1584,51 +1806,267 @@
         </div>
     </section>
 
-    <!-- ========== 25 다양한 레퍼런스 ========== -->
+    <!-- ========== 25 카테고리 인덱스 ========== -->
     <section class="slide">
         <div class="corner-mark">NCA·TD/W01 · 25</div>
         <div class="slide-content flex-col gap-md">
-            <div class="label reveal">Reference Sources</div>
-            <h2 class="reveal">어떤 레퍼런스를 함께 볼까</h2>
-            <div class="three-col">
-                <div class="info-card reveal">
-                    <h3>내 작업</h3>
-                    <p>가장 가까운 케이스. 구조를 직접 설명할 수 있다.</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>인스타그램 레퍼런스</h3>
-                    <p>지금 이 순간의 흐름. 짧고 빠르게.</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>공연 / 전시 / 설치</h3>
-                    <p>긴 호흡의 실제 운영 사례.</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>라이브 비주얼</h3>
-                    <p>실시간 입력에 반응하는 비주얼.</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>도구 제작</h3>
-                    <p>작업자가 자기 작업을 위해 만든 도구.</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>각자의 발견</h3>
-                    <p>다음 주부터 한 개씩 가져와서 함께.</p>
-                </div>
+            <div class="label reveal">Reference Categories</div>
+            <h2 class="reveal">TouchDesigner가 자주 만나는 자리</h2>
+            <div class="category-grid reveal">
+                <a class="category-card" href="#cat-audio-visual">
+                    <span class="cat-num">01 / 05</span>
+                    <span class="cat-name">Audio Visual</span>
+                    <span class="cat-note">소리에 반응하는 비주얼, 공연·VJ·뮤직비디오.</span>
+                </a>
+                <a class="category-card" href="#cat-interactive-performance">
+                    <span class="cat-num">02 / 05</span>
+                    <span class="cat-name">Interactive Performance</span>
+                    <span class="cat-note">무대 위 몸·센서·카메라가 비주얼을 움직인다.</span>
+                </a>
+                <a class="category-card" href="#cat-installation">
+                    <span class="cat-num">03 / 05</span>
+                    <span class="cat-name">Installation</span>
+                    <span class="cat-note">공간에 놓인 작업. 프로젝션 매핑·갤러리·전시.</span>
+                </a>
+                <a class="category-card" href="#cat-generative-particles">
+                    <span class="cat-num">04 / 05</span>
+                    <span class="cat-name">Generative &amp; Particles</span>
+                    <span class="cat-note">파티클·인스턴싱·포인트 클라우드, 시스템이 만드는 풍경.</span>
+                </a>
+                <a class="category-card" href="#cat-tool-system">
+                    <span class="cat-num">05 / 05</span>
+                    <span class="cat-name">Tool &amp; System</span>
+                    <span class="cat-note">작업자가 자기 또는 동료를 위해 만든 도구.</span>
+                </a>
             </div>
         </div>
         <div class="colophon">
-            <span>SOURCES</span>
+            <span>CATEGORIES</span>
             <span class="dot">•</span>
-            <span>SIX KINDS OF REFERENCE</span>
+            <span>FIVE AREAS</span>
             <span class="dot">•</span>
             <span>WEEK 01</span>
         </div>
     </section>
 
-    <!-- ========== 26 결과물이 아니라 구조를 본다 ========== -->
-    <section class="slide">
+    <!-- ========== CATEGORY · AUDIO VISUAL ========== -->
+    <section class="slide" id="cat-audio-visual">
         <div class="corner-mark">NCA·TD/W01 · 26</div>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Reference · 01 / 05</div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3.2vw,2.2rem);">Audio Visual</h2>
+            <ol class="ref-list reveal">
+                <li>
+                    <span class="ref-num">01</span>
+                    <span class="ref-title">Amon Tobin — ISAM Live<span class="ref-artist">Amon Tobin × V Squared Labs · 음악 입력을 입체 큐브에 실시간 매핑.</span></span>
+                    <a class="ref-link" href="https://vimeo.com/24502224" target="_blank" rel="noopener">vimeo.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">02</span>
+                    <span class="ref-title">Robert Henke — Lumière III<span class="ref-artist">Robert Henke · 사운드에 동기화된 ILDA 레이저 벡터 드로잉.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=hznAf1uuAtI" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">03</span>
+                    <span class="ref-title">Lumière — Laser Performance Demo<span class="ref-artist">Robert Henke · 퍼커시브 트리거에 맞춰 점멸·이동하는 레이저 라인.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=z7LIZUATn0s" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">04</span>
+                    <span class="ref-title">Cao Yuxi — Dimensional Sampling #1<span class="ref-artist">Cao Yuxi (James) · GLSL 셰이더 패치로 받은 라이브 음악을 격자 데이터 풍경으로.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=zh1xOfQq4wE" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">05</span>
+                    <span class="ref-title">TouchDesigner Showreel 2024<span class="ref-artist">Derivative · 라이브 비주얼·콘서트 무대 모음.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=SB_0FHbyONw" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+            </ol>
+        </div>
+        <div class="colophon">
+            <span>CATEGORY 01</span>
+            <span class="dot">•</span>
+            <span>AUDIO VISUAL</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== CATEGORY · INTERACTIVE PERFORMANCE ========== -->
+    <section class="slide" id="cat-interactive-performance">
+        <div class="corner-mark">NCA·TD/W01 · 27</div>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Reference · 02 / 05</div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3.2vw,2.2rem);">Interactive Performance</h2>
+            <ol class="ref-list reveal">
+                <li>
+                    <span class="ref-num">01</span>
+                    <span class="ref-title">Apparition — Interactive Dance<span class="ref-artist">Klaus Obermaier × Ars Electronica Futurelab · 카메라 추적 + 물리 시뮬레이션이 신체 위에서 반응.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=XqyEZ0GwS3E" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">02</span>
+                    <span class="ref-title">Vivisector<span class="ref-artist">Klaus Obermaier × Chris Haring · 네 명의 무용수 신체에 영상 직접 매핑.</span></span>
+                    <a class="ref-link" href="https://vimeo.com/62275012" target="_blank" rel="noopener">vimeo.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">03</span>
+                    <span class="ref-title">Blacktrax Reactive Visuals<span class="ref-artist">Sila Sveta · Blacktrax 마커 위치 데이터로 무대 영상을 따라붙임.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/@SilaSveta" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">04</span>
+                    <span class="ref-title">7 Questions to Yourself<span class="ref-artist">Sila Sveta · 발레 무용수 + 홀로그래픽 도플갱어 동시 퍼포먼스.</span></span>
+                    <a class="ref-link" href="https://www.silasveta.com/projects/7-questions-to-yourself" target="_blank" rel="noopener">silasveta.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">05</span>
+                    <span class="ref-title">Kinect + TouchDesigner + Dance<span class="ref-artist">Musikschule Prinzersdorf · 골격 데이터로 라인·잔상을 따라붙이는 실습 사례.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=xZJ3bOE9Q-g" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+            </ol>
+        </div>
+        <div class="colophon">
+            <span>CATEGORY 02</span>
+            <span class="dot">•</span>
+            <span>INTERACTIVE PERFORMANCE</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== CATEGORY · INSTALLATION ========== -->
+    <section class="slide" id="cat-installation">
+        <div class="corner-mark">NCA·TD/W01 · 28</div>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Reference · 03 / 05</div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3.2vw,2.2rem);">Installation</h2>
+            <ol class="ref-list reveal">
+                <li>
+                    <span class="ref-num">01</span>
+                    <span class="ref-title">HALO — Sculpting Sunlight<span class="ref-artist">Kimchi and Chips (김치앤칩스) · 99개 로봇 거울이 태양 위치 데이터로 빛의 원반을 조각.</span></span>
+                    <a class="ref-link" href="https://kimchiandchips.com/works/halo/" target="_blank" rel="noopener">kimchiandchips.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">02</span>
+                    <span class="ref-title">WAVE — Public Media Art<span class="ref-artist">d'strict (디스트릭트) · SMTOWN COEX 곡면 LED에 아나모픽 파도 영상.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=HsQXQbJyyGc" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">03</span>
+                    <span class="ref-title">Beyond the Scene (CONNECT, BTS)<span class="ref-artist">Yiyun Kang (강이연) · 안무 영상을 몰입형 대형 프로젝션 매핑으로.</span></span>
+                    <a class="ref-link" href="https://www.yiyunkang.com/beyondthescene-bts" target="_blank" rel="noopener">yiyunkang.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">04</span>
+                    <span class="ref-title">SKALAR — Reflections on Light and Sound<span class="ref-artist">Christopher Bauder × Kangding Ray · 65개 키네틱 미러 + 조명·사운드 동기화.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=W6VnHEf24RM" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">05</span>
+                    <span class="ref-title">Fluid Structure<span class="ref-artist">Vincent Houzé · 관객 위치 입력으로 대형 스크린 위 디지털 유체가 흩어지고 모임.</span></span>
+                    <a class="ref-link" href="https://vincenthouze.com/about/" target="_blank" rel="noopener">vincenthouze.com</a>
+                </li>
+            </ol>
+        </div>
+        <div class="colophon">
+            <span>CATEGORY 03</span>
+            <span class="dot">•</span>
+            <span>INSTALLATION</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== CATEGORY · GENERATIVE & PARTICLES ========== -->
+    <section class="slide" id="cat-generative-particles">
+        <div class="corner-mark">NCA·TD/W01 · 29</div>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Reference · 04 / 05</div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3.2vw,2.2rem);">Generative &amp; Particles</h2>
+            <ol class="ref-list reveal">
+                <li>
+                    <span class="ref-num">01</span>
+                    <span class="ref-title">Daily Sketches<span class="ref-artist">Simon Alexander-Adams (Polyhop) · 매일 한 개씩 올리는 GPU 파티클·인스턴싱 데일리 스케치.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/@polyhop" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">02</span>
+                    <span class="ref-title">Oceanic Dust<span class="ref-artist">Bileam Tschepe (elekktronaut) · 노이즈 필드 위 수십만 파티클이 사운드에 반응.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=nuw6aF0U8aE" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">03</span>
+                    <span class="ref-title">River<span class="ref-artist">Bileam Tschepe (elekktronaut) · 파티클 + 옵티컬 플로우로 흐르는 강 같은 운동.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=JGDPORsmwtk" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">04</span>
+                    <span class="ref-title">Dynamic Simulations for Large Scale<span class="ref-artist">Vincent Houzé · NVIDIA Flex 기반 유체·파티클 시뮬을 설치 규모로.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=8olwmT6VZ44" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">05</span>
+                    <span class="ref-title">TUNDRA — The Void<span class="ref-artist">TUNDRA (wearetundra) · 360도 패노라마 위 노이즈 입자가 빅뱅처럼 펼쳐짐.</span></span>
+                    <a class="ref-link" href="https://vimeo.com/79200891" target="_blank" rel="noopener">vimeo.com</a>
+                </li>
+            </ol>
+        </div>
+        <div class="colophon">
+            <span>CATEGORY 04</span>
+            <span class="dot">•</span>
+            <span>GENERATIVE &amp; PARTICLES</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== CATEGORY · TOOL & SYSTEM ========== -->
+    <section class="slide" id="cat-tool-system">
+        <div class="corner-mark">NCA·TD/W01 · 30</div>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Reference · 05 / 05</div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3.2vw,2.2rem);">Tool &amp; System</h2>
+            <ol class="ref-list reveal">
+                <li>
+                    <span class="ref-num">01</span>
+                    <span class="ref-title">Control Room 42<span class="ref-artist">RTBF × Derivative · 방송용 스위칭·재생·UI를 TouchDesigner 하나로 통합.</span></span>
+                    <a class="ref-link" href="https://derivative.ca/community-post/control-room-42-ushers-future-broadcasting/63857" target="_blank" rel="noopener">derivative.ca</a>
+                </li>
+                <li>
+                    <span class="ref-num">02</span>
+                    <span class="ref-title">Next-Gen Graphics Management<span class="ref-artist">Derivative Community · TV 프로덕션 그래픽 컴포지팅·송출을 모듈화한 도구.</span></span>
+                    <a class="ref-link" href="https://derivative.ca/community-post/crafting-next-generation-graphics-management-system-touchdesigner/72420" target="_blank" rel="noopener">derivative.ca</a>
+                </li>
+                <li>
+                    <span class="ref-num">03</span>
+                    <span class="ref-title">Disguise × TD Virtual Game Show (1)<span class="ref-artist">The Interactive &amp; Immersive HQ · Notch 블록을 TD에서 UI·트리거로 컨트롤.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=jb-FZszrVvo" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">04</span>
+                    <span class="ref-title">Virtual Game Show (2) — Notch + TD<span class="ref-artist">The Interactive &amp; Immersive HQ · MIDI/OSC 입력으로 Notch 콘텐츠 라이브 버스킹.</span></span>
+                    <a class="ref-link" href="https://www.youtube.com/watch?v=jcvnJA65EII" target="_blank" rel="noopener">youtube.com</a>
+                </li>
+                <li>
+                    <span class="ref-num">05</span>
+                    <span class="ref-title">NestDrop V2 — VJ Tool<span class="ref-artist">NestImmersion · Milkdrop 프리셋을 실시간 렌더 → Spout로 TD·Resolume 송출.</span></span>
+                    <a class="ref-link" href="https://nestimmersion.ca/nestdrop.php" target="_blank" rel="noopener">nestimmersion.ca</a>
+                </li>
+            </ol>
+        </div>
+        <div class="colophon">
+            <span>CATEGORY 05</span>
+            <span class="dot">•</span>
+            <span>TOOL &amp; SYSTEM</span>
+            <span class="dot">•</span>
+            <span>WEEK 01</span>
+        </div>
+    </section>
+
+    <!-- ========== 결과물이 아니라 구조를 본다 ========== -->
+    <section class="slide">
+        <div class="corner-mark">NCA·TD/W01 · 31</div>
         <div class="slide-content flex-col gap-md" style="justify-content:center;">
             <div class="label reveal">Approach</div>
             <p class="quote-block reveal">결과물만 감상하지 않고,<br><span class="accent">가볍게 구조를 추측</span>해 본다.</p>
@@ -1645,7 +2083,7 @@
 
     <!-- ========== 27 네 가지 질문 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 27</div>
+        <div class="corner-mark">NCA·TD/W01 · 32</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Four Questions</div>
             <h2 class="reveal">레퍼런스 앞에서 던질 네 가지 질문</h2>
@@ -1683,7 +2121,7 @@
 
     <!-- ========== 28 INTERACTIVE: signal flow demo ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 28</div>
+        <div class="corner-mark">NCA·TD/W01 · 33</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Interactive · Signal Flow</div>
             <h2 class="reveal">입력 &rarr; 처리 &rarr; 출력</h2>
@@ -1725,7 +2163,7 @@
 
     <!-- ========== 29 SECTION: 화면 열어보기 ========== -->
     <section class="slide section-slide">
-        <div class="corner-mark">NCA·TD/W01 · 29</div>
+        <div class="corner-mark">NCA·TD/W01 · 34</div>
         <div class="slide-content">
             <div class="part-number reveal">Part 06</div>
             <h2 class="reveal">화면을 가볍게<br>열어봅니다</h2>
@@ -1745,7 +2183,7 @@
 
     <!-- ========== 30 무엇을 볼까 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 30</div>
+        <div class="corner-mark">NCA·TD/W01 · 35</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">What we&rsquo;ll look at</div>
             <h2 class="reveal">화면에서 무엇을 같이 볼까</h2>
@@ -1779,7 +2217,7 @@
 
     <!-- ========== 31 패밀리 색 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 31</div>
+        <div class="corner-mark">NCA·TD/W01 · 36</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Family Colors</div>
             <h2 class="reveal">노드 색깔로<br>패밀리 구분하기</h2>
@@ -1803,7 +2241,7 @@
 
     <!-- ========== 32 시연 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 32</div>
+        <div class="corner-mark">NCA·TD/W01 · 37</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Tiny Demo</div>
             <h2 class="reveal">아주 작은 시연</h2>
@@ -1838,7 +2276,7 @@
 
     <!-- ========== 33 SECTION: 운영 방식 ========== -->
     <section class="slide section-slide">
-        <div class="corner-mark">NCA·TD/W01 · 33</div>
+        <div class="corner-mark">NCA·TD/W01 · 38</div>
         <div class="slide-content">
             <div class="part-number reveal">Part 07</div>
             <h2 class="reveal">수업<br>운영 방식</h2>
@@ -1858,7 +2296,7 @@
 
     <!-- ========== 34 FigJam ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 34</div>
+        <div class="corner-mark">NCA·TD/W01 · 39</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">FigJam</div>
             <h2 class="reveal">FigJam 사용 방식</h2>
@@ -1888,7 +2326,7 @@
 
     <!-- ========== 35 질문 방식 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 35</div>
+        <div class="corner-mark">NCA·TD/W01 · 40</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Asking Questions</div>
             <h2 class="reveal">질문은 어디서든</h2>
@@ -1918,7 +2356,7 @@
 
     <!-- ========== 36 과제 톤 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 36</div>
+        <div class="corner-mark">NCA·TD/W01 · 41</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Homework Tone</div>
             <h2 class="reveal">과제와 복습 톤</h2>
@@ -1946,7 +2384,7 @@
 
     <!-- ========== 37 수강 정정 이후 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 37</div>
+        <div class="corner-mark">NCA·TD/W01 · 42</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">After Add/Drop</div>
             <h2 class="reveal">앞으로 조정되는 것</h2>
@@ -1976,7 +2414,7 @@
 
     <!-- ========== 38 SECTION: 마무리 ========== -->
     <section class="slide section-slide">
-        <div class="corner-mark">NCA·TD/W01 · 38</div>
+        <div class="corner-mark">NCA·TD/W01 · 43</div>
         <div class="slide-content">
             <div class="part-number reveal">Part 08</div>
             <h2 class="reveal">마무리</h2>
@@ -1996,7 +2434,7 @@
 
     <!-- ========== 39 다음 주 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 39</div>
+        <div class="corner-mark">NCA·TD/W01 · 44</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">Next Week</div>
             <h2 class="reveal">Week 02 &mdash;<br>TOP 기반 실시간 이미지 합성</h2>
@@ -2022,7 +2460,7 @@
 
     <!-- ========== 40 오늘의 정리 1 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 40</div>
+        <div class="corner-mark">NCA·TD/W01 · 45</div>
         <div class="slide-content flex-col gap-md" style="justify-content:center;">
             <div class="label reveal">Today &mdash; Takeaway 01</div>
             <p class="quote-block reveal">
@@ -2042,7 +2480,7 @@
 
     <!-- ========== 41 오늘의 정리 2 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 41</div>
+        <div class="corner-mark">NCA·TD/W01 · 46</div>
         <div class="slide-content flex-col gap-md" style="justify-content:center;">
             <div class="label reveal">Today &mdash; Takeaway 02</div>
             <p class="quote-block reveal">
@@ -2062,7 +2500,7 @@
 
     <!-- ========== 42 끝나고 더 이야기 ========== -->
     <section class="slide">
-        <div class="corner-mark">NCA·TD/W01 · 42</div>
+        <div class="corner-mark">NCA·TD/W01 · 47</div>
         <div class="slide-content flex-col gap-md">
             <div class="label reveal">After Class</div>
             <h2 class="reveal">끝나고 더 이야기</h2>
@@ -2269,20 +2707,20 @@
     document.addEventListener('DOMContentLoaded', () => {
         new SlidePresentation();
 
+        document.querySelectorAll('.tag-chip').forEach((chip) => {
+            chip.addEventListener('click', () => chip.classList.toggle('on'));
+        });
         const tagCloud = document.getElementById('tagCloud');
         if (tagCloud) {
             const counter = document.getElementById('tagCount');
             const listEl = document.getElementById('tagList');
             const update = () => {
-                const on = [...tagCloud.querySelectorAll('.tag-chip.on')].map(c => c.dataset.tag);
-                counter.textContent = on.length;
-                listEl.textContent = on.join(' · ');
+                const on = [...tagCloud.querySelectorAll('.tag-chip.on')].map((c) => c.dataset.tag);
+                if (counter) counter.textContent = on.length;
+                if (listEl) listEl.textContent = on.join(' · ');
             };
-            tagCloud.querySelectorAll('.tag-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    chip.classList.toggle('on');
-                    update();
-                });
+            tagCloud.addEventListener('click', (e) => {
+                if (e.target.classList?.contains('tag-chip')) update();
             });
         }
 
