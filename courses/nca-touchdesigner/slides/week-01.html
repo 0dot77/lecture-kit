@@ -434,6 +434,151 @@
             font-size: clamp(0.8rem, 1.25vw, 1.05rem);
         }
 
+        .curriculum-map {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: clamp(0.35rem, 0.8vw, 0.65rem);
+            width: 100%;
+            max-width: 1250px;
+        }
+        .map-cell {
+            position: relative;
+            background: var(--paper);
+            border: 1.5px solid var(--ink);
+            padding: clamp(0.45rem, 0.9vw, 0.75rem) clamp(0.5rem, 1vw, 0.75rem);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.15rem, 0.35vw, 0.3rem);
+            min-height: clamp(82px, 11vw, 130px);
+        }
+        .map-cell .phase {
+            font-family: var(--font-mono);
+            font-size: clamp(0.48rem, 0.7vw, 0.6rem);
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--ink);
+            opacity: 0.6;
+        }
+        .map-cell .week {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            letter-spacing: 0.12em;
+            color: var(--ink);
+        }
+        .map-cell .topic {
+            font-family: var(--font-display);
+            font-size: clamp(0.78rem, 1.4vw, 1.1rem);
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            color: var(--ink);
+            text-transform: uppercase;
+            margin-top: auto;
+        }
+        .map-cell.milestone {
+            background: var(--ink);
+        }
+        .map-cell.milestone .week,
+        .map-cell.milestone .topic,
+        .map-cell.milestone .phase { color: var(--paper); }
+        .map-cell.milestone .phase { opacity: 0.85; }
+        .map-cell.now::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid var(--ink);
+            pointer-events: none;
+        }
+        .map-cell.now .badge-now {
+            position: absolute;
+            top: -0.6em;
+            right: -0.4em;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--font-mono);
+            font-size: clamp(0.5rem, 0.75vw, 0.65rem);
+            letter-spacing: 0.15em;
+            padding: 0.18em 0.45em;
+            text-transform: uppercase;
+        }
+        .map-legend {
+            display: flex;
+            gap: clamp(0.6rem, 1.4vw, 1.2rem);
+            flex-wrap: wrap;
+            margin-top: clamp(0.4rem, 0.9vw, 0.7rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.85vw, 0.72rem);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+        .map-legend .swatch {
+            display: inline-block;
+            width: 0.8em;
+            height: 0.8em;
+            margin-right: 0.4em;
+            vertical-align: -0.05em;
+        }
+        .map-legend .swatch-ink { background: var(--ink); border: 1.5px solid var(--ink); }
+        .map-legend .swatch-paper { background: var(--paper); border: 1.5px solid var(--ink); }
+        @media (max-width: 960px) {
+            .curriculum-map { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 560px) {
+            .curriculum-map { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .image-slot {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            aspect-ratio: 16/9;
+            border: 1.5px dashed var(--ink);
+            background: var(--paper-deep);
+            background-image:
+                radial-gradient(var(--ink-faint) 1px, transparent 1.2px);
+            background-size: 14px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.3rem, 0.6vw, 0.5rem);
+            color: var(--ink);
+            overflow: hidden;
+        }
+        .image-slot::before {
+            content: '+';
+            position: absolute;
+            top: -0.6em;
+            left: -0.45em;
+            font-family: var(--font-bitmap);
+            font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+            color: var(--ink);
+            background: var(--paper);
+            padding: 0 0.18em;
+            line-height: 1;
+        }
+        .image-slot .slot-label {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            opacity: 0.55;
+        }
+        .image-slot .slot-hint {
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.85vw, 0.72rem);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.45;
+        }
+        .image-slot img,
+        .image-slot video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         .video-frame {
             position: relative;
             width: 100%;
@@ -1368,8 +1513,6 @@
                 <iframe src="https://www.youtube.com/embed/B67towDsGc8" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
             <div class="video-meta reveal">
-                <span>입력 장치 · 센서 · 외부 장비 연동</span>
-                <span class="dot">·</span>
                 <a href="https://youtu.be/B67towDsGc8" target="_blank" rel="noopener">youtu.be/B67towDsGc8</a>
             </div>
         </div>
@@ -1407,39 +1550,20 @@
         </div>
     </section>
 
-    <!-- ========== 08 TD가 한 일들 ========== -->
+    <!-- ========== 공연 시스템 제작 ========== -->
     <section class="slide">
         <div class="corner-mark">NCA·TD/W01 · 11</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">What TD Did</div>
-            <h2 class="reveal">작업 안에서 TouchDesigner가 한 일</h2>
-            <div class="four-col">
-                <div class="info-card reveal">
-                    <h3>실시간 비주얼</h3>
-                    <p>무대 위에서 살아 움직이는 영상</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>공연 시스템</h3>
-                    <p>큐, 타임라인, 미디어 분배</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>입력 / 센서</h3>
-                    <p>카메라, 마이크, IMU, OSC</p>
-                </div>
-                <div class="info-card reveal">
-                    <h3>장비 / 소프트웨어 연동</h3>
-                    <p>외부 소프트웨어와 신호 주고받기</p>
-                </div>
-            </div>
-            <div class="info-card reveal" style="margin-top:var(--element-gap);">
-                <h3>작업자를 위한 도구 제작</h3>
-                <p>스태프와 협업자가 직접 쓰는 컨트롤러, 패널, 자동화 도구</p>
+        <div class="slide-content flex-col gap-sm" style="justify-content:center;">
+            <div class="label reveal">Role</div>
+            <h2 class="reveal" style="font-size:clamp(1.6rem,3.6vw,2.6rem);">공연 시스템 제작</h2>
+            <div class="image-slot reveal" aria-label="공연 시스템 네트워크 화면">
+                <img src="./assets/performance-system.png" alt="TouchDesigner 네트워크 — 공연 시스템 운영 화면" loading="lazy">
             </div>
         </div>
         <div class="colophon">
             <span>ROLE</span>
             <span class="dot">•</span>
-            <span>WHAT TD ACTUALLY DID</span>
+            <span>PERFORMANCE SYSTEM</span>
             <span class="dot">•</span>
             <span>WEEK 01</span>
         </div>
@@ -1671,22 +1795,100 @@
         </div>
     </section>
 
-    <!-- ========== 19 이 수업으로 뭘 할 수 있나 ========== -->
+    <!-- ========== 19 커리큘럼 지도 ========== -->
     <section class="slide">
         <div class="corner-mark">NCA·TD/W01 · 19</div>
-        <div class="slide-content flex-col gap-md">
-            <div class="label reveal">After This Course</div>
-            <h2 class="reveal">이 수업을 기반으로<br>어떤 작업을 할 수 있나</h2>
-            <div class="flex-col gap-sm">
-                <p class="reveal">실시간 비주얼 한 장면을 끝까지 만들 수 있는 <strong>기본 뼈대</strong>가 생긴다.</p>
-                <p class="reveal">외부 입력(소리, 카메라, 센서, 데이터)을 받아 영상이나 시스템으로 <strong>연결하는 감각</strong>이 생긴다.</p>
-                <p class="reveal">그 후엔 자기 작업의 결을 따라 <strong>특정 방향으로 깊게 파고드는</strong> 일이 가능해진다.</p>
+        <div class="slide-content flex-col gap-sm">
+            <div class="label reveal">Curriculum Map</div>
+            <h2 class="reveal" style="font-size:clamp(1.5rem,3.4vw,2.4rem);">15주의 지도</h2>
+            <div class="curriculum-map reveal">
+                <div class="map-cell now">
+                    <span class="badge-now">You · Now</span>
+                    <span class="phase">Start</span>
+                    <span class="week">W01 · 05.12</span>
+                    <span class="topic">오리엔테이션</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">2D · Image</span>
+                    <span class="week">W02 · 05.19</span>
+                    <span class="topic">TOP 합성</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">2D · Image</span>
+                    <span class="week">W03 · 05.26</span>
+                    <span class="topic">TOP/CHOP 인터랙션</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">2D · Signal</span>
+                    <span class="week">W04 · 06.02</span>
+                    <span class="topic">CHOP 데이터 처리</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">Audio Visual</span>
+                    <span class="week">W05 · 06.09</span>
+                    <span class="topic">AV 시스템</span>
+                </div>
+                <div class="map-cell milestone">
+                    <span class="phase">Midpoint</span>
+                    <span class="week">W06 · 06.16</span>
+                    <span class="topic">중간 점검</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">3D · Space</span>
+                    <span class="week">W07 · 06.23</span>
+                    <span class="topic">SOP 3D 렌더링</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">3D · Space</span>
+                    <span class="week">W08 · 06.30</span>
+                    <span class="topic">Instancing 1</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">3D · Space</span>
+                    <span class="week">W09 · 07.07</span>
+                    <span class="topic">Instancing 2</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">3D · Space</span>
+                    <span class="week">W10 · 07.14</span>
+                    <span class="topic">Point Clouds</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">I/O · Network</span>
+                    <span class="week">W11 · 07.21</span>
+                    <span class="topic">Networking &middot; DAT</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">Body</span>
+                    <span class="week">W12 · 07.28</span>
+                    <span class="topic">MediaPipe</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">Particles</span>
+                    <span class="week">W13 · 08.04</span>
+                    <span class="topic">POP 워크플로</span>
+                </div>
+                <div class="map-cell">
+                    <span class="phase">Project</span>
+                    <span class="week">W14 · 08.11</span>
+                    <span class="topic">개별 프로젝트</span>
+                </div>
+                <div class="map-cell milestone">
+                    <span class="phase">Final</span>
+                    <span class="week">W15 · 08.18</span>
+                    <span class="topic">최종 발표</span>
+                </div>
+            </div>
+            <div class="map-legend reveal">
+                <span><span class="swatch swatch-paper"></span>주차별 주제</span>
+                <span><span class="swatch swatch-ink"></span>중간 점검 / 발표</span>
+                <span>15주 &middot; TOP &rarr; CHOP &rarr; SOP &rarr; DAT &rarr; POP</span>
             </div>
         </div>
         <div class="colophon">
-            <span>AFTER COURSE</span>
+            <span>CURRICULUM MAP</span>
             <span class="dot">•</span>
-            <span>WHAT YOU CAN BUILD</span>
+            <span>15 WEEKS · MAY 12 — AUG 18</span>
             <span class="dot">•</span>
             <span>WEEK 01</span>
         </div>
