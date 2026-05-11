@@ -94,7 +94,7 @@
             position: absolute;
             bottom: clamp(10px, 1.5vw, 18px);
             left: clamp(16px, 2.5vw, 28px);
-            right: clamp(16px, 2.5vw, 28px);
+            right: clamp(64px, 8vw, 110px);
             border-top: 1px solid var(--ink);
             padding-top: clamp(4px, 0.6vw, 6px);
             font-family: var(--font-mono);
@@ -103,8 +103,10 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             display: flex;
-            justify-content: space-between;
-            gap: 1em;
+            justify-content: flex-start;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0 0.8em;
             z-index: 3;
         }
         .colophon .dot { opacity: 0.6; }
@@ -389,7 +391,9 @@
             height: clamp(180px, 38vw, 520px);
             z-index: 1;
             opacity: 0.92;
+            display: block;
         }
+        canvas.hero-dither { background: var(--paper); }
 
         .section-slide .slide-content {
             align-items: center;
@@ -936,7 +940,7 @@
     <!-- ========== 01 TITLE ========== -->
     <section class="slide title-slide">
         <div class="corner-mark">NCA·TD/W01</div>
-        <div class="hero-dither dither-block"></div>
+        <canvas class="hero-dither" data-signal="dense"></canvas>
         <div class="slide-content">
             <div class="course-label reveal">NCA TouchDesigner · Week 01</div>
             <h1 class="reveal"><span class="ko">오리엔테이션</span><br><span class="en">SIGNAL CHECK</span></h1>
@@ -2065,7 +2069,7 @@
     <!-- ========== 43 END ========== -->
     <section class="slide title-slide">
         <div class="corner-mark">NCA·TD/W01 · END</div>
-        <div class="hero-dither dither-block dither-sparse"></div>
+        <canvas class="hero-dither" data-signal="sparse"></canvas>
         <div class="slide-content">
             <div class="course-label reveal">End of Week 01</div>
             <h1 class="reveal">다음 주<br>다시 만나요</h1>
@@ -2442,6 +2446,74 @@
 
             update();
         }
+
+        // ===== Hero signal-flow halftone =====
+        const heroCanvases = document.querySelectorAll('canvas.hero-dither');
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        heroCanvases.forEach((canvas) => {
+            const ctx = canvas.getContext('2d');
+            const sparse = canvas.dataset.signal === 'sparse';
+            let raf = 0, w = 0, h = 0, dpr = 1;
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const r = canvas.getBoundingClientRect();
+                if (!r.width || !r.height) return;
+                w = canvas.width = Math.round(r.width * dpr);
+                h = canvas.height = Math.round(r.height * dpr);
+            }
+
+            const t0 = performance.now();
+            function frame(now) {
+                if (!w || !h) { raf = requestAnimationFrame(frame); return; }
+                const t = (now - t0) / 1000;
+                ctx.fillStyle = '#ece6cf';
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#0b14b5';
+                const cell = (sparse ? 13 : 9) * dpr;
+                const maxR = cell * 0.52;
+                for (let y = 0; y < h + cell; y += cell) {
+                    for (let x = 0; x < w + cell; x += cell) {
+                        const nx = x / w;
+                        const ny = y / h;
+                        const v =
+                            Math.sin(nx * 6.5 + t * 0.42) * 0.55 +
+                            Math.cos(ny * 5.0 - t * 0.31) * 0.45 +
+                            Math.sin((nx * 9.0 + ny * 7.0) + t * 0.55) * 0.35 +
+                            Math.cos((nx * 2.6 - ny * 3.2) + t * 0.18) * 0.30;
+                        const norm = (v + 1.65) / 3.3;
+                        const lifted = sparse ? Math.max(0, norm - 0.18) * 1.15 : norm;
+                        const r = Math.max(0, Math.min(maxR, lifted * maxR * 1.08));
+                        if (r > 0.6) {
+                            ctx.beginPath();
+                            ctx.arc(x + cell / 2, y + cell / 2, r, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+                if (!reduced) raf = requestAnimationFrame(frame);
+            }
+
+            const ro = new ResizeObserver(() => { resize(); if (reduced) frame(performance.now()); });
+            ro.observe(canvas);
+            resize();
+
+            if (reduced) {
+                frame(performance.now());
+            } else {
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach((e) => {
+                        if (e.isIntersecting && !raf) {
+                            raf = requestAnimationFrame(frame);
+                        } else if (!e.isIntersecting && raf) {
+                            cancelAnimationFrame(raf);
+                            raf = 0;
+                        }
+                    });
+                }, { threshold: 0.05 });
+                io.observe(canvas);
+            }
+        });
     });
     </script>
 </body>
