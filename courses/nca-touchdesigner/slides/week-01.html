@@ -7,7 +7,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=VT323&family=JetBrains+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=Space+Grotesk:wght@400;500;700&family=VT323&family=JetBrains+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 
     <style>
         :root {
@@ -18,10 +19,10 @@
             --paper: #ece6cf;
             --paper-deep: #ddd4b5;
 
-            --font-display: 'Anton', 'Archivo Black', sans-serif;
-            --font-body: 'Space Grotesk', sans-serif;
+            --font-display: 'Anton', 'Black Han Sans', 'Pretendard Variable', 'Pretendard', sans-serif;
+            --font-body: 'Space Grotesk', 'Pretendard Variable', 'Pretendard', sans-serif;
             --font-bitmap: 'VT323', monospace;
-            --font-mono: 'JetBrains Mono', monospace;
+            --font-mono: 'JetBrains Mono', 'Pretendard Variable', 'Pretendard', monospace;
 
             --title-size: clamp(2.6rem, 7vw, 6rem);
             --h2-size: clamp(1.8rem, 4.5vw, 3.2rem);
@@ -171,23 +172,29 @@
             font-family: var(--font-display);
             font-size: var(--title-size);
             font-weight: 400;
-            line-height: 0.92;
-            letter-spacing: -0.01em;
+            line-height: 0.95;
+            letter-spacing: -0.045em;
             color: var(--ink);
             text-transform: uppercase;
-            transform: scaleX(0.96);
-            transform-origin: left;
+            word-spacing: -0.05em;
+            font-feature-settings: "kern" 1;
         }
+        h1 .ko { letter-spacing: -0.075em; word-spacing: -0.05em; display: inline-block; }
+        h1 .en { letter-spacing: -0.045em; display: inline-block; }
         h2 {
             font-family: var(--font-display);
             font-size: var(--h2-size);
             font-weight: 400;
-            line-height: 0.95;
-            letter-spacing: 0;
+            line-height: 1.0;
+            letter-spacing: -0.035em;
             color: var(--ink);
             text-transform: uppercase;
             margin-bottom: var(--content-gap);
+            word-spacing: -0.03em;
+            font-feature-settings: "kern" 1;
         }
+        h2 .ko { letter-spacing: -0.055em; }
+        h2 .en { letter-spacing: -0.035em; }
         h3 {
             font-family: var(--font-display);
             font-size: var(--h3-size);
@@ -195,12 +202,18 @@
             color: var(--ink);
             margin-bottom: var(--element-gap);
             text-transform: uppercase;
-            letter-spacing: 0.01em;
+            letter-spacing: -0.02em;
+            font-feature-settings: "kern" 1;
         }
+        h3 .ko { letter-spacing: -0.04em; }
+        h3 .en { letter-spacing: -0.02em; }
         p, li {
             font-size: var(--body-size);
-            line-height: 1.55;
+            line-height: 1.6;
             color: var(--ink);
+            letter-spacing: -0.01em;
+            word-spacing: -0.01em;
+            font-feature-settings: "kern" 1;
         }
         strong { color: var(--ink); font-weight: 700; }
 
@@ -352,8 +365,15 @@
         .title-slide h1 {
             font-size: clamp(3rem, 11vw, 9rem);
             margin-bottom: clamp(0.6rem, 1.2vw, 1.2rem);
-            line-height: 0.88;
-            transform: scaleX(0.94);
+            line-height: 0.92;
+            letter-spacing: -0.055em;
+        }
+        .title-slide h1 .ko {
+            letter-spacing: -0.085em;
+            word-spacing: -0.05em;
+        }
+        .title-slide h1 .en {
+            letter-spacing: -0.05em;
         }
         .title-slide .subtitle {
             font-size: clamp(0.95rem, 1.7vw, 1.25rem);
@@ -915,7 +935,7 @@
         <div class="hero-dither dither-block"></div>
         <div class="slide-content">
             <div class="course-label reveal">NCA TouchDesigner · Week 01</div>
-            <h1 class="reveal">오리엔테이션<br>SIGNAL CHECK</h1>
+            <h1 class="reveal"><span class="ko">오리엔테이션</span><br><span class="en">SIGNAL CHECK</span></h1>
             <p class="subtitle reveal">뉴콘텐츠아카데미 3기 · TouchDesigner 기본교과<br>2026.05.12 · 유태양</p>
             <div class="bitrow reveal" style="margin-top:clamp(1rem,2vw,2rem);">
                 <span>▮</span><span>▮</span><span>▮</span><span>·</span><span>·</span><span>+</span><span>+</span><span>×</span>
