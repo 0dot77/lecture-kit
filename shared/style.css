@@ -788,6 +788,145 @@ details .details-body {
 }
 
 
+/* ─── Share / Short Link ─── */
+
+.share-btn {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.share-btn:hover {
+  border-color: var(--color-accent-blue);
+  color: var(--color-accent-blue);
+}
+
+.share-btn .sig-led {
+  width: 6px;
+  height: 6px;
+}
+
+.share-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: share-fade-in 0.15s ease-out;
+}
+
+@keyframes share-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.share-modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.share-modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.6rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0.4rem 0.6rem;
+}
+
+.share-modal-close:hover {
+  color: var(--color-text);
+}
+
+.share-link-display {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.75rem 0.85rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  word-break: break-all;
+  color: var(--color-text);
+  margin: 0.35rem 0 1.1rem;
+  line-height: 1.5;
+}
+
+.share-short-link {
+  font-size: 1.15rem;
+  color: var(--color-accent-blue);
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.share-action-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
+  color: var(--color-accent-blue);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.share-action-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent-blue) 25%, transparent);
+  border-color: var(--color-accent-blue);
+}
+
+.share-action-btn:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.share-hint {
+  text-align: center;
+  color: var(--color-text-dim);
+  font-size: 0.7rem;
+  margin-top: 0.75rem;
+}
+
+@media print {
+  .share-btn,
+  .share-modal-backdrop {
+    display: none !important;
+  }
+}
+
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .lecture-page {
