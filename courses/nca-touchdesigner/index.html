@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NCA TouchDesigner 기본교과</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <span style="color: var(--color-text-muted);">NCA TouchDesigner 기본교과</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-blue sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-blue"></span>
+          <span class="sig-led sig-led-purple sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-purple"></span>
+          <span class="sig-led sig-led-green sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">뉴콘텐츠아카데미 3기 — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          TouchDesigner 기본교과
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          노드 기반 실시간 반응형 시각 시스템 — 기본부터 개인 프로젝트까지
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-purple), var(--color-accent-green), transparent);"></div>
+      </header>
+
+      <!-- Course Info -->
+      <section class="course-panel mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="sig-knob"></span>
+          <span class="sig-label">강의 개요</span>
+        </div>
+        <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <div>
+            <dt style="color: var(--color-text-dim);" class="sig-label mb-1">강의시간</dt>
+            <dd>화요일 10:00 ~ 13:00 (3시간)</dd>
+          </div>
+          <div>
+            <dt style="color: var(--color-text-dim);" class="sig-label mb-1">담당강사</dt>
+            <dd>유태양</dd>
+          </div>
+          <div>
+            <dt style="color: var(--color-text-dim);" class="sig-label mb-1">기간</dt>
+            <dd>2026.05.12 ~ 2026.08.18 (15주)</dd>
+          </div>
+          <div>
+            <dt style="color: var(--color-text-dim);" class="sig-label mb-1">강의장소</dt>
+            <dd>강의실</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Chapter List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">주차별 커리큘럼</h2>
+          <div class="sig-cable sig-cable-blue" style="max-width: 40px;"></div>
+          <span class="sig-label" style="margin-left: auto;">15 weeks</span>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <a href="week-01.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 01 · 2026-05-12</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">오리엔테이션 및 제작 점검</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">TouchDesigner 작업 방식 점검, 노드 기반 비주얼 프로그래밍 구조 이해, 기본 조작 복습</p>
+          </a>
+
+          <a href="week-02.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 02 · 2026-05-19</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">TOP 기반 실시간 이미지 합성</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">이미지 합성, 이펙트, 피드백 루프를 활용한 실시간 비주얼 구조 만들기</p>
+          </a>
+
+          <a href="week-03.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 03 · 2026-05-26</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">TOP/CHOP 인터랙션 응용</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">웹캠, 마우스, 키보드 데이터를 활용하여 비주얼을 제어하는 인터랙션 구조 만들기</p>
+          </a>
+
+          <a href="week-04.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 04 · 2026-06-02</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">CHOP 데이터 처리 심화</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">Math, Limit, Lag 등을 활용한 데이터 정리, 보정, 매핑 방식 이해</p>
+          </a>
+
+          <a href="week-05.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 05 · 2026-06-09</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">Audio Visual 시스템 제작</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">소리 데이터를 분석하고 시각 요소의 움직임에 연결하기</p>
+          </a>
+
+          <a href="week-06.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-purple sig-led-pulse"></span>
+                <span class="sig-label">Week 06 · 2026-06-16</span>
+              </div>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent); color: var(--color-accent-purple); border: 1px solid color-mix(in srgb, var(--color-accent-purple) 30%, transparent);">중간 점검</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">중간 점검 및 미니 프로젝트</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">오디오/입력 데이터를 활용한 미니 VJing 또는 반응형 비주얼 셋 제작 · HTML 기반 웹 믹서</p>
+          </a>
+
+          <a href="week-07.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 07 · 2026-06-23</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">SOP 기반 3D 렌더링 구조</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">TouchDesigner 3D 렌더링 파이프라인과 공간 구성 방식 이해</p>
+          </a>
+
+          <a href="week-08.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 08 · 2026-06-30</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">Instancing 1 — SOP 구조</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">SOP 데이터를 활용한 인스턴싱 구조와 반복 객체 제어</p>
+          </a>
+
+          <a href="week-09.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 09 · 2026-07-07</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">Instancing 2 — 데이터 제어</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">TOP, CHOP 데이터를 활용한 인스턴스 색상, 위치, 움직임 제어</p>
+          </a>
+
+          <a href="week-10.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 10 · 2026-07-14</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">Point Clouds &amp; Particles</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">Particles, Point Cloud, Gaussian Splatting, World AI Model 사례를 통해 데이터 기반 공간 비주얼 이해</p>
+          </a>
+
+          <a href="week-11.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 11 · 2026-07-21</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">Networking &amp; DAT 활용</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">DAT 기본 구조, OSC/WebSocket 개념, 스마트폰 센서 연동을 통한 외부 데이터 입력 실습</p>
+          </a>
+
+          <a href="week-12.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 12 · 2026-07-28</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">MediaPipe 신체 인터랙션</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">신체 움직임 추적 데이터를 활용한 실시간 인터랙티브 아트 구조 제작 · Teachable Machine, YOLO 탐색</p>
+          </a>
+
+          <a href="week-13.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-blue sig-led-pulse"></span>
+                <span class="sig-label">Week 13 · 2026-08-04</span>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold mb-1">POP 워크플로우와 응용</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">POP을 활용한 파티클/포인트 기반 워크플로우 소개 및 응용 실습</p>
+          </a>
+
+          <a href="week-14.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-green sig-led-pulse"></span>
+                <span class="sig-label">Week 14 · 2026-08-11</span>
+              </div>
+              <span class="badge badge-wip">개인 프로젝트</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">개별 프로젝트 기획 및 제작</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">개별 프로젝트 구조 설계, 입력-처리-출력 흐름 점검, 제작 진행</p>
+          </a>
+
+          <a href="week-15.html" class="course-panel">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="sig-led sig-led-green sig-led-pulse"></span>
+                <span class="sig-label">Week 15 · 2026-08-18</span>
+              </div>
+              <span class="badge badge-wip">최종 발표</span>
+            </div>
+            <h3 class="text-base font-semibold mb-1">최종 작업 발표 및 피드백</h3>
+            <p class="text-sm" style="color: var(--color-text-muted);">프로젝트 발표, 제작 과정 공유, 기술 피드백</p>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>
