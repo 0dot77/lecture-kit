@@ -31,6 +31,7 @@ export default defineConfig({
         "fh-week04": "courses/feed-hijacking/week-04.html",
         "nca-index": "courses/nca-touchdesigner/index.html",
         "nca-week01": "courses/nca-touchdesigner/week-01.html",
+        "nca-week01-slides": "courses/nca-touchdesigner/slides/week-01.html",
         "nca-week02": "courses/nca-touchdesigner/week-02.html",
         "nca-week03": "courses/nca-touchdesigner/week-03.html",
         "nca-week04": "courses/nca-touchdesigner/week-04.html",

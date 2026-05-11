@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 01 · 오리엔테이션 — NCA TouchDesigner</title>
+
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400;500;600;700&f[]=satoshi@400;500;700&f[]=jet-brains-mono@400;500&display=swap">
+
+    <style>
+        :root {
+            --bg-primary: #2c2c2c;
+            --bg-secondary: #363636;
+            --bg-panel: #333333;
+            --bg-inset: #292929;
+            --border-panel: #4a4a4a;
+            --border-screw: #555555;
+            --text-primary: #e8e0d4;
+            --text-secondary: #9a9285;
+            --text-dim: #6b6560;
+            --accent-orange: #d4843e;
+            --accent-blue: #4a9ece;
+            --accent-green: #4caf6e;
+            --accent-purple: #8b6cc4;
+            --accent-cyan: #5bbfbf;
+            --cream: #e8e0d4;
+            --cream-dim: rgba(232, 224, 212, 0.08);
+            --cream-border: rgba(232, 224, 212, 0.15);
+
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 5vw, 4rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            --body-size: clamp(0.8rem, 1.4vw, 1.1rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --label-size: clamp(0.6rem, 0.9vw, 0.75rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.25rem, 1vw, 0.75rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            padding-bottom: clamp(2rem, 4vw, 3.5rem);
+        }
+
+        .panel-frame {
+            position: absolute;
+            inset: clamp(8px, 1.2vw, 16px);
+            border: 1px solid var(--border-panel);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .panel-frame::before,
+        .panel-frame::after {
+            content: '';
+            position: absolute;
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-screw);
+        }
+        .panel-frame::before { top: clamp(6px, 1vw, 12px); left: clamp(6px, 1vw, 12px); }
+        .panel-frame::after { top: clamp(6px, 1vw, 12px); right: clamp(6px, 1vw, 12px); }
+
+        .screw-bl, .screw-br {
+            position: absolute;
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-screw);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .screw-bl { bottom: clamp(14px, 2.2vw, 28px); left: clamp(14px, 2.2vw, 28px); }
+        .screw-br { bottom: clamp(14px, 2.2vw, 28px); right: clamp(14px, 2.2vw, 28px); }
+
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(232, 224, 212, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(232, 224, 212, 0.02) 1px, transparent 1px);
+            background-size: clamp(30px, 4vw, 50px) clamp(30px, 4vw, 50px);
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--cream);
+        }
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            color: var(--cream);
+            margin-bottom: var(--content-gap);
+        }
+        h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            color: var(--cream);
+            margin-bottom: var(--element-gap);
+        }
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .label {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+        }
+
+        .accent-orange { color: var(--accent-orange); }
+        .accent-blue { color: var(--accent-blue); }
+        .accent-green { color: var(--accent-green); }
+        .accent-purple { color: var(--accent-purple); }
+        .accent-cyan { color: var(--accent-cyan); }
+
+        code, .code-inline {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+            background: var(--bg-inset);
+            padding: 0.15em 0.4em;
+            border-radius: 3px;
+            color: var(--accent-cyan);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--body-size);
+        }
+        .data-table th {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-align: left;
+            padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid var(--cream-border);
+        }
+        .data-table td {
+            padding: clamp(0.35rem, 0.8vw, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid rgba(232, 224, 212, 0.05);
+            color: var(--text-secondary);
+        }
+        .data-table td:first-child {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+        }
+        .info-card h3 {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            margin-bottom: clamp(0.3rem, 0.5vw, 0.5rem);
+        }
+        .info-card p, .info-card li {
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.3rem, 0.8vw, 0.75rem);
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: clamp(0.75rem, 1.5vw, 1.25rem) 0;
+        }
+        .flow-node {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 4px;
+            padding: clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.5rem, 1vw, 0.8rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 1vw, 0.8rem);
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .flow-node.highlight { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .flow-node.green { border-color: var(--accent-green); color: var(--accent-green); }
+        .flow-node.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .flow-node.purple { border-color: var(--accent-purple); color: var(--accent-purple); }
+        .flow-node.cyan { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .flow-arrow { color: var(--text-dim); font-size: clamp(0.8rem, 1.2vw, 1rem); }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(0.75rem, 2vw, 2rem);
+            align-items: start;
+            align-content: start;
+            width: 100%;
+        }
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.5rem, 1.5vw, 1.5rem);
+            align-items: start;
+            align-content: start;
+            width: 100%;
+        }
+        .four-col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.5rem, 1vw, 1rem);
+        }
+        @media (max-width: 768px) {
+            .two-col, .three-col, .four-col { grid-template-columns: 1fr; }
+        }
+
+        .led {
+            width: clamp(6px, 0.8vw, 10px);
+            height: clamp(6px, 0.8vw, 10px);
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .led-orange { background: var(--accent-orange); box-shadow: 0 0 6px var(--accent-orange); }
+        .led-green { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+        .led-blue { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
+        .led-purple { background: var(--accent-purple); box-shadow: 0 0 6px var(--accent-purple); }
+        .led-cyan { background: var(--accent-cyan); box-shadow: 0 0 6px var(--accent-cyan); }
+        .led-dim { background: var(--text-dim); box-shadow: none; }
+
+        .cable-line {
+            height: 3px;
+            border-radius: 2px;
+            flex: 1;
+            min-width: 30px;
+        }
+        .cable-orange { background: linear-gradient(90deg, var(--accent-orange), rgba(212, 132, 62, 0.3)); }
+        .cable-blue { background: linear-gradient(90deg, var(--accent-blue), rgba(74, 158, 206, 0.3)); }
+        .cable-green { background: linear-gradient(90deg, var(--accent-green), rgba(76, 175, 110, 0.3)); }
+        .cable-purple { background: linear-gradient(90deg, var(--accent-purple), rgba(139, 108, 196, 0.3)); }
+        .cable-cyan { background: linear-gradient(90deg, var(--accent-cyan), rgba(91, 191, 191, 0.3)); }
+
+        .title-slide .slide-content {
+            justify-content: flex-end;
+            padding-bottom: clamp(3rem, 8vw, 6rem);
+        }
+        .title-slide .course-label {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+        .title-slide h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+        .title-slide .subtitle {
+            font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .section-slide { background: var(--bg-inset); }
+        .section-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+        .section-slide .part-number {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--accent-orange);
+            margin-bottom: clamp(0.5rem, 1vw, 1rem);
+        }
+        .section-slide h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            text-align: center;
+        }
+        .section-slide .section-desc {
+            max-width: 600px;
+            text-align: center;
+            margin-top: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .highlight-box {
+            background: rgba(212, 132, 62, 0.08);
+            border-left: 3px solid var(--accent-orange);
+            padding: clamp(0.6rem, 1.2vw, 1rem) clamp(0.8rem, 1.5vw, 1.25rem);
+            border-radius: 0 6px 6px 0;
+            margin: var(--element-gap) 0;
+        }
+        .highlight-box p {
+            color: var(--text-primary);
+            font-size: clamp(0.75rem, 1.2vw, 1rem);
+        }
+
+        .quote-block {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: clamp(1.3rem, 3vw, 2.2rem);
+            line-height: 1.35;
+            color: var(--cream);
+            max-width: 900px;
+            letter-spacing: -0.01em;
+        }
+        .quote-block .accent {
+            color: var(--accent-orange);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .reveal:nth-child(6) { transition-delay: 0.40s; }
+        .reveal:nth-child(7) { transition-delay: 0.47s; }
+
+        @keyframes pulse-led {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .led-pulse { animation: pulse-led 2s ease-in-out infinite; }
+
+        /* Side signal strip */
+        .signal-strip {
+            position: absolute;
+            top: 50%;
+            left: clamp(28px, 3vw, 48px);
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.4vw, 14px);
+            z-index: 3;
+            pointer-events: none;
+        }
+        .signal-strip .led { width: clamp(7px, 0.9vw, 11px); height: clamp(7px, 0.9vw, 11px); }
+        .signal-strip .sig-cable {
+            width: 2px;
+            height: clamp(20px, 3vw, 32px);
+            background: linear-gradient(180deg, var(--text-dim), transparent);
+            margin-left: clamp(2.5px, 0.4vw, 4.5px);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent-orange);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: clamp(12px, 2vw, 20px);
+            right: clamp(16px, 2.5vw, 28px);
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            color: var(--text-dim);
+            z-index: 100;
+        }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(12px, 2vw, 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.7vw, 0.65rem);
+            color: var(--text-dim);
+            opacity: 0.5;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        .overview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .overview-overlay.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            align-content: start;
+        }
+        .overview-thumb {
+            aspect-ratio: 16/9;
+            border: 1px solid var(--cream-border);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: var(--bg-secondary);
+            transition: border-color 0.2s;
+            padding: 0.5rem;
+            text-align: center;
+            white-space: pre-line;
+            line-height: 1.4;
+        }
+        .overview-thumb:hover { border-color: var(--accent-orange); color: var(--text-primary); }
+        .overview-thumb.current { border-color: var(--accent-orange); background: rgba(212, 132, 62, 0.1); color: var(--cream); }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2100;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .help-overlay.active { display: flex; }
+        .help-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(1.2rem, 2.5vw, 2rem);
+            max-width: 480px;
+            width: 100%;
+        }
+        .help-card h3 {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+        }
+        .help-card dl {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem 1.2rem;
+            font-size: var(--small-size);
+        }
+        .help-card dt {
+            font-family: var(--font-mono);
+            color: var(--cream);
+            white-space: nowrap;
+        }
+        .help-card dd { color: var(--text-secondary); }
+
+        /* INTERACTIVE: signal flow demo */
+        .signal-demo {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            align-items: center;
+            gap: clamp(0.5rem, 1.5vw, 1.5rem);
+            width: 100%;
+        }
+        .signal-demo .col {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 1vw, 0.8rem);
+        }
+        .signal-demo .col-label {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 0.4em;
+        }
+        .input-chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 5px;
+            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.6rem, 1.2vw, 0.9rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            transition: all 0.25s var(--ease-out-expo);
+            user-select: none;
+        }
+        .input-chip:hover { border-color: var(--cream-border); color: var(--text-primary); }
+        .input-chip.active {
+            border-color: var(--accent-orange);
+            background: rgba(212, 132, 62, 0.08);
+            color: var(--cream);
+            transform: translateX(4px);
+        }
+        .input-chip .led { background: var(--text-dim); box-shadow: none; }
+        .input-chip.active .led { background: var(--accent-orange); box-shadow: 0 0 6px var(--accent-orange); }
+        .process-box {
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.8rem, 1.6vw, 1.2rem);
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+            color: var(--text-primary);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .process-box.live {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 24px rgba(212, 132, 62, 0.18);
+        }
+        .process-box .ops {
+            margin-top: 0.6em;
+            font-size: 0.85em;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+        .output-box {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border-radius: 6px;
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+        .output-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .output-label {
+            position: absolute;
+            bottom: 0.4em;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            padding: 0.2em 0.6em;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--cream);
+            white-space: nowrap;
+        }
+        .signal-arrow {
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: clamp(1rem, 1.8vw, 1.6rem);
+            text-align: center;
+        }
+        .signal-arrow.live { color: var(--accent-orange); }
+
+        /* INTERACTIVE: family selector */
+        .family-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: clamp(0.4rem, 1vw, 0.8rem);
+        }
+        @media (max-width: 900px) {
+            .family-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .family-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 6px;
+            padding: clamp(0.7rem, 1.4vw, 1.1rem) clamp(0.4rem, 1vw, 0.8rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.8rem, 1.4vw, 1.05rem);
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+        .family-btn:hover { color: var(--text-primary); border-color: var(--text-dim); }
+        .family-btn.active {
+            color: var(--cream);
+            background: var(--bg-panel);
+            transform: translateY(-2px);
+        }
+        .family-btn[data-fam="TOP"].active { border-color: var(--accent-orange); box-shadow: 0 0 18px rgba(212, 132, 62, 0.2); }
+        .family-btn[data-fam="CHOP"].active { border-color: var(--accent-green); box-shadow: 0 0 18px rgba(76, 175, 110, 0.2); }
+        .family-btn[data-fam="SOP"].active { border-color: var(--accent-blue); box-shadow: 0 0 18px rgba(74, 158, 206, 0.2); }
+        .family-btn[data-fam="DAT"].active { border-color: var(--accent-cyan); box-shadow: 0 0 18px rgba(91, 191, 191, 0.2); }
+        .family-btn[data-fam="COMP"].active { border-color: var(--accent-purple); box-shadow: 0 0 18px rgba(139, 108, 196, 0.2); }
+        .family-btn[data-fam="POP"].active { border-color: var(--cream); box-shadow: 0 0 18px rgba(232, 224, 212, 0.15); }
+        .family-detail {
+            margin-top: clamp(1rem, 2vw, 1.5rem);
+            background: var(--bg-inset);
+            border: 1px solid var(--cream-border);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 0 6px 6px 0;
+            padding: clamp(0.8rem, 1.6vw, 1.25rem);
+            min-height: clamp(80px, 12vw, 110px);
+            transition: border-left-color 0.3s;
+        }
+        .family-detail .fam-name {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            margin-bottom: 0.3em;
+        }
+        .family-detail .fam-title {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 1.8vw, 1.35rem);
+            color: var(--cream);
+            margin-bottom: 0.4em;
+        }
+        .family-detail .fam-desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* INTERACTIVE: survey tag chips */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.4rem, 0.9vw, 0.7rem);
+        }
+        .tag-chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 999px;
+            padding: clamp(0.4rem, 0.8vw, 0.55rem) clamp(0.7rem, 1.2vw, 1rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1vw, 0.8rem);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .tag-chip::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            transition: all 0.2s;
+        }
+        .tag-chip:hover { color: var(--text-primary); border-color: var(--text-dim); }
+        .tag-chip.on {
+            color: var(--cream);
+            border-color: var(--accent-orange);
+            background: rgba(212, 132, 62, 0.1);
+        }
+        .tag-chip.on::before { background: var(--accent-orange); box-shadow: 0 0 6px var(--accent-orange); }
+
+        .tag-counter {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+            margin-top: clamp(0.6rem, 1.2vw, 1rem);
+        }
+        .tag-counter strong { color: var(--accent-orange); }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.4rem, 0.9vw, 0.7rem);
+        }
+        .pill {
+            background: var(--bg-secondary);
+            border: 1px solid var(--cream-border);
+            border-radius: 999px;
+            padding: 0.35em 0.9em;
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1vw, 0.8rem);
+            color: var(--text-primary);
+        }
+        .pill.dim { color: var(--text-dim); }
+        .pill.accent { color: var(--accent-orange); border-color: rgba(212, 132, 62, 0.35); }
+
+        .credit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4em;
+        }
+        .credit-list .credit-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6em;
+            padding: 0.45em 0;
+            border-bottom: 1px solid rgba(232, 224, 212, 0.06);
+            font-size: clamp(0.8rem, 1.3vw, 1.05rem);
+        }
+        .credit-list .credit-role {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-dim);
+            min-width: clamp(120px, 14vw, 180px);
+        }
+        .credit-list .credit-val {
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .num-badge {
+            font-family: var(--font-mono);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            color: var(--accent-orange);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1.1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .keyboard-hint, .panel-frame, .screw-bl, .screw-br, .signal-strip { display: none; }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .signal-strip { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        @media print {
+            html { scroll-snap-type: none; }
+            .progress-bar, .slide-number, .keyboard-hint, .overview-overlay, .help-overlay { display: none !important; }
+            .slide { page-break-after: always; height: 100vh; }
+            .reveal { opacity: 1 !important; transform: none !important; }
+        }
+
+        .gap-sm { gap: var(--element-gap); }
+        .gap-md { gap: var(--content-gap); }
+        .gap-lg { gap: clamp(1rem, 2.5vw, 2rem); }
+        .mt-sm { margin-top: var(--element-gap); }
+        .mt-md { margin-top: var(--content-gap); }
+        .mb-sm { margin-bottom: var(--element-gap); }
+        .text-center { text-align: center; }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-row { display: flex; align-items: center; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-start { align-items: start; }
+        .w-full { width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-number" id="slideNumber">01 / 00</div>
+    <div class="keyboard-hint" id="keyboardHint">&larr; &rarr; navigate &middot; O overview &middot; F fullscreen &middot; ? help</div>
+    <div class="overview-overlay" id="overviewOverlay"></div>
+
+    <div class="help-overlay" id="helpOverlay">
+        <div class="help-card">
+            <h3>Keyboard</h3>
+            <dl>
+                <dt>&rarr; &darr; Space PgDn</dt><dd>다음 슬라이드</dd>
+                <dt>&larr; &uarr; PgUp</dt><dd>이전 슬라이드</dd>
+                <dt>Home / End</dt><dd>처음 / 마지막</dd>
+                <dt>O</dt><dd>전체 보기 (overview)</dd>
+                <dt>F</dt><dd>전체 화면 토글</dd>
+                <dt>?</dt><dd>이 도움말</dd>
+                <dt>Esc</dt><dd>오버레이 닫기</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- ========== 01 TITLE ========== -->
+    <section class="slide title-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="signal-strip">
+            <span class="led led-orange led-pulse"></span>
+            <span class="sig-cable"></span>
+            <span class="led led-green led-pulse" style="animation-delay:.5s;"></span>
+            <span class="sig-cable"></span>
+            <span class="led led-blue led-pulse" style="animation-delay:1s;"></span>
+        </div>
+        <div class="slide-content">
+            <div class="course-label reveal">NCA TouchDesigner · Week 01</div>
+            <h1 class="reveal">오리엔테이션<br><span class="accent-orange">Signal Check</span></h1>
+            <p class="subtitle reveal">뉴콘텐츠아카데미 3기 · TouchDesigner 기본교과<br>2026.05.12 · 유태양</p>
+            <div style="display:flex;align-items:center;gap:clamp(0.5rem,1vw,1rem);margin-top:clamp(1rem,2vw,2rem);" class="reveal">
+                <span class="led led-orange led-pulse"></span>
+                <span class="led led-green led-pulse" style="animation-delay:.5s;"></span>
+                <span class="led led-blue led-pulse" style="animation-delay:1s;"></span>
+                <span class="cable-line cable-orange" style="max-width:80px;"></span>
+                <span class="cable-line cable-blue" style="max-width:60px;"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 02 FIRST CLASS DIRECTION ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">First Class · Direction</div>
+            <h2 class="reveal">첫 시간 운영 방향</h2>
+            <div class="two-col">
+                <div class="flex-col gap-sm">
+                    <p class="reveal">오늘은 <span class="accent-orange">작업 방향을 확정하지 않는다.</span> 수업의 <strong>범위와 난이도</strong>를 판단할 수 있도록 전체 흐름과 레퍼런스를 소개한다.</p>
+                    <p class="reveal">본격적인 제작 실습보다는, TouchDesigner를 <strong>어떤 관점으로 다룰지</strong> 감각을 열어두는 시간으로 구성한다.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>오늘 흐름</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.35em;">
+                        <li>강사 소개</li>
+                        <li>참여작과 수업 방향</li>
+                        <li>설문 &amp; 자기소개</li>
+                        <li>TouchDesigner 소개 + 레퍼런스 보는 법</li>
+                        <li>화면 가볍게 열어보기</li>
+                        <li>수업 운영 방식 안내</li>
+                        <li>마무리 &amp; 선택 참여</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 03 SECTION: 강사 소개 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 01</div>
+            <h2 class="reveal">강사 소개</h2>
+            <p class="section-desc reveal">유태양 &mdash; TouchDesigner를 제작 문제 해결 도구로 다루는 사람</p>
+        </div>
+    </section>
+
+    <!-- ========== 04 강사: 유태양 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Instructor</div>
+            <h2 class="reveal">유태양</h2>
+            <div class="credit-list">
+                <div class="credit-item reveal"><span class="credit-role">강사 / 한예종 무용원</span><span class="credit-val">스테이지디자인</span></div>
+                <div class="credit-item reveal"><span class="credit-role">강사 / 한예종 영상원</span><span class="credit-val">공연예술산업매체 · 디지털미디어비주얼</span></div>
+                <div class="credit-item reveal"><span class="credit-role">기술개발 팀장</span><span class="credit-val">봄랩</span></div>
+                <div class="credit-item reveal"><span class="credit-role">테크니컬 디렉터</span><span class="credit-val">파프리스튜디오</span></div>
+                <div class="credit-item reveal"><span class="credit-role">멘토</span><span class="credit-val">성남업스케일링</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 05 소개의 초점 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Focus</div>
+            <h2 class="reveal">소개의 초점</h2>
+            <div class="flex-col gap-sm">
+                <div class="highlight-box reveal">
+                    <p>이력 자체보다는 <span class="accent-orange">TouchDesigner를 어떤 제작 문제 해결 도구로 써왔는지</span>를 중심으로.</p>
+                </div>
+                <p class="reveal">개인적으로는 비주얼 자체보다 <strong>전반적인 시스템 제작</strong>에 관심이 많다.</p>
+                <p class="reveal">이 수업은 단순 예제 따라하기가 아니라, 각자의 배경을 <strong>실시간 제작 구조</strong>로 연결하는 시간이다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 06 SECTION: 참여작 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 02</div>
+            <h2 class="reveal">참여작과 수업 방향</h2>
+            <p class="section-desc reveal">결과물이 아니라, 그 결과물을 가능하게 한 구조에 대해</p>
+        </div>
+    </section>
+
+    <!-- ========== 07 주요 참여작 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Selected Works</div>
+            <h2 class="reveal">주요 참여작</h2>
+            <div class="two-col">
+                <div class="flex-col gap-sm reveal">
+                    <div class="info-card">
+                        <h3 class="accent-orange">문문문</h3>
+                        <p>실시간 비주얼 + 공연 시스템</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 class="accent-blue">XR 뮤지컬 등</h3>
+                        <p>입력 장치 · 센서 · 외부 장비 연동</p>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <p>각 작업에서 TouchDesigner가 어떻게 쓰였는지, <strong>도구로서의 역할</strong>을 중심으로 살펴본다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 08 TD가 한 일들 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">What TD Did</div>
+            <h2 class="reveal">작업 안에서 TouchDesigner가 한 일</h2>
+            <div class="four-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">실시간 비주얼</h3>
+                    <p>무대 위에서 살아 움직이는 영상</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">공연 시스템</h3>
+                    <p>큐, 타임라인, 미디어 분배</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">입력 / 센서</h3>
+                    <p>카메라, 마이크, IMU, OSC</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-purple">장비 / 소프트웨어 연동</h3>
+                    <p>외부 소프트웨어와 신호 주고받기</p>
+                </div>
+            </div>
+            <div class="info-card reveal" style="margin-top:var(--element-gap);">
+                <h3 class="accent-cyan">작업자를 위한 도구 제작</h3>
+                <p>스태프와 협업자가 직접 쓰는 컨트롤러, 패널, 자동화 도구</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 09 요즘 관심사 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Current Interests</div>
+            <h2 class="reveal">요즘 관심사와 연구 주제</h2>
+            <div class="two-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">아티스트를 위한 도구 제작</h3>
+                    <p>창작자가 직접 자기 도구를 다듬을 수 있게 하는 흐름</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">AI 교육 연구</h3>
+                    <p>아티스트를 위한 Claude Code, Codex</p>
+                </div>
+            </div>
+            <div class="highlight-box reveal">
+                <p>AI를 TouchDesigner에 붙이는 구체적인 방법보다, <span class="accent-orange">창작자가 도구를 직접 다루는 태도</span>와 연결해서 소개한다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 10 수업의 입장 (quote) ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="justify-content:center;">
+            <div class="label reveal">Position</div>
+            <p class="quote-block reveal">
+                이 수업은 단순 예제 따라하기가 아니라,<br>
+                각자의 배경을 <span class="accent">실시간 제작 구조</span>로<br>연결해 보는 시간이다.
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== 11 SECTION: 설문 & 자기소개 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 03</div>
+            <h2 class="reveal">설문 &amp; 자기소개</h2>
+            <p class="section-desc reveal">서로의 현재 위치와 관심사를 가볍게 확인</p>
+        </div>
+    </section>
+
+    <!-- ========== 12 설문 목적 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Survey · Purpose</div>
+            <h2 class="reveal">왜 설문을 받나</h2>
+            <div class="flex-col gap-sm">
+                <p class="reveal"><strong>수강 정정 기간 이후</strong> 최종 수강 인원을 기준으로 수업 난이도와 예제 방향을 조정하기 위한 참고 자료다.</p>
+                <div class="highlight-box reveal">
+                    <p>이 시간에 개인 프로젝트나 수업 방향을 <span class="accent-orange">확정하지는 않는다.</span> 부담 없이 답하면 된다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 13 설문: 무엇을 묻나 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Survey · Items</div>
+            <h2 class="reveal">설문에서 확인할 내용</h2>
+            <div class="two-col">
+                <div class="reveal">
+                    <table class="data-table">
+                        <thead><tr><th>항목</th><th>물어보는 것</th></tr></thead>
+                        <tbody>
+                            <tr><td class="accent-cyan">TD 경험</td><td>어떻게, 얼마나 활용해보았는지</td></tr>
+                            <tr><td class="accent-cyan">익숙한 영역</td><td>TOP / CHOP / SOP / DAT / COMP 중 어디</td></tr>
+                            <tr><td class="accent-cyan">장비 / 설치</td><td>사용 장비와 설치 상태</td></tr>
+                            <tr><td class="accent-cyan">관심 분야</td><td>아래 슬라이드에서 별도로</td></tr>
+                            <tr><td class="accent-cyan">하고 싶은 것</td><td>이 수업을 통해 해보고 싶은 것</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-card reveal">
+                    <h3>자기소개 톤</h3>
+                    <p>긴 발표보다는, <strong>관심사와 현재 위치</strong>를 서로 확인하는 정도로 진행한다. 짧게.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 14 INTERACTIVE: 관심 분야 chips ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Interactive · Interest Tags</div>
+            <h2 class="reveal">관심 분야 &mdash; 어디에 끌리나요?</h2>
+            <p class="reveal">클릭해서 토글해보세요. 수업 중 이 슬라이드를 보면서 함께 이야기합니다.</p>
+            <div class="tag-cloud reveal" id="tagCloud">
+                <span class="tag-chip" data-tag="공연">공연</span>
+                <span class="tag-chip" data-tag="설치">설치</span>
+                <span class="tag-chip" data-tag="VJ">VJ / 라이브 비주얼</span>
+                <span class="tag-chip" data-tag="사운드">사운드 / 오디오비주얼</span>
+                <span class="tag-chip" data-tag="카메라">카메라 / 신체 인터랙션</span>
+                <span class="tag-chip" data-tag="3D">3D / 파티클 / 인스턴싱</span>
+                <span class="tag-chip" data-tag="AI">AI / 데이터 / 네트워크</span>
+                <span class="tag-chip" data-tag="도구">도구 제작</span>
+                <span class="tag-chip" data-tag="센서">센서 / IMU</span>
+                <span class="tag-chip" data-tag="공간">공간 / 매핑</span>
+                <span class="tag-chip" data-tag="실시간">실시간 시스템</span>
+                <span class="tag-chip" data-tag="협업">협업 / 워크플로</span>
+            </div>
+            <div class="tag-counter reveal">선택됨: <strong id="tagCount">0</strong> &nbsp;·&nbsp; <span id="tagList" style="color:var(--text-secondary);"></span></div>
+        </div>
+    </section>
+
+    <!-- ========== 15 break / pause ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal" style="color:var(--text-dim);">Pause</div>
+            <h2 class="reveal" style="font-size:clamp(1.4rem,3vw,2.2rem);">잠깐 숨 고르고<br>다시 시작합니다.</h2>
+            <div class="reveal" style="display:flex;gap:0.6em;justify-content:center;margin-top:1.5rem;">
+                <span class="led led-orange led-pulse"></span>
+                <span class="led led-green led-pulse" style="animation-delay:.5s;"></span>
+                <span class="led led-blue led-pulse" style="animation-delay:1s;"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 16 SECTION: TouchDesigner 소개 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 04</div>
+            <h2 class="reveal">TouchDesigner 소개</h2>
+            <p class="section-desc reveal">이 소프트웨어가 지금 가진 힘</p>
+        </div>
+    </section>
+
+    <!-- ========== 17 TD는 무엇인가 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Software · Where it stands</div>
+            <h2 class="reveal">대략적인 위치, 그리고 방향</h2>
+            <div class="flex-col gap-sm">
+                <p class="reveal">TouchDesigner는 <span class="accent-orange">노드 기반의 실시간 비주얼 / 시스템 제작 환경</span>이다. 결과물을 만드는 도구이자, 그 결과물을 살아 움직이게 하는 <strong>구조</strong>를 설계하는 환경.</p>
+                <p class="reveal">최근 몇 년간은 공연 · 전시 · 설치 · 라이브 비주얼 · 도구 제작까지 영역이 넓어졌고, <strong>외부 장비/소프트웨어와의 연동</strong>이 점점 자연스러워지고 있다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 18 어떤 작업에 쓰이나 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Use Cases</div>
+            <h2 class="reveal">어떤 작업들에 많이 쓰이나</h2>
+            <div class="three-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">공연 / 무대</h3>
+                    <p>실시간 영상, 미디어 큐, 무대 시스템</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">전시 / 설치</h3>
+                    <p>관객 인터랙션, 멀티 채널, 장기 운영</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">라이브 비주얼 / VJ</h3>
+                    <p>음악에 반응하는 실시간 시각</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-purple">아티스트 도구</h3>
+                    <p>창작자 자신을 위한 인터페이스</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-cyan">프로토타이핑</h3>
+                    <p>아이디어를 빨리 만져보는 작업장</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>R&amp;D / 연구</h3>
+                    <p>센서, 데이터, AI 연결 실험</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 19 이 수업으로 뭘 할 수 있나 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">After This Course</div>
+            <h2 class="reveal">이 수업을 기반으로<br>어떤 작업을 할 수 있나</h2>
+            <div class="flex-col gap-sm">
+                <p class="reveal">실시간 비주얼 한 장면을 끝까지 만들 수 있는 <strong>기본 뼈대</strong>가 생긴다.</p>
+                <p class="reveal">외부 입력(소리, 카메라, 센서, 데이터)을 받아 영상이나 시스템으로 <strong>연결하는 감각</strong>이 생긴다.</p>
+                <p class="reveal">그 후엔 자기 작업의 결을 따라 <strong>특정 방향으로 깊게 파고드는</strong> 일이 가능해진다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 20 AI 방향 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">AI</div>
+            <h2 class="reveal">AI는 어떤 방향으로 붙여지고 있나</h2>
+            <div class="two-col">
+                <div class="flex-col gap-sm reveal">
+                    <p>이미지/영상 생성 모델, 오디오 분석, 자세/제스처 인식, 텍스트 처리 &mdash; 이런 것들이 <strong>실시간 입력</strong>으로 들어오기 시작했다.</p>
+                    <p>동시에 TouchDesigner 자체를 다루는 흐름에도 <strong>AI 보조 도구</strong>가 함께 들어오고 있다.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>이 수업의 입장</h3>
+                    <p>AI는 별도 주제로 다루기보다, 필요한 자리에 <span class="accent-orange">하나의 입력 / 도구</span>로 등장시키며 다룬다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 21 강의 방향 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Course Direction</div>
+            <h2 class="reveal">강의 방향</h2>
+            <div class="info-card reveal">
+                <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.45em;">
+                    <li><strong>기본기를 단단히.</strong> 화려함보다 구조의 이해.</li>
+                    <li>다양한 작업을 커버리지할 수 있는 <strong>키워드 지식</strong>을 함께.</li>
+                    <li>각자 가지고 있는 <strong>암묵지와 배경</strong>을 살릴 방향으로 함께 고민.</li>
+                    <li>수강 정정 이후 최종 구성원의 관심사를 보고, 예제의 강조점이나 레퍼런스 방향은 일부 조정.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 22 큰 흐름은 유지 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Curriculum Backbone</div>
+            <h2 class="reveal">큰 흐름은 유지</h2>
+            <p class="reveal">전체 커리큘럼은 다음의 순서를 따라 <strong>실시간 제작 구조</strong>를 익히는 방향으로 진행한다.</p>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node green">CHOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">SOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node cyan">DAT</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node purple">POP</span>
+            </div>
+            <p class="reveal" style="text-align:center;font-size:var(--small-size);color:var(--text-dim);">이미지 &middot; 신호 &middot; 형상 &middot; 데이터 &middot; 파티클</p>
+        </div>
+    </section>
+
+    <!-- ========== 23 INTERACTIVE: family selector ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Interactive · Operator Families</div>
+            <h2 class="reveal">오퍼레이터 패밀리 &mdash; 클릭해 보기</h2>
+            <div class="family-grid reveal" id="familyGrid">
+                <div class="family-btn active" data-fam="TOP">TOP</div>
+                <div class="family-btn" data-fam="CHOP">CHOP</div>
+                <div class="family-btn" data-fam="SOP">SOP</div>
+                <div class="family-btn" data-fam="DAT">DAT</div>
+                <div class="family-btn" data-fam="COMP">COMP</div>
+                <div class="family-btn" data-fam="POP">POP</div>
+            </div>
+            <div class="family-detail reveal" id="familyDetail">
+                <div class="fam-name" id="famName">TOP</div>
+                <div class="fam-title" id="famTitle">Texture Operator</div>
+                <div class="fam-desc" id="famDesc">이미지가 흐르는 길. 이전 프레임의 잔상부터 GPU 합성까지 &mdash; 우리가 화면에서 보는 거의 모든 것은 여기를 거친다.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 24 SECTION: 레퍼런스 보기 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 05</div>
+            <h2 class="reveal">레퍼런스 보는 법</h2>
+            <p class="section-desc reveal">결과물 감상이 아니라, 구조 추측하기</p>
+        </div>
+    </section>
+
+    <!-- ========== 25 다양한 레퍼런스 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Reference Sources</div>
+            <h2 class="reveal">어떤 레퍼런스를 함께 볼까</h2>
+            <div class="three-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">내 작업</h3>
+                    <p>가장 가까운 케이스. 구조를 직접 설명할 수 있다.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">인스타그램 레퍼런스</h3>
+                    <p>지금 이 순간의 흐름. 짧고 빠르게.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">공연 / 전시 / 설치</h3>
+                    <p>긴 호흡의 실제 운영 사례.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-purple">라이브 비주얼</h3>
+                    <p>실시간 입력에 반응하는 비주얼.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-cyan">도구 제작</h3>
+                    <p>작업자가 자기 작업을 위해 만든 도구.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>각자의 발견</h3>
+                    <p>다음 주부터 한 개씩 가져와서 함께.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 26 결과물이 아니라 구조를 본다 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="justify-content:center;">
+            <div class="label reveal">Approach</div>
+            <p class="quote-block reveal">결과물만 감상하지 않고,<br><span class="accent">가볍게 구조를 추측</span>해 본다.</p>
+        </div>
+    </section>
+
+    <!-- ========== 27 네 가지 질문 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Four Questions</div>
+            <h2 class="reveal">레퍼런스 앞에서 던질 네 가지 질문</h2>
+            <div class="four-col">
+                <div class="info-card reveal">
+                    <div class="num-badge accent-orange">01</div>
+                    <h3 style="margin-top:0.4em;">무엇이 입력인가?</h3>
+                    <p>소리? 영상? 카메라? 데이터?</p>
+                </div>
+                <div class="info-card reveal">
+                    <div class="num-badge" style="color:var(--accent-green);">02</div>
+                    <h3 style="margin-top:0.4em;">어떤 처리를 거쳤을까?</h3>
+                    <p>가공의 단계 추측하기.</p>
+                </div>
+                <div class="info-card reveal">
+                    <div class="num-badge" style="color:var(--accent-blue);">03</div>
+                    <h3 style="margin-top:0.4em;">어디로 출력되는가?</h3>
+                    <p>스크린? 프로젝션? 오디오? 신호?</p>
+                </div>
+                <div class="info-card reveal">
+                    <div class="num-badge" style="color:var(--accent-purple);">04</div>
+                    <h3 style="margin-top:0.4em;">몇 주차와 닿는가?</h3>
+                    <p>커리큘럼 어디서 다룰지.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 28 INTERACTIVE: signal flow demo ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Interactive · Signal Flow</div>
+            <h2 class="reveal">입력 &rarr; 처리 &rarr; 출력</h2>
+            <p class="reveal">왼쪽 입력을 켜고 꺼보세요. 처리 칸이 어떤 오퍼레이터를 부르는지 / 출력이 어떻게 달라지는지 가볍게 시뮬레이션합니다.</p>
+            <div class="signal-demo reveal" id="signalDemo">
+                <div class="col">
+                    <div class="col-label">Input</div>
+                    <div class="input-chip" data-in="webcam"><span class="led"></span>Webcam</div>
+                    <div class="input-chip" data-in="mouse"><span class="led"></span>Mouse</div>
+                    <div class="input-chip" data-in="audio"><span class="led"></span>Audio</div>
+                    <div class="input-chip" data-in="noise"><span class="led"></span>Noise</div>
+                </div>
+                <div class="signal-arrow" id="arrow1">&rarr;</div>
+                <div class="col">
+                    <div class="col-label">Process</div>
+                    <div class="process-box" id="processBox">
+                        <div id="procTitle" style="color:var(--text-dim);">입력 없음</div>
+                        <div class="ops" id="procOps">입력을 켜보세요</div>
+                    </div>
+                </div>
+                <div class="signal-arrow" id="arrow2">&rarr;</div>
+                <div class="col">
+                    <div class="col-label">Output</div>
+                    <div class="output-box">
+                        <canvas id="outputCanvas" class="output-canvas"></canvas>
+                        <div class="output-label" id="outputLabel">Idle</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 29 SECTION: 화면 열어보기 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 06</div>
+            <h2 class="reveal">화면을 가볍게<br>열어봅니다</h2>
+            <p class="section-desc reveal">본격 실습 아님 &mdash; 부담 낮추기, 설치 확인</p>
+        </div>
+    </section>
+
+    <!-- ========== 30 무엇을 볼까 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">What we&rsquo;ll look at</div>
+            <h2 class="reveal">화면에서 무엇을 같이 볼까</h2>
+            <div class="four-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">Network</h3>
+                    <p>노드를 놓고 잇는 작업 공간</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">Parameter</h3>
+                    <p>각 노드의 설정 패널</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">Viewer</h3>
+                    <p>결과물을 미리보는 창</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-purple">Operator</h3>
+                    <p>생성 / 연결 / 패밀리 색 구분</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 31 패밀리 색 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Family Colors</div>
+            <h2 class="reveal">노드 색깔로 패밀리 구분하기</h2>
+            <p class="reveal">TouchDesigner 화면에서 노드는 <strong>패밀리별로 색이 다르다.</strong> 색만 봐도 무엇이 흘러가는지 어렴풋이 보인다.</p>
+            <div class="pill-row reveal" style="margin-top:1rem;">
+                <span class="pill" style="color:var(--accent-orange);">TOP &middot; 이미지</span>
+                <span class="pill" style="color:var(--accent-green);">CHOP &middot; 신호 / 값</span>
+                <span class="pill" style="color:var(--accent-blue);">SOP &middot; 3D 형상</span>
+                <span class="pill" style="color:var(--accent-cyan);">DAT &middot; 텍스트 / 표</span>
+                <span class="pill" style="color:var(--accent-purple);">COMP &middot; 컨테이너 / 3D scene</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 32 시연 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Tiny Demo</div>
+            <h2 class="reveal">아주 작은 시연</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node highlight">Noise TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Level TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Transform TOP</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Out</span>
+            </div>
+            <div class="two-col">
+                <div class="info-card reveal">
+                    <h3>목표</h3>
+                    <p>화면이 <strong>실시간으로 변하는 감각</strong>을 한 번 느끼는 것.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>분위기</h3>
+                    <p>따라하기 필수 실습이 아니다. <span class="accent-orange">앞으로 어떤 식으로 배울지 맛보기</span> 정도.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 33 SECTION: 운영 방식 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 07</div>
+            <h2 class="reveal">수업 운영 방식</h2>
+            <p class="section-desc reveal">FigJam, 질문, 과제 톤</p>
+        </div>
+    </section>
+
+    <!-- ========== 34 FigJam ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">FigJam</div>
+            <h2 class="reveal">FigJam 사용 방식</h2>
+            <div class="two-col">
+                <div class="flex-col gap-sm reveal">
+                    <p>매주 <strong>복습 결과물</strong> 또는 개인 작업에 적용해 본 실험을 공유한다.</p>
+                    <p><span class="accent-orange">완성도보다 실험 과정과 질문</span>을 남기는 방식으로 운영.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>FigJam에 남기는 것</h3>
+                    <ul style="padding-left:1.1em;display:flex;flex-direction:column;gap:0.3em;">
+                        <li>이번 주 만져본 노드 캡처</li>
+                        <li>막혔던 지점 / 궁금증</li>
+                        <li>관심 레퍼런스 한 컷</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 35 질문 방식 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Asking Questions</div>
+            <h2 class="reveal">질문은 어디서든</h2>
+            <div class="three-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">수업 중</h3>
+                    <p>화면을 보면서 바로 물어보는 게 가장 효율적.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">수업 후 개별</h3>
+                    <p>설치, 장비, 개인 상황에 가까운 이야기.</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">FigJam / 공유 보드</h3>
+                    <p>천천히 정리해서 적어둘 질문.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 36 과제 톤 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Homework Tone</div>
+            <h2 class="reveal">과제와 복습 톤</h2>
+            <div class="flex-col gap-sm">
+                <div class="highlight-box reveal">
+                    <p>첫 주에는 <span class="accent-orange">무거운 제작 과제를 내지 않는다.</span></p>
+                </div>
+                <div class="info-card reveal">
+                    <h3>이번 주 과제</h3>
+                    <ol style="padding-left:1.2em;display:flex;flex-direction:column;gap:0.35em;">
+                        <li>관심 있는 <strong>TouchDesigner 레퍼런스 1개</strong> 가져오기</li>
+                        <li>그 레퍼런스가 어떤 <strong>입력 - 처리 - 출력</strong> 구조일지 가볍게 추측해오기</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 37 수강 정정 이후 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">After Add/Drop</div>
+            <h2 class="reveal">수강 정정 이후</h2>
+            <div class="two-col">
+                <div class="flex-col gap-sm reveal">
+                    <p>최종 수강 인원과 경험치를 보고, 다음 항목을 조정한다.</p>
+                    <ul style="padding-left:1.2em;color:var(--text-secondary);font-size:var(--body-size);display:flex;flex-direction:column;gap:0.3em;">
+                        <li>예제 난이도</li>
+                        <li>레퍼런스의 강조점</li>
+                        <li>보조 설명의 밀도</li>
+                    </ul>
+                </div>
+                <div class="info-card reveal">
+                    <h3>유지되는 것</h3>
+                    <p>커리큘럼의 <strong>큰 골격</strong>은 그대로 유지된다. <br>TOP / CHOP / SOP / DAT / POP의 순서, 실시간 제작 구조라는 방향성.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 38 SECTION: 마무리 ========== -->
+    <section class="slide section-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="part-number reveal">Part 08</div>
+            <h2 class="reveal">마무리</h2>
+            <p class="section-desc reveal">다음 주 예고와 오늘의 정리</p>
+        </div>
+    </section>
+
+    <!-- ========== 39 다음 주 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">Next Week</div>
+            <h2 class="reveal">Week 02 &mdash; TOP 기반 실시간 이미지 합성</h2>
+            <div class="flow-diagram reveal">
+                <span class="flow-node">Image</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node highlight">Effect</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node blue">Feedback Loop</span>
+                <span class="flow-arrow">&rarr;</span>
+                <span class="flow-node">Out</span>
+            </div>
+            <p class="reveal" style="text-align:center;">이미지, 이펙트, 피드백 루프를 활용한 <strong>실시간 비주얼 구조</strong>를 함께 만든다.</p>
+        </div>
+    </section>
+
+    <!-- ========== 40 오늘의 정리 1 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="justify-content:center;">
+            <div class="label reveal">Today &mdash; Takeaway 01</div>
+            <p class="quote-block reveal">
+                TouchDesigner는<br>
+                결과물을 만드는 툴이면서, 동시에<br>
+                <span class="accent">실시간 시스템을 설계하는 환경</span>이다.
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== 41 오늘의 정리 2 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md" style="justify-content:center;">
+            <div class="label reveal">Today &mdash; Takeaway 02</div>
+            <p class="quote-block reveal">
+                이 수업은<br>
+                다양한 <span class="accent">입력을 처리하고 출력하는 구조</span>를<br>
+                단계적으로 익히는 과정이다.
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== 42 끝나고 더 이야기 ========== -->
+    <section class="slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content flex-col gap-md">
+            <div class="label reveal">After Class</div>
+            <h2 class="reveal">끝나고 더 이야기</h2>
+            <p class="reveal">수업이 끝난 뒤에는 가볍게 남아 다음을 함께 할 수 있다. 강제는 아니다.</p>
+            <div class="two-col">
+                <div class="info-card reveal">
+                    <h3 class="accent-orange">개별 질문</h3>
+                    <p>수업 중 끄집어내기 어려웠던 것</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-blue">설치 문제 확인</h3>
+                    <p>버전, 라이선스, 장비 환경</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-green">수강 고민 상담</h3>
+                    <p>이 수업이 나에게 맞을까?</p>
+                </div>
+                <div class="info-card reveal">
+                    <h3 class="accent-purple">개인 관심사 공유</h3>
+                    <p>이런 작업을 하고 싶다는 이야기</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 43 END ========== -->
+    <section class="slide title-slide grid-bg">
+        <div class="panel-frame"></div>
+        <div class="screw-bl"></div><div class="screw-br"></div>
+        <div class="slide-content">
+            <div class="course-label reveal">End of Week 01</div>
+            <h1 class="reveal">다음 주에 봐요.<br><span class="accent-orange">레퍼런스 한 개</span> 들고 오세요.</h1>
+            <div style="display:flex;align-items:center;gap:clamp(0.5rem,1vw,1rem);margin-top:clamp(1rem,2vw,2rem);" class="reveal">
+                <span class="led led-orange led-pulse"></span>
+                <span class="cable-line cable-orange" style="max-width:120px;"></span>
+                <span class="led led-green led-pulse" style="animation-delay:.5s;"></span>
+                <span class="cable-line cable-green" style="max-width:80px;"></span>
+                <span class="led led-blue led-pulse" style="animation-delay:1s;"></span>
+            </div>
+            <div class="reveal" style="margin-top:clamp(0.5rem,1vw,1rem);font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim);">NCA TouchDesigner &middot; 2026 &middot; 유태양</div>
+        </div>
+    </section>
+
+    <script>
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.currentSlide = 0;
+            this.totalSlides = this.slides.length;
+            this.setupIntersectionObserver();
+            this.setupKeyboardNav();
+            this.setupTouchNav();
+            this.setupWheelNav();
+            this.setupProgressBar();
+            this.setupOverview();
+            this.updateSlideNumber();
+            this.slides[0].classList.add('visible');
+            setTimeout(() => {
+                const hint = document.getElementById('keyboardHint');
+                if (hint) hint.style.opacity = '0';
+            }, 8000);
+        }
+        setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        const idx = Array.from(this.slides).indexOf(entry.target);
+                        if (idx >= 0) {
+                            this.currentSlide = idx;
+                            this.updateSlideNumber();
+                            this.updateProgressBar();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            this.slides.forEach(slide => observer.observe(slide));
+        }
+        setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                const ov = document.getElementById('overviewOverlay');
+                const help = document.getElementById('helpOverlay');
+                if (e.key === 'Escape') {
+                    if (ov.classList.contains('active')) ov.classList.remove('active');
+                    if (help.classList.contains('active')) help.classList.remove('active');
+                    return;
+                }
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide + 1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+                    e.preventDefault();
+                    this.goToSlide(this.currentSlide - 1);
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    this.goToSlide(0);
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    this.goToSlide(this.totalSlides - 1);
+                } else if (e.key === 'o' || e.key === 'O') {
+                    this.toggleOverview();
+                } else if (e.key === 'f' || e.key === 'F') {
+                    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+                    else document.exitFullscreen?.();
+                } else if (e.key === '?' || e.key === '/') {
+                    help.classList.toggle('active');
+                }
+            });
+            document.getElementById('helpOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'helpOverlay') e.currentTarget.classList.remove('active');
+            });
+        }
+        setupTouchNav() {
+            let startY = 0, startX = 0;
+            document.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+            document.addEventListener('touchend', (e) => {
+                const dy = startY - e.changedTouches[0].clientY;
+                const dx = startX - e.changedTouches[0].clientX;
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+                    if (dy > 0) this.goToSlide(this.currentSlide + 1);
+                    else this.goToSlide(this.currentSlide - 1);
+                }
+            }, { passive: true });
+        }
+        setupWheelNav() {
+            let lastWheel = 0;
+            document.addEventListener('wheel', (e) => {
+                const now = Date.now();
+                if (now - lastWheel < 800) return;
+                lastWheel = now;
+                if (e.deltaY > 0) this.goToSlide(this.currentSlide + 1);
+                else if (e.deltaY < 0) this.goToSlide(this.currentSlide - 1);
+            }, { passive: true });
+        }
+        goToSlide(idx) {
+            if (idx < 0 || idx >= this.totalSlides) return;
+            this.currentSlide = idx;
+            this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+            this.updateSlideNumber();
+            this.updateProgressBar();
+        }
+        setupProgressBar() {
+            this.progressBar = document.getElementById('progressBar');
+            this.updateProgressBar();
+        }
+        updateProgressBar() {
+            if (!this.progressBar) return;
+            const pct = ((this.currentSlide + 1) / this.totalSlides) * 100;
+            this.progressBar.style.width = pct + '%';
+        }
+        updateSlideNumber() {
+            const el = document.getElementById('slideNumber');
+            if (el) {
+                const cur = String(this.currentSlide + 1).padStart(2, '0');
+                const tot = String(this.totalSlides).padStart(2, '0');
+                el.textContent = `${cur} / ${tot}`;
+            }
+        }
+        setupOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            this.slides.forEach((slide, i) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'overview-thumb' + (i === this.currentSlide ? ' current' : '');
+                const h1 = slide.querySelector('h1');
+                const h2 = slide.querySelector('h2');
+                const label = slide.querySelector('.label, .part-number, .course-label');
+                let text = `Slide ${i + 1}`;
+                if (label) text = label.textContent.trim();
+                const head = h1 || h2;
+                if (head) text += '\n' + head.textContent.trim().substring(0, 40);
+                thumb.textContent = text;
+                thumb.addEventListener('click', () => {
+                    overlay.classList.remove('active');
+                    this.goToSlide(i);
+                });
+                overlay.appendChild(thumb);
+            });
+        }
+        toggleOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                overlay.querySelectorAll('.overview-thumb').forEach((t, i) => {
+                    t.classList.toggle('current', i === this.currentSlide);
+                });
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        new SlidePresentation();
+
+        // ============ Tag chips ============
+        const tagCloud = document.getElementById('tagCloud');
+        if (tagCloud) {
+            const counter = document.getElementById('tagCount');
+            const listEl = document.getElementById('tagList');
+            const update = () => {
+                const on = [...tagCloud.querySelectorAll('.tag-chip.on')].map(c => c.dataset.tag);
+                counter.textContent = on.length;
+                listEl.textContent = on.join(' · ');
+            };
+            tagCloud.querySelectorAll('.tag-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    chip.classList.toggle('on');
+                    update();
+                });
+            });
+        }
+
+        // ============ Family selector ============
+        const familyData = {
+            TOP: {
+                name: 'TOP',
+                title: 'Texture Operator',
+                desc: '이미지가 흐르는 길. 노이즈, 영상, 합성, 피드백, GPU 이펙트 — 화면에서 보는 거의 모든 것이 여기를 거친다.',
+                color: 'var(--accent-orange)'
+            },
+            CHOP: {
+                name: 'CHOP',
+                title: 'Channel Operator',
+                desc: '시간에 따라 변하는 숫자의 흐름. 오디오, 센서, 키보드 입력, 곡선, 노이즈 신호. 영상 파라미터를 살아 움직이게 만든다.',
+                color: 'var(--accent-green)'
+            },
+            SOP: {
+                name: 'SOP',
+                title: 'Surface Operator',
+                desc: '3D 형상의 점·선·면. 박스부터 가져온 모델, 절차적 지오메트리까지. 공간 안에 무엇을 둘지 정한다.',
+                color: 'var(--accent-blue)'
+            },
+            DAT: {
+                name: 'DAT',
+                title: 'Data Operator',
+                desc: '텍스트와 표, 그리고 코드. 키보드 매핑, OSC 메시지, 파이썬 스크립트, 외부 API와의 대화가 여기서 일어난다.',
+                color: 'var(--accent-cyan)'
+            },
+            COMP: {
+                name: 'COMP',
+                title: 'Component',
+                desc: '컨테이너이자 3D 씬의 뼈대. 카메라, 라이트, 지오메트리를 묶고, 직접 만든 UI 패널을 담는다.',
+                color: 'var(--accent-purple)'
+            },
+            POP: {
+                name: 'POP',
+                title: 'Particle Operator',
+                desc: '점들의 시스템. 인스턴싱, 파티클, GPU 기반의 다수 객체 — 군집 / 흐름 / 거대한 양의 시각으로 가는 길.',
+                color: 'var(--cream)'
+            }
+        };
+        const famGrid = document.getElementById('familyGrid');
+        if (famGrid) {
+            const famName = document.getElementById('famName');
+            const famTitle = document.getElementById('famTitle');
+            const famDesc = document.getElementById('famDesc');
+            const detail = document.getElementById('familyDetail');
+            const setFam = (key) => {
+                const d = familyData[key];
+                if (!d) return;
+                famGrid.querySelectorAll('.family-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.fam === key);
+                });
+                famName.textContent = d.name;
+                famTitle.textContent = d.title;
+                famDesc.textContent = d.desc;
+                detail.style.borderLeftColor = d.color;
+            };
+            famGrid.querySelectorAll('.family-btn').forEach(btn => {
+                btn.addEventListener('click', () => setFam(btn.dataset.fam));
+            });
+            setFam('TOP');
+        }
+
+        // ============ Signal flow demo ============
+        const signalDemo = document.getElementById('signalDemo');
+        if (signalDemo) {
+            const inputMeta = {
+                webcam:  { label: 'Webcam',  op: 'Video Device In TOP',  color: '#d4843e', kind: 'image' },
+                mouse:   { label: 'Mouse',   op: 'Mouse In CHOP',         color: '#4a9ece', kind: 'cursor' },
+                audio:   { label: 'Audio',   op: 'Audio Device In CHOP',  color: '#4caf6e', kind: 'wave' },
+                noise:   { label: 'Noise',   op: 'Noise TOP / CHOP',      color: '#8b6cc4', kind: 'noise' }
+            };
+            const active = new Set();
+            const chips = signalDemo.querySelectorAll('.input-chip');
+            const procTitle = document.getElementById('procTitle');
+            const procOps = document.getElementById('procOps');
+            const procBox = document.getElementById('processBox');
+            const arrow1 = document.getElementById('arrow1');
+            const arrow2 = document.getElementById('arrow2');
+            const outLabel = document.getElementById('outputLabel');
+            const canvas = document.getElementById('outputCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function fit() {
+                const dpr = window.devicePixelRatio || 1;
+                const r = canvas.getBoundingClientRect();
+                if (canvas.width !== Math.round(r.width * dpr) || canvas.height !== Math.round(r.height * dpr)) {
+                    canvas.width = Math.round(r.width * dpr);
+                    canvas.height = Math.round(r.height * dpr);
+                }
+                return dpr;
+            }
+
+            function update() {
+                const list = [...active];
+                if (list.length === 0) {
+                    procTitle.textContent = '입력 없음';
+                    procTitle.style.color = 'var(--text-dim)';
+                    procOps.textContent = '왼쪽에서 입력을 켜보세요';
+                    procBox.classList.remove('live');
+                    arrow1.classList.remove('live');
+                    arrow2.classList.remove('live');
+                    outLabel.textContent = 'Idle';
+                } else {
+                    procTitle.textContent = list.map(k => inputMeta[k].label).join(' + ');
+                    procTitle.style.color = 'var(--cream)';
+                    procOps.textContent = list.map(k => inputMeta[k].op).join(' · ');
+                    procBox.classList.add('live');
+                    arrow1.classList.add('live');
+                    arrow2.classList.add('live');
+                    outLabel.textContent = list.length === 1 ? inputMeta[list[0]].label + ' → Out' : 'Mixed → Out';
+                }
+            }
+
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const id = chip.dataset.in;
+                    if (active.has(id)) { active.delete(id); chip.classList.remove('active'); }
+                    else { active.add(id); chip.classList.add('active'); }
+                    update();
+                });
+            });
+
+            let rafId = null;
+            function draw(t) {
+                fit();
+                const w = canvas.width, h = canvas.height;
+                ctx.fillStyle = '#1f1f1f';
+                ctx.fillRect(0, 0, w, h);
+
+                if (active.size === 0) {
+                    ctx.fillStyle = '#3a3a3a';
+                    ctx.font = `${Math.floor(h * 0.08)}px JetBrains Mono, monospace`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('—', w / 2, h / 2);
+                } else {
+                    const time = t * 0.001;
+                    // noise background
+                    if (active.has('noise')) {
+                        const cells = 24;
+                        const cs = w / cells;
+                        for (let y = 0; y < cells; y++) {
+                            for (let x = 0; x < cells; x++) {
+                                const v = (Math.sin(x * 0.7 + time * 1.3) + Math.cos(y * 0.5 + time)) * 0.5;
+                                const g = Math.floor(50 + (v + 1) * 40);
+                                ctx.fillStyle = `rgba(139, 108, 196, ${0.15 + Math.abs(v) * 0.25})`;
+                                ctx.fillRect(x * cs, y * cs, cs + 1, cs + 1);
+                            }
+                        }
+                    }
+                    // webcam stripes
+                    if (active.has('webcam')) {
+                        const stripes = 8;
+                        for (let i = 0; i < stripes; i++) {
+                            const a = 0.04 + (i / stripes) * 0.18;
+                            ctx.fillStyle = `rgba(212, 132, 62, ${a})`;
+                            const yy = (i / stripes) * h + Math.sin(time + i) * h * 0.02;
+                            ctx.fillRect(0, yy, w, h / stripes * 0.6);
+                        }
+                    }
+                    // audio wave
+                    if (active.has('audio')) {
+                        ctx.strokeStyle = 'rgba(76, 175, 110, 0.85)';
+                        ctx.lineWidth = Math.max(2, w * 0.006);
+                        ctx.beginPath();
+                        const steps = 64;
+                        for (let i = 0; i <= steps; i++) {
+                            const x = (i / steps) * w;
+                            const amp = 0.18 + 0.12 * Math.sin(time * 2.2 + i * 0.3);
+                            const y = h / 2 + Math.sin(i * 0.5 + time * 4) * h * amp;
+                            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+                    }
+                    // mouse cursor (animated dot)
+                    if (active.has('mouse')) {
+                        const cx = w / 2 + Math.cos(time * 1.4) * w * 0.32;
+                        const cy = h / 2 + Math.sin(time * 1.7) * h * 0.32;
+                        ctx.fillStyle = 'rgba(74, 158, 206, 0.9)';
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, Math.max(6, w * 0.04), 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(74, 158, 206, 0.4)';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, Math.max(12, w * 0.08), 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                }
+                rafId = requestAnimationFrame(draw);
+            }
+
+            const demoSlide = signalDemo.closest('.slide');
+            const demoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        if (!rafId) rafId = requestAnimationFrame(draw);
+                    } else {
+                        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                    }
+                });
+            }, { threshold: 0.3 });
+            demoObserver.observe(demoSlide);
+
+            update();
+        }
+    });
+    </script>
+</body>
+</html>
