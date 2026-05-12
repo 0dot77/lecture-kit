@@ -1,136 +1,156 @@
-# TouchDesigner References — Week 01
+# TouchDesigner References — Week 01 (Refreshed, 2024-2026 focus)
 
 ## audio-visual
-- title: Amon Tobin 'ISAM' Live (Extended Trailer)
-  artist: Amon Tobin × V Squared Labs
-  url: https://vimeo.com/24502224
-  note: 음악 IDM 사운드를 입력으로 받아 입체 큐브 구조에 실시간 프로젝션 매핑을 송출한 라이브 셋의 대표 사례.
+- title: Kara-Lis Coverdale × Rich & Miyu — Live AV at MUTEK
+  artist: Rich & Miyu (Richard & Miyu Burns)
+  year: 2024
+  url: https://richandmiyu.com/projects/kara-lis-coverdale-%7C-mutek-
+  note: 음악가의 라이브 사운드를 입력으로 받아 포인트클라우드와 IMAG 파티클로 변환한 MUTEK 무대 비주얼. 2025 POPs 워크플로우의 출발점.
 
-- title: Robert Henke — Lumière III (Extract)
-  artist: Robert Henke
-  url: https://www.youtube.com/watch?v=hznAf1uuAtI
-  note: 사운드 신호에 동기화된 ILDA 레이저 벡터 드로잉이 어둠 속 스크린을 그어내는 오디오비주얼 콘서트.
+- title: Structures — Live AV Performance
+  artist: Pauric Freeman
+  year: 2024
+  url: https://www.youtube.com/watch?v=dOlLuM1A1VQ
+  note: 모듈러 신스·드럼머신의 피치·리듬·앰플리튜드 데이터를 그대로 비주얼 파라미터로 매핑한 더블린 작가의 시스템 디자인 토크.
 
-- title: Lumière Laser Performance Demonstration
-  artist: Robert Henke
-  url: https://www.youtube.com/watch?v=z7LIZUATn0s
-  note: 퍼커시브 사운드 트리거에 맞춰 레이저 라인이 점멸·이동하며 그래픽 노트로 변환되는 데모.
+- title: Performable Landscapes 2025
+  artist: Jamie Gledhill
+  year: 2025
+  url: https://jamiegledhill.tv/performable-landscapes-2025/
+  note: 하드웨어 신스의 MIDI·오디오 데이터를 받아 절차적 지형이 실시간으로 변형되는 “연주 가능한 풍경” 시리즈.
 
-- title: Cao Yuxi — Dimensional Sampling #1
-  artist: Cao Yuxi (James)
-  url: https://www.youtube.com/watch?v=zh1xOfQq4wE
-  note: 라이브 음악을 GLSL 셰이더 패치로 받아 격자형 데이터 풍경으로 변환하는 오디오리액티브 퍼포먼스.
+- title: Visuals for Phish Concert at Sphere
+  artist: Sila Sveta × Moment Factory
+  year: 2024
+  url: https://vimeo.com/1059965871
+  note: 라스베이거스 Sphere 16K 캔버스용으로 제작된 60여 개의 추상 렌더 루프 — TouchDesigner·Notch·Houdini로 만든 콘서트 비주얼 콘텐츠.
 
-- title: TouchDesigner Showreel 2024
-  artist: Derivative
-  url: https://www.youtube.com/watch?v=SB_0FHbyONw
-  note: 한 해 동안 TouchDesigner로 제작된 라이브 비주얼·콘서트 무대 작품을 모은 공식 쇼릴.
+- title: Tools for Improvisation — Building, Sharing, Performing
+  artist: Torin Blankensmith
+  year: 2025
+  url: https://www.torinblankensmith.com/
+  note: MediaPipe·DepthAnything 등 자체 툴을 직접 무대 위 즉흥 도구로 사용하는 라이브 AV 워크플로우 사례 (TouchDesigner Event Tokyo 2025).
 
 ## interactive-performance
-- title: Apparition — Interactive Dance with Real-time Visuals
-  artist: Klaus Obermaier & Ars Electronica Futurelab
-  url: https://www.youtube.com/watch?v=XqyEZ0GwS3E
-  note: 무용수의 동작을 카메라로 추적해 물리 시뮬레이션 기반 영상이 신체 위에서 실시간으로 반응하는 무대.
+- title: Surrogate Bodies — AI Interactive Installation/Performance
+  artist: Aisling Phelan
+  year: 2024
+  url: https://2024.betafestival.ie/exhibitions/local-artists-network/Surrogate%20Bodies
+  note: 카메라로 관객 얼굴을 검출해 커스텀 LoRA Stable Diffusion이 실시간으로 AI 얼굴을 덧씌우는 신체-감시 퍼포먼스.
 
-- title: Vivisector
-  artist: Klaus Obermaier & Chris Haring
-  url: https://vimeo.com/62275012
-  note: 네 명의 무용수 신체에 직접 영상을 매핑해 속도·형태·텍스처의 환영을 만들어내는 신체 프로젝션 퍼포먼스.
+- title: Integrating AI and TouchDesigner into Interactive Installations
+  artist: Aisling Phelan
+  year: 2025
+  url: https://www.youtube.com/watch?v=HaBnUxYS8Xo
+  note: 위 작업의 라이브 인터랙션 영상 — TouchDesigner Event Dublin 2025에서 공개된 풀 세션 토크.
 
-- title: Interactive Dance with Blacktrax Reactive Visuals
-  artist: Sila Sveta
-  url: https://www.youtube.com/@SilaSveta
-  note: 무용수에게 부착한 Blacktrax 마커로 위치를 받아 무대 영상이 따라붙는 모스크바 스튜디오의 인터랙티브 댄스 사례.
+- title: Machine Learning as Conceptual Bridge — Visualization of Lengger
+  artist: Patrick Gunawan Hartono
+  year: 2025
+  url: https://patrickhartono.com/Audiovisual/
+  note: 인도네시아 Lengger 무용수 Rianto의 모션캡처 데이터를 학습한 신경망이 비신체적 젠더 표현을 추상 비주얼로 매핑하는 무대 작업.
 
-- title: 7 Questions to Yourself
-  artist: Sila Sveta
-  url: https://www.silasveta.com/projects/7-questions-to-yourself
-  note: 발레 무용수와 두 명의 홀로그래픽 도플갱어가 동시에 춤추는 라이브 퍼포먼스 시스템.
+- title: Lee Ungno — A Great Artistic Journey, Seoul–Paris (Interactive Rooms)
+  artist: PEAK Studio (한국)
+  year: 2024
+  url: https://peakstudio.kr/
+  note: 그랜드워커힐 Théâtre des Lumières 150개 프로젝터 공간에서 관객 초상화를 NST로 변환·Hokuyo 센서로 파티클을 구동한 두 점의 대형 인터랙티브 작.
 
-- title: Interactive Visuals: Kinect + TouchDesigner + Dance
-  artist: Musikschule Prinzersdorf 학생 프로젝트
-  url: https://www.youtube.com/watch?v=xZJ3bOE9Q-g
-  note: Kinect 골격 데이터를 입력으로 받아 무용수 주위에 라인·잔상 비주얼이 따라붙는 실습 사례.
+- title: Real Data, Imaginary Landscape
+  artist: Satoru Higa
+  year: 2025
+  url: http://satoruhiga.com/
+  note: 라이브 데이터·센서를 받아 가상 지형을 즉시 합성하는 BACKSPACE 디렉터의 TouchDesigner Event Tokyo 2025 발표 작업.
 
 ## installation
-- title: HALO — Sculpting Sunlight
-  artist: Kimchi and Chips (김치앤칩스)
-  url: https://kimchiandchips.com/works/halo/
-  note: 99개의 로봇 거울이 태양 위치 데이터를 받아 수분 안개 속에서 빛의 원반을 조각해내는 옥외 설치.
+- title: SOLAR at The Bentway
+  artist: Quayola
+  year: 2025
+  url: https://youtu.be/8TCCBzVQ78c
+  note: KUKA 산업로봇 한 대와 200개 무빙헤드를 TouchDesigner Pan/Tilt CHOP으로 동기화해 공중에 일출-일몰 광선을 조각해내는 대형 키네틱 라이트 작업.
 
-- title: WAVE — Public Media Art #1
-  artist: d'strict (디스트릭트)
-  url: https://www.youtube.com/watch?v=HsQXQbJyyGc
-  note: SMTOWN COEX 외벽 곡면 LED에 아나모픽 영상을 송출해 거대한 파도가 유리 큐브 안에 갇힌 듯한 도시 미디어 작품.
+- title: null² Signature Pavilion at Expo 2025 Osaka
+  artist: Yoichi Ochiai × NOIZ × WOW (Takeshi Funatsu)
+  year: 2025
+  url: https://www.w0w.co.jp/en/works/null2
+  note: 거울막 큐브 파빌리온 내부에서 AI 이미지 생성·Gaussian Splatting 아바타·로봇팔 진동을 TouchDesigner가 통합 제어하는 시그니처 인터랙티브 공간.
 
-- title: Beyond the Scene (CONNECT, BTS)
+- title: Entanglement
   artist: Yiyun Kang (강이연)
-  url: https://www.yiyunkang.com/beyondthescene-bts
-  note: BTS 안무 영상을 소재로 한 대형 프로젝션 매핑이 관객의 신체와 공간을 감싸는 몰입형 설치.
+  year: 2025
+  url: https://www.yiyunkang.com/projects
+  note: 서울 신세계 헤리티지뮤지엄(2025.7–9) 솔로전 — 미시-거시 세계의 얽힘을 다층 프로젝션으로 풀어낸 신작 매핑 설치.
 
-- title: SKALAR — Reflections on Light and Sound
-  artist: Christopher Bauder × Kangding Ray
-  url: https://www.youtube.com/watch?v=W6VnHEf24RM
-  note: 65개의 키네틱 미러와 동기화된 조명·사운드가 어두운 공간에서 빛의 기하학을 조립해내는 베를린 다크매터 대표작.
+- title: Unread Characters
+  artist: Kimchi and Chips (김치앤칩스)
+  year: 2025
+  url: https://www.kimchiandchips.com/works/
+  note: 라이트박스와 렌즈로 만든 광학 설치 — 관객 움직임에 따라 빛으로 “쓰여진” 글자가 변하며 사라지는 언어와 의미의 덧없음을 다룬 신작.
 
-- title: Fluid Structure — Interactive Fluid Simulation
-  artist: Vincent Houzé
-  url: https://vincenthouze.com/about/
-  note: 관객 위치를 입력으로 받아 거대한 스크린 위 디지털 유체가 흩어지고 다시 모이는 인터랙티브 시뮬레이션 설치.
+- title: Astrum — Turning Riyadh's Skyline into a Living Planetarium
+  artist: László Zsolt Bordos
+  year: 2026
+  url: https://derivative.ca/showcase
+  note: 도시 스카이라인을 거대한 천체관처럼 다루는 대형 스카이 매핑 — 2026년 Derivative 쇼케이스에 등록된 신작.
 
 ## generative-particles
-- title: Daily Sketches (Polyhop)
-  artist: Simon Alexander-Adams
-  url: https://www.youtube.com/@polyhop
-  note: 매일 한 개씩 GPU 파티클·인스턴싱 기반 추상 시스템을 만들어 올리는 생성형 데일리 스케치 채널.
+- title: POPs Experimental — Shape Morphs
+  artist: Polyhop (Simon Alexander-Adams)
+  year: 2025
+  url: https://www.patreon.com/posts/pops-shape-in-131029376
+  note: 2025년 신규 Point Operators(POPs)로 수십만 포인트의 형상 모핑을 GPU에서 직접 다루는 절차적 시스템 데일리 시리즈.
 
-- title: Oceanic Dust — TouchDesigner Project
+- title: Depth Scatter Rendering in TouchDesigner
+  artist: Owen Hindley
+  year: 2025
+  url: https://www.youtube.com/watch?v=7bF52QbgDW0
+  note: 단순한 3D 씬을 컴퓨트 셰이더로 스캐터링해 ‘유령 같은 포인트 클라우드’로 렌더하는 기법 — TouchDesigner Event London 2025.
+
+- title: Collectible Scape
+  artist: Saeko Ehara (skohr)
+  year: 2024
+  url: https://skohr.works/
+  note: 소멸 직전의 도쿄 일상 풍경을 Scaniverse로 3D 스캔해 TouchDesigner에서 빛나는 포인트클라우드로 재구성하는 생성형 아카이브 시리즈.
+
+- title: Oceanic — Audio-Reactive GPU Particles
   artist: Bileam Tschepe (elekktronaut)
-  url: https://www.youtube.com/watch?v=nuw6aF0U8aE
-  note: 노이즈 필드 위에 흩뿌려진 수십만 개 파티클이 사운드에 반응하며 유기적 흐름을 만드는 GPU 파티클 작업.
+  year: 2024
+  url: https://www.youtube.com/@elekktronaut/videos
+  note: 노이즈 필드 위의 수십만 입자가 사운드에 반응하며 유기적 흐름을 만드는 베를린 작가의 최신 GPU 파티클 작업 채널.
 
-- title: elekktronaut — River
-  artist: Bileam Tschepe (elekktronaut)
-  url: https://www.youtube.com/watch?v=JGDPORsmwtk
-  note: 파티클 시스템과 옵티컬 플로우를 결합해 흐르는 강 같은 유기적 운동을 만드는 생성형 비주얼.
-
-- title: Dynamic Simulations for Large Scale Installations
-  artist: Vincent Houzé
-  url: https://www.youtube.com/watch?v=8olwmT6VZ44
-  note: NVIDIA Flex 기반 유체·파티클 시뮬레이션을 대형 설치 규모로 끌어올리는 기술 데모 강연.
-
-- title: TUNDRA — The Void
-  artist: TUNDRA (wearetundra)
-  url: https://vimeo.com/79200891
-  note: 360도 패노라마 프로젝션 위에서 노이즈 기반 입자가 빅뱅처럼 펼쳐지다 관객 움직임에 응답해 정지하는 작품.
+- title: TouchDesigner Diaries — Anatomy of an Installation
+  artist: Sumeet Rohilla
+  year: 2025
+  url: https://www.youtube.com/watch?v=-X8YB8b5fvo
+  note: 풀돔과 라이트 페스티벌용 대형 인터랙티브 설치 안에서 파티클·라이트·관객 데이터가 어떻게 결합되는지 해부한 Paris 2025 토크.
 
 ## tool-system
-- title: Control Room 42 — Software-based Broadcast Control
-  artist: RTBF × Derivative
-  url: https://derivative.ca/community-post/control-room-42-ushers-future-broadcasting/63857
-  note: 방송용 영상 스위칭·재생·UI를 TouchDesigner 하나로 통합한 차세대 컨트롤룸 시스템 사례.
+- title: TouchDesigner 2025 — POPs (Point Operators)
+  artist: Derivative
+  year: 2025
+  url: https://derivative.ca/community-post/2025-official-update/73153
+  note: 10년 만에 추가된 GPU 기반 새 오퍼레이터 패밀리 — 셰이더 없이도 수백만 포인트의 속성을 다룰 수 있는 “타인이 쓰는” 기반 도구.
 
-- title: Crafting a Next-Generation Graphics Management System
-  artist: Derivative Community
-  url: https://derivative.ca/community-post/crafting-next-generation-graphics-management-system-touchdesigner/72420
-  note: TV 프로덕션용 그래픽 컴포지팅·송출 워크플로우를 TouchDesigner로 모듈화한 그래픽 매니지먼트 도구.
+- title: MediaPipe Plugin for TouchDesigner
+  artist: Torin Blankensmith × Dom Scott
+  year: 2024
+  url: https://github.com/torinmb/mediapipe-touchdesigner
+  note: 웹캠만으로 얼굴·손·자세·오브젝트 추적을 GPU에서 돌리는 무설치 .tox — 전 세계 아티스트들이 그대로 가져다 쓰는 표준 오픈소스 도구.
 
-- title: Disguise × TouchDesigner Virtual Game Show (Day 1)
-  artist: The Interactive & Immersive HQ
-  url: https://www.youtube.com/watch?v=jb-FZszrVvo
-  note: Notch 블록을 런타임에 노출하고 TouchDesigner에서 UI·트리거로 컨트롤하는 라이브 쇼 툴 데모.
+- title: TDDepthAnything — Real-time Monocular Depth
+  artist: TouchDesigner / Oleg Chomp / jetXS / Torin Blankensmith
+  year: 2025
+  url: https://github.com/TouchDesigner/TDDepthAnything
+  note: 2025.30000의 Thread Manager·PyEnvManager 위에서 Depth Anything V2를 라이브로 돌려 어떤 영상이든 즉시 깊이 맵으로 만드는 공식·커뮤니티 컴포넌트.
 
-- title: Building a Virtual Game Show with Notch + TouchDesigner (Day 2)
-  artist: The Interactive & Immersive HQ
-  url: https://www.youtube.com/watch?v=jcvnJA65EII
-  note: MIDI/OSC 입력을 받아 Notch 콘텐츠를 라이브 버스킹하는 컨트롤 패널 구축 과정.
+- title: TouchDesigner Fulldome Simulator TOX
+  artist: THE INFRANET
+  year: 2025
+  url: https://derivative.ca/community-post/asset/touchdesigner-fulldome-simulator-tox-beta/72740
+  note: 어떤 2D/3D 비주얼도 가상 돔에 래핑해 미리 보는 무료 .tox — 풀돔 아티스트가 실제 설치 전에 콘텐츠를 검증하는 워크플로우 도구.
 
-- title: Matthew Ragan — Buttons for Interfaces
-  artist: Matthew Ragan
-  url: https://matthewragan.com/2013/11/02/touchdesigner-buttons-for-interfaces/
-  note: 다른 아티스트가 쓸 수 있는 컨트롤 패널을 직접 설계하는 위젯·버튼 패턴 가이드.
-
-- title: NestDrop V2 — VJ Tool with Spout Bridge
-  artist: NestImmersion
-  url: https://nestimmersion.ca/nestdrop.php
-  note: Milkdrop 프리셋을 실시간 렌더링해 TouchDesigner·Resolume로 Spout 송출하는 VJ 도구의 대표 사례.
+- title: okVJ — Modular Toolkit for Live Visuals
+  artist: Chelsea Liggatt (vjbunbun)
+  year: 2025
+  url: https://vjbunbun.com
+  note: VJ가 다른 VJ를 위해 만든 모듈러 라이브 비주얼 툴킷 — TouchDesigner Event Tokyo 2025에서 공개된 ‘아티스트가 만든 아티스트 도구’의 대표 사례.
