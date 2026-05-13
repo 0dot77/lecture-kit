@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>연세대학교 특강</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <span style="color: var(--color-text-muted);">연세대학교 특강</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-blue sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-blue"></span>
+          <span class="sig-led sig-led-purple sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-purple"></span>
+          <span class="sig-led sig-led-orange sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">Guest Lecture — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          연세대학교 특강
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          Yonsei University Guest Lecture
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-purple), var(--color-accent-orange), transparent);"></div>
+      </header>
+
+      <!-- Chapter List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">챕터 목록</h2>
+          <div class="sig-cable sig-cable-purple" style="max-width: 40px;"></div>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <a href="./slides/interface.html" class="course-panel group">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">01</span>
+              <span class="sig-led sig-led-purple" style="width: 5px; height: 5px;"></span>
+              <h3 class="font-semibold group-hover:text-[var(--color-accent-purple)] transition-colors">
+                Interface — 무대를 인터랙티브하게 만들기
+              </h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              무대 위 퍼포머와 관객, 그리고 시스템 사이의 인터페이스를 설계하는 방법
+            </p>
+            <div class="flex items-center gap-2 mt-4 ml-[3.3rem] flex-wrap">
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-purple) 15%, transparent); color: var(--color-accent-purple);">Interface</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">Stage</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">Interactive</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>

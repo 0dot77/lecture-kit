@@ -46,6 +46,8 @@ export default defineConfig({
         "nca-week13": "courses/nca-touchdesigner/week-13.html",
         "nca-week14": "courses/nca-touchdesigner/week-14.html",
         "nca-week15": "courses/nca-touchdesigner/week-15.html",
+        "yonsei-lecture-index": "courses/yonsei-lecture/index.html",
+        "yonsei-interface-slides": "courses/yonsei-lecture/slides/interface.html",
       },
     },
   },
