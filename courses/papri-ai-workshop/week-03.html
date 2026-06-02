@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEEK 03 — Papri AI Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=Archivo+Black&family=JetBrains+Mono:wght@400;600&display=swap" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    :root {
+      --navy: #1e2a4a;
+      --navy-deep: #161e3a;
+      --cream: #ede4d3;
+      --cream-light: #f5efe1;
+      --cream-dim-on-navy: rgba(237, 228, 211, 0.6);
+      --cream-faint-on-navy: rgba(237, 228, 211, 0.18);
+      --ink: #1a2542;
+      --ink-muted: rgba(26, 37, 66, 0.62);
+      --ink-faint: rgba(26, 37, 66, 0.18);
+      --accent: #d4623a;
+
+      --font-body: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+      --font-display-en: "Archivo Black", "Bebas Neue", "Pretendard Variable", sans-serif;
+      --font-display-ko: "Black Han Sans", "Pretendard Variable", sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      background: #000;
+      color: var(--cream);
+    }
+
+    .deck { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: clamp(1.4rem, 3vw, 2.8rem) clamp(2rem, 5vw, 4.5rem);
+      background: var(--navy);
+      color: var(--cream);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.cream { background: var(--cream); color: var(--ink); }
+
+    .rail {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: clamp(0.6rem, 0.8vw, 0.78rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--cream-dim-on-navy);
+    }
+    .slide.cream .rail { color: var(--ink-muted); }
+    .rail-bottom { padding-top: 0.9rem; border-top: 1px solid var(--cream-faint-on-navy); }
+    .slide.cream .rail-bottom { border-top-color: var(--ink-faint); }
+
+    .body {
+      flex: 1;
+      display: flex; flex-direction: column;
+      padding: clamp(1.2rem, 2.5vw, 2.5rem) 0;
+      overflow: hidden;
+      justify-content: center;
+    }
+
+    .ko-display {
+      font-family: var(--font-display-ko);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.015em;
+    }
+    .en-display {
+      font-family: var(--font-display-en);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .display-xl { font-size: clamp(3rem, 11vw, 9.5rem); }
+    .display-lg { font-size: clamp(2.5rem, 8vw, 6.5rem); }
+    .display-md { font-size: clamp(2rem, 6vw, 5rem); }
+    .display-sm { font-size: clamp(1.5rem, 4vw, 3.2rem); }
+
+    .label {
+      font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .lead {
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      line-height: 1.55;
+      max-width: 60ch;
+      opacity: 0.9;
+    }
+    .body-text {
+      font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+      line-height: 1.65;
+      opacity: 0.82;
+    }
+
+    .row { display: flex; gap: clamp(2rem, 4vw, 4rem); height: 100%; }
+    .col { display: flex; flex-direction: column; gap: clamp(1rem, 2vw, 1.5rem); }
+    .col.center { justify-content: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 4vw, 4rem); height: 100%; align-items: center; }
+    .grid-2.lopsided { grid-template-columns: 1.1fr 0.9fr; }
+    .grid-2.image-left { grid-template-columns: 0.9fr 1.1fr; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.2rem, 2.5vw, 2.2rem); height: 100%; }
+    .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(1rem, 2vw, 1.8rem); height: 100%; }
+
+    .photo {
+      position: relative;
+      width: 100%; height: 100%;
+      min-height: clamp(220px, 40vh, 460px);
+      background: var(--navy-deep);
+      overflow: hidden;
+      filter: grayscale(100%) contrast(1.1) brightness(0.85);
+    }
+    .slide.cream .photo { filter: grayscale(100%) contrast(1.05) brightness(0.92); }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo .photo-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        repeating-linear-gradient(45deg, transparent 0 12px, rgba(237,228,211,0.06) 12px 13px),
+        var(--navy-deep);
+      color: var(--cream-dim-on-navy);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .photo.tinted::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(30,42,74,0.35) 0%, rgba(30,42,74,0.55) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    /* Inline decor illustration */
+    .decor-illust {
+      width: 100%;
+      height: 100%;
+      min-height: clamp(220px, 40vh, 460px);
+      background: var(--cream-light);
+      border: 1px solid var(--ink-faint);
+      padding: clamp(0.4rem, 1vw, 0.8rem);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .decor-illust svg {
+      width: 100%; height: 100%;
+      display: block;
+      max-height: 100%;
+    }
+    .slide:not(.cream) .decor-illust { background: var(--navy-deep); border-color: var(--cream-faint-on-navy); }
+
+    .num-list { display: flex; flex-direction: column; gap: clamp(0.6rem, 1.2vw, 1rem); list-style: none; }
+    .num-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: clamp(0.9rem, 1.8vw, 1.5rem);
+      align-items: baseline;
+      padding-bottom: clamp(0.5rem, 0.9vw, 0.85rem);
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .num-list li { border-bottom-color: var(--ink-faint); }
+    .num-list .num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .num-list .text {
+      font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .num-list .sub {
+      display: block; margin-top: 0.25rem;
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      font-weight: 400; opacity: 0.65;
+      letter-spacing: 0; text-transform: none;
+    }
+
+    .card {
+      border: 1px solid var(--cream-faint-on-navy);
+      padding: clamp(1.1rem, 1.8vw, 1.7rem);
+      display: flex; flex-direction: column;
+      gap: 0.55rem;
+      height: 100%;
+    }
+    .slide.cream .card { border-color: var(--ink-faint); }
+    .card .c-num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    .card .c-title {
+      font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+    }
+    .card .c-title.mono { font-family: var(--font-mono); font-weight: 700; letter-spacing: 0; }
+    .card .c-body {
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      line-height: 1.55;
+      opacity: 0.78;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+    .tag {
+      font-size: clamp(0.7rem, 0.9vw, 0.82rem);
+      padding: 0.28rem 0.65rem;
+      border: 1px solid var(--cream-faint-on-navy);
+      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+    .slide.cream .tag { border-color: var(--ink-faint); }
+    .tag.solid { background: var(--accent); color: var(--cream-light); border-color: var(--accent); }
+
+    .code {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1.05vw, 0.95rem);
+      line-height: 1.7;
+      padding: clamp(1rem, 1.8vw, 1.5rem) clamp(1.1rem, 2vw, 1.7rem);
+      background: var(--navy-deep);
+      color: var(--cream);
+      border-left: 3px solid var(--accent);
+      overflow: auto;
+    }
+    .slide.cream .code { background: var(--navy); }
+    .code .cm { color: var(--cream-dim-on-navy); }
+    .code .hl { color: var(--accent); }
+
+    .datestack {
+      font-family: var(--font-display-en);
+      font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .datestack .slash { color: var(--accent); margin: 0 0.05em; }
+
+    .quote-block {
+      font-family: var(--font-display-ko);
+      font-size: clamp(2rem, 5.5vw, 4.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .quote-block .accent { color: var(--accent); }
+
+    /* Year band (re-purposed as layered table) */
+    .year-row {
+      display: grid;
+      grid-template-columns: minmax(190px, 30%) 1fr;
+      gap: clamp(1.2rem, 2.5vw, 2.5rem);
+      align-items: baseline;
+      padding: clamp(0.85rem, 1.6vw, 1.4rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .year-row:last-child { border-bottom: none; }
+    .slide.cream .year-row { border-bottom-color: var(--ink-faint); }
+    .year-row .y {
+      font-family: var(--font-mono);
+      font-size: clamp(0.85rem, 1.15vw, 1.05rem);
+      line-height: 1.2;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .year-row .y-title {
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .year-row .y-sub {
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      opacity: 0.72;
+      margin-top: 0.3rem;
+    }
+
+    .flow { display: flex; width: 100%; }
+    .flow-step {
+      flex: 1;
+      padding: clamp(1.1rem, 2vw, 1.7rem);
+      border: 1px solid var(--cream-faint-on-navy);
+      border-right: none;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .flow-step:last-child { border-right: 1px solid var(--cream-faint-on-navy); }
+    .slide.cream .flow-step { border-color: var(--ink-faint); }
+    .slide.cream .flow-step:last-child { border-right-color: var(--ink-faint); }
+    .flow-step.hi { background: var(--accent); color: var(--cream-light); border-color: var(--accent); }
+    .flow-step.hi + .flow-step { border-left-color: var(--accent); }
+    .flow-step .s-num { font-family: var(--font-display-en); font-size: 0.78rem; letter-spacing: 0.15em; opacity: 0.7; }
+    .flow-step .s-title {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+      letter-spacing: 0.02em; line-height: 1.05;
+    }
+    .flow-step .s-quote { font-size: clamp(0.78rem, 1vw, 0.95rem); line-height: 1.45; opacity: 0.85; font-style: italic; }
+
+    /* Compare strip: 약한 줄 / 강한 줄 */
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(0.8rem, 1.6vw, 1.4rem);
+      padding: clamp(0.7rem, 1.2vw, 1rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+      align-items: start;
+    }
+    .compare-row:last-child { border-bottom: none; }
+    .slide.cream .compare-row { border-bottom-color: var(--ink-faint); }
+    .compare-cell {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1.05vw, 0.96rem);
+      line-height: 1.55;
+      padding: clamp(0.5rem, 0.9vw, 0.8rem) clamp(0.7rem, 1.2vw, 1rem);
+      border-left: 2.5px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .compare-cell { border-left-color: var(--ink-faint); }
+    .compare-cell.weak { opacity: 0.55; text-decoration: line-through; text-decoration-thickness: 1px; }
+    .compare-cell.strong { border-left-color: var(--accent); color: inherit; opacity: 1; }
+    .compare-tag {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.65rem, 0.85vw, 0.78rem);
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .compare-cell.weak .compare-tag { color: var(--cream-dim-on-navy); }
+    .slide.cream .compare-cell.weak .compare-tag { color: var(--ink-muted); }
+    .elem-label {
+      font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+      letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800;
+      color: var(--accent);
+      padding: clamp(0.5rem, 1vw, 0.85rem) 0 0.1rem;
+    }
+
+    /* Loop diagram: vertical numbered */
+    .loop-list {
+      display: flex; flex-direction: column;
+      gap: clamp(0.5rem, 1vw, 0.85rem);
+      counter-reset: loopstep;
+      list-style: none;
+    }
+    .loop-list li {
+      counter-increment: loopstep;
+      display: grid;
+      grid-template-columns: clamp(40px, 5vw, 60px) 1fr;
+      gap: clamp(0.8rem, 1.4vw, 1.2rem);
+      align-items: baseline;
+      padding: clamp(0.6rem, 1vw, 0.9rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .loop-list li { border-bottom-color: var(--ink-faint); }
+    .loop-list li::before {
+      content: counter(loopstep, decimal-leading-zero);
+      font-family: var(--font-display-en);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      color: var(--accent);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .loop-list .l-title {
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .loop-list .l-sub {
+      display: block; margin-top: 0.25rem;
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      opacity: 0.72;
+      font-weight: 400;
+    }
+
+    /* Reference links */
+    .reflink {
+      display: block;
+      padding: clamp(0.5rem, 0.9vw, 0.8rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+      text-decoration: none;
+      color: inherit;
+    }
+    .slide.cream .reflink { border-bottom-color: var(--ink-faint); }
+    .reflink:last-child { border-bottom: none; }
+    .reflink .r-name {
+      font-size: clamp(0.95rem, 1.4vw, 1.18rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .reflink .r-name .r-note {
+      font-weight: 400; opacity: 0.6;
+      font-size: clamp(0.78rem, 1vw, 0.92rem);
+      margin-left: 0.4rem;
+    }
+    .reflink .r-url {
+      display: block; margin-top: 0.2rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.92vw, 0.84rem);
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .reflink:hover .r-name { color: var(--accent); }
+
+    .papri-logo {
+      height: clamp(34px, 3.6vw, 52px);
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .speaker-note {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-height: 38vh; overflow-y: auto;
+      background: var(--navy-deep);
+      border-top: 2px solid var(--accent);
+      color: var(--cream);
+      padding: 1.1rem 2rem;
+      font-size: 0.92rem; line-height: 1.6;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .speaker-note.visible { transform: translateY(0); }
+    .speaker-note .sn-label {
+      font-family: var(--font-display-en);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 50; transition: width 0.3s ease; }
+    .help {
+      position: fixed; inset: 0; background: rgba(22,30,58,0.96);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; color: var(--cream);
+    }
+    .help.visible { display: flex; }
+    .help-content { max-width: 500px; padding: 2rem; }
+    .help-content h3 { font-family: var(--font-display-en); font-size: 1.6rem; margin-bottom: 1.4rem; letter-spacing: 0.02em; }
+    .help-content kbd {
+      display: inline-block; padding: 0.2rem 0.55rem;
+      background: var(--navy-deep);
+      border: 1px solid var(--cream-faint-on-navy);
+      font-family: var(--font-mono); font-size: 0.82rem;
+      margin-right: 0.5rem; min-width: 2.4rem; text-align: center;
+    }
+    .help-content ul { list-style: none; }
+    .help-content li { padding: 0.45rem 0; font-size: 0.95rem; }
+
+    /* Cover layout */
+    .cover-mark {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(0.6rem, 1.2vw, 1rem);
+    }
+    .cover-doc {
+      width: clamp(180px, 28vw, 320px);
+      height: clamp(220px, 36vw, 400px);
+      background: var(--cream);
+      color: var(--ink);
+      position: relative;
+      padding: clamp(1rem, 2vw, 1.6rem);
+      box-shadow:
+        0 0 0 1px rgba(237,228,211,0.18),
+        0 18px 60px rgba(0,0,0,0.55);
+      transform: rotate(-3deg);
+      display: flex; flex-direction: column;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
+    .cover-doc::before {
+      content: ""; position: absolute;
+      right: -1px; top: -1px;
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, transparent 50%, var(--cream-light) 50%);
+      border-left: 1px solid var(--ink-faint);
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .cover-doc-title {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1vw, 0.92rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--accent);
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--ink-faint);
+    }
+    .cover-doc-line {
+      height: 6px;
+      background: var(--ink-faint);
+      border-radius: 2px;
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+    .cover-doc-line.short { width: 60%; }
+    .cover-doc-line.mid { width: 80%; }
+    .cover-doc-line.accent { background: var(--accent); width: 45%; }
+    .cover-doc-h {
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.9vw, 0.8rem);
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 0.4rem;
+      clip-path: inset(0 100% 0 0);
+    }
+    .cover-mark.is-typing .cover-doc-h,
+    .cover-mark.is-typing .cover-doc-line {
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+    }
+    .cover-mark.is-typing .cover-doc-h {
+      animation-name: type-text;
+      animation-duration: 0.45s;
+    }
+    .cover-mark.is-typing .cover-doc-line {
+      animation-name: type-line;
+      animation-duration: 0.35s;
+    }
+    /* Child order inside .cover-doc:
+       1=title 2=h 3=line 4=line 5=h 6=line 7=line 8=h 9=line 10=line */
+    .cover-mark.is-typing .cover-doc > :nth-child(2)  { animation-delay: 0.10s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(3)  { animation-delay: 0.55s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(4)  { animation-delay: 0.85s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(5)  { animation-delay: 1.20s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(6)  { animation-delay: 1.65s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(7)  { animation-delay: 1.95s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(8)  { animation-delay: 2.30s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(9)  { animation-delay: 2.75s; }
+    .cover-mark.is-typing .cover-doc > :nth-child(10) { animation-delay: 3.05s; }
+
+    @keyframes type-text {
+      from { clip-path: inset(0 100% 0 0); }
+      to   { clip-path: inset(0 0 0 0); }
+    }
+    @keyframes type-line {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    @media (max-width: 760px) {
+      .grid-2, .grid-2.lopsided, .grid-2.image-left, .grid-3 { grid-template-columns: 1fr; gap: 1.5rem; }
+      .grid-4 { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .row { flex-direction: column; }
+      .flow { flex-direction: column; }
+      .flow-step { border-right: 1px solid var(--cream-faint-on-navy); }
+      .photo { min-height: 200px; }
+      .year-row { grid-template-columns: 1fr; gap: 0.6rem; }
+      .compare-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      .slide { position: relative; opacity: 1; page-break-after: always; height: 100vh; }
+      .progress, .speaker-note, .help { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <!-- ===== 01 / COVER ===== -->
+    <section class="slide active">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body" style="justify-content: center; align-items: center; position: relative;">
+        <div class="cover-mark" style="margin-bottom: clamp(1rem, 2.5vw, 2rem);">
+          <div class="cover-doc">
+            <div class="cover-doc-title">SKILL.md</div>
+            <div class="cover-doc-h">## 능력</div>
+            <div class="cover-doc-line mid"></div>
+            <div class="cover-doc-line short"></div>
+            <div class="cover-doc-h" style="margin-top:0.3rem;">## 금지선</div>
+            <div class="cover-doc-line"></div>
+            <div class="cover-doc-line mid"></div>
+            <div class="cover-doc-h" style="margin-top:0.3rem;">## 완료기준</div>
+            <div class="cover-doc-line accent"></div>
+            <div class="cover-doc-line short"></div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; width: 100%; flex-wrap: wrap;">
+          <div class="datestack">
+            <span>2026</span><span class="slash">/</span><span>06</span>
+          </div>
+          <div style="text-align: center; flex: 1; min-width: 280px;">
+            <div class="label" style="margin-bottom: 0.6rem;">다시 부를 수 있는 작업 절차</div>
+          </div>
+          <div class="datestack" style="text-align: right;">
+            <span>WEEK</span><span class="slash">\</span><span>03</span>
+          </div>
+        </div>
+        <h1 class="en-display display-xl" style="text-align: center; margin-top: clamp(0.5rem, 1.5vw, 1rem);">PAPRI<br/>AI WORKSHOP</h1>
+      </div>
+      <div class="rail rail-bottom">
+        <div>WORKSHOP — 2026</div>
+        <div>PRESENTED BY YOO TAEYANG</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        3주차 — Agent Skills. 약 2시간 분량. 프롬프트와 매니페스트 위에, 반복해서 부를 수 있는 작은 스킬을 얹는 시간. 능력 · 금지선 · 완료기준을 먼저 쓰고 말투는 나중에.
+      </div>
+    </section>
+
+    <!-- ===== 02 / 지난주 회고 — 3주의 흐름 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>RECAP — WEEK 01–02</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%; gap: clamp(0.9rem, 1.8vw, 1.4rem);">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div class="label">3주의 흐름</div>
+              <h1 class="en-display" style="margin-top: 0.4rem; font-size: clamp(1.7rem, 4.4vw, 3.4rem); line-height: 0.95;">PROMPT → MANIFEST → SKILL.</h1>
+            </div>
+            <div class="label">— 3 WEEKS</div>
+          </div>
+
+          <div class="flow" style="flex: 1;">
+            <div class="flow-step" style="gap: 0.4rem;">
+              <div class="s-num">— 01 / WEEK 01</div>
+              <div class="s-title">PROMPT</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1.15rem, 2vw, 1.7rem); line-height: 1.0; margin-top: 0.3rem; color: var(--ink);">말을<br/>걸어본 시간.</div>
+              <div class="s-quote" style="margin-top: 0.4rem;">"AI한테 지금 하는 한 마디"</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.72rem, 0.92vw, 0.85rem); opacity: 0.55; border-top: 1px solid var(--ink-faint); padding-top: 0.55rem; color: var(--ink);">↺ 매번 다시 쓴다</div>
+            </div>
+            <div class="flow-step" style="gap: 0.4rem;">
+              <div class="s-num">— 02 / WEEK 02</div>
+              <div class="s-title">MANIFEST</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1.15rem, 2vw, 1.7rem); line-height: 1.0; margin-top: 0.3rem; color: var(--ink);">작업장의<br/>헌법을 만든 시간.</div>
+              <div class="s-quote" style="margin-top: 0.4rem;">"이 폴더는 어떤 작업장인가"</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.72rem, 0.92vw, 0.85rem); opacity: 0.55; border-top: 1px solid var(--ink-faint); padding-top: 0.55rem; color: var(--ink);">CLAUDE.md · AGENTS.md</div>
+            </div>
+            <div class="flow-step hi" style="gap: 0.4rem;">
+              <div class="s-num">— 03 / WEEK 03 · TODAY</div>
+              <div class="s-title">SKILL</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1.15rem, 2vw, 1.7rem); line-height: 1.0; margin-top: 0.3rem;">반복해서<br/>부를 수 있는 기술.</div>
+              <div class="s-quote" style="margin-top: 0.4rem;">"이 일을 할 때는 이렇게 해"</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.72rem, 0.92vw, 0.85rem); opacity: 0.78; border-top: 1px solid rgba(245,239,225,0.35); padding-top: 0.55rem;">↗ SKILL.md</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: clamp(1rem, 2.5vw, 2.5rem); align-items: center; padding: clamp(0.75rem, 1.4vw, 1.1rem) 0; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);">
+            <div>
+              <div class="label" style="color: var(--ink-muted);">지난주</div>
+              <div style="font-size: clamp(0.95rem, 1.35vw, 1.18rem); margin-top: 0.3rem; font-weight: 600;">에이전트가 어떤 세계에서 일하는지를 정했다.</div>
+            </div>
+            <div style="font-family: var(--font-display-en); font-size: clamp(1.8rem, 3.2vw, 2.6rem); color: var(--accent); line-height: 1;">→</div>
+            <div>
+              <div class="label">이번 주</div>
+              <div style="font-size: clamp(0.95rem, 1.35vw, 1.18rem); margin-top: 0.3rem; font-weight: 700; color: var(--accent);">그 에이전트가 어떤 기술을 쓸 줄 아는지 정한다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>02</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        지난 2주 사용 후기 듣기 (8분). AI를 한 번이라도 켜봤는지, 무엇을 시켜봤는지, "이건 반복해서 시키고 싶다"는 일이 있었는지 끌어낸다. 그 신호가 곧 스킬의 필요성.
+      </div>
+    </section>
+    <!-- ===== 03 / REFERENCES ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>REFERENCES</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div class="label">참고 자료</div>
+              <h1 class="en-display display-md" style="margin-top: 0.4rem;">LINKS &amp;<br/>REFERENCES.</h1>
+            </div>
+            <div class="label">— LINKS</div>
+          </div>
+          <div class="grid-2" style="flex: 1; margin-top: clamp(0.6rem, 1.5vw, 1.2rem); align-items: start; gap: clamp(2rem, 4vw, 4rem);">
+            <div class="col" style="gap: clamp(0.8rem, 1.6vw, 1.3rem);">
+              <div>
+                <div class="label" style="margin-bottom: 0.3rem;">오늘의 맥락 자료</div>
+                <a class="reflink" href="https://github.com/nexu-io/open-design" target="_blank" rel="noopener">
+                  <span class="r-name">Open Design<span class="r-note">App으로 출시</span></span>
+                  <span class="r-url">github.com/nexu-io/open-design</span>
+                </a>
+                <a class="reflink" href="https://github.com/google-labs-code/design.md" target="_blank" rel="noopener">
+                  <span class="r-name">Design.md<span class="r-note">나만의 DESIGN.md 만들기</span></span>
+                  <span class="r-url">github.com/google-labs-code/design.md</span>
+                </a>
+              </div>
+              <div>
+                <div class="label" style="margin-bottom: 0.3rem;">스킬 참고</div>
+                <a class="reflink" href="https://github.com/NomaDamas/k-skill" target="_blank" rel="noopener">
+                  <span class="r-name">k-skill</span>
+                  <span class="r-url">github.com/NomaDamas/k-skill</span>
+                </a>
+                <a class="reflink" href="https://github.com/Q00/ouroboros" target="_blank" rel="noopener">
+                  <span class="r-name">ouroboros</span>
+                  <span class="r-url">github.com/Q00/ouroboros</span>
+                </a>
+              </div>
+            </div>
+            <div class="col" style="gap: 0;">
+              <div class="label" style="margin-bottom: 0.3rem;">2주간의 흐름</div>
+              <a class="reflink" href="https://x.com/CopyRebeldia/status/2061511449051341309" target="_blank" rel="noopener">
+                <span class="r-name">@CopyRebeldia</span>
+                <span class="r-url">x.com/CopyRebeldia</span>
+              </a>
+              <a class="reflink" href="https://x.com/parazar/status/2060407652870500767" target="_blank" rel="noopener">
+                <span class="r-name">@parazar</span>
+                <span class="r-url">x.com/parazar</span>
+              </a>
+              <a class="reflink" href="https://x.com/99opentabs/status/2059676473951498591" target="_blank" rel="noopener">
+                <span class="r-name">@99opentabs</span>
+                <span class="r-url">x.com/99opentabs</span>
+              </a>
+              <a class="reflink" href="https://x.com/simonkim_nft/status/2059642166885155045" target="_blank" rel="noopener">
+                <span class="r-name">@simonkim_nft</span>
+                <span class="r-url">x.com/simonkim_nft</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>03</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        지난 2주의 AI 흐름 X 글들과, 오늘의 맥락 자료(Open Design · Design.md), 스킬 참고 저장소(k-skill · ouroboros). 시간이 남을 때 한두 개만 열어 보여준다.
+      </div>
+    </section>
+
+    <!-- ===== 04 / KEY SENTENCE ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>TODAY'S SENTENCE</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%; justify-content: center; gap: clamp(1.4rem, 2.8vw, 2.2rem); max-width: 30ch;">
+          <div class="label">오늘의 한 문장</div>
+
+          <div style="font-family: var(--font-display-ko); font-size: clamp(1.5rem, 3.6vw, 2.9rem); line-height: 1.25; letter-spacing: -0.012em; font-weight: 400;">
+            <div style="opacity: 0.45;">
+              <span style="opacity: 1; color: var(--cream);">프롬프트</span>는<br/>한 번 하는 부탁,
+            </div>
+            <div style="margin-top: clamp(0.8rem, 1.6vw, 1.3rem);">
+              <span style="color: var(--cream);">스킬</span>은<br/>다시 부를 수 있는<br/><span style="color: var(--accent);">작업 절차</span>.
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: clamp(0.6rem, 1.2vw, 1rem); padding-top: clamp(0.8rem, 1.6vw, 1.3rem); border-top: 1px solid var(--cream-faint-on-navy); font-family: var(--font-mono); font-size: clamp(0.72rem, 0.92vw, 0.85rem); letter-spacing: 0.18em; color: var(--cream-dim-on-navy); text-transform: uppercase;">
+            <span>PROMPT</span>
+            <span style="color: var(--accent);">≠</span>
+            <span>SKILL</span>
+            <span style="flex: 1; height: 1px; background: var(--cream-faint-on-navy);"></span>
+            <span>CALL AGAIN</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>04</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        오늘 수업 전체를 끌고 갈 문장. 칠판에 적어두고 시작. "좋은 스킬은 멋진 말투보다 능력 · 금지선 · 완료기준이 먼저다"도 함께.
+      </div>
+    </section>
+
+    <!-- ===== 05 / PART I DIVIDER — 오늘의 지도 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART I — MAP</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 01 / SECTION</div>
+            <h1 class="ko-display display-xl">오늘의<br/><span style="color: var(--accent);">지도.</span></h1>
+            <p class="lead">스킬이 어디에 서 있는지 먼저 잡습니다. Prompt부터 Checklist까지.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1400&q=80" alt="Map" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">TODAY'S MAP</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>05</div>
+      </div>
+    </section>
+
+    <!-- ===== 06 / 5종 지도 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>FIVE LAYERS</div>
+      </div>
+      <div class="body">
+        <div class="row">
+          <div class="col" style="flex: 0 0 30%; justify-content: flex-start;">
+            <div class="label">— 칠판 문장</div>
+            <h1 class="ko-display display-md">다섯 개의<br/><span style="color: var(--accent);">역할.</span></h1>
+            <p class="body-text">하나의 만능 버튼이 아닙니다. 각자 다른 일을 하는 다섯 층입니다.</p>
+          </div>
+          <div class="col" style="flex: 1; justify-content: center; gap: 0;">
+            <div class="year-row">
+              <div class="y">PROMPT</div>
+              <div>
+                <div class="y-title">지금 하는 부탁</div>
+                <div class="y-sub">한 번의 요청 — 매번 다시 쓴다</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">MANIFEST</div>
+              <div>
+                <div class="y-title">작업장 벽에 붙은 상시 규칙</div>
+                <div class="y-sub">CLAUDE.md · AGENTS.md · DESIGN.md — 작업장의 기본 규칙</div>
+              </div>
+            </div>
+            <div class="year-row" style="border-bottom: 2px solid var(--accent); border-top: 2px solid var(--accent);">
+              <div class="y" style="color: var(--accent);">SKILL ★</div>
+              <div>
+                <div class="y-title" style="color: var(--accent);">다시 부를 수 있는 작업 절차</div>
+                <div class="y-sub">"이 일을 할 때는 이렇게 해" — 반복 가능한 절차에 이름을 붙인 것</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">MCP / CONNECTOR</div>
+              <div>
+                <div class="y-title">외부 세계에 손을 뻗는 도구</div>
+                <div class="y-sub">지도 · 메일 · 드라이브 · 데이터베이스처럼 외부 정보와 연결</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">CHECKLIST</div>
+              <div>
+                <div class="y-title">결과를 검사하는 감사관</div>
+                <div class="y-sub">결과가 잘 나왔는지 확인하는 검찰 · 감사 역할</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>06</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        칠판에 다섯 줄 적기. 오늘 배울 스킬이 이 중 가운데 칸이라는 것만 분명히. MCP는 다음 주 예고편 정도로 가볍게.
+      </div>
+    </section>
+
+    <!-- ===== 07 / 주의 — 만능 버튼 아님 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>NOT A MAGIC BUTTON</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">주의할 점</div>
+            <h1 class="ko-display display-lg">스킬은<br/>만능 버튼이<br/><span style="color: var(--accent);">아니다.</span></h1>
+            <p class="body-text">
+              한 번만 할 작업은 프롬프트로 충분합니다.<br/>
+              반복되고, 기준이 있고, 입력과 출력이 어느 정도<br/>
+              정해지는 일이 스킬 후보가 됩니다.
+            </p>
+          </div>
+          <div class="col center">
+            <div class="row" style="height: auto; gap: clamp(1rem, 2vw, 1.6rem);">
+              <div class="col" style="flex: 1; gap: 0.6rem;">
+                <div class="label" style="color: var(--ink-muted);">— 프롬프트로 충분</div>
+                <div class="body-text" style="opacity: 1;">
+                  · 한 번만 할 일<br/>
+                  · 기준이 아직 흐릿<br/>
+                  · 입력이 매번 완전히 다름<br/>
+                  · 즉흥 판단이 대부분
+                </div>
+              </div>
+              <div class="col" style="flex: 1; gap: 0.6rem; border-left: 2px solid var(--accent); padding-left: clamp(1rem, 2vw, 1.6rem);">
+                <div class="label">+ 스킬 후보</div>
+                <div class="body-text" style="opacity: 1;">
+                  · 반복해서 하는 일<br/>
+                  · 매번 비슷한 입력<br/>
+                  · 매번 비슷한 출력<br/>
+                  · 성공·실패를 말할 수 있음
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>07</div>
+      </div>
+    </section>
+
+    <!-- ===== 08 / PART II DIVIDER — Harness 복습 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PART II — HARNESS</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="photo" style="filter: none; background: var(--cream); display: flex; align-items: center; justify-content: center;">
+            <img src="./assets/harness-horse.png" alt="갑옷 입은 머리, 거친 몸통 — 하네스 비유" loading="lazy" style="object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">THE HARNESS</div>
+          </div>
+          <div class="col center">
+            <div class="label">— 02 / SECTION</div>
+            <h1 class="ko-display display-xl">하네스,<br/>다시<br/><span style="color: var(--accent);">복습.</span></h1>
+            <p class="lead">AI를 더 똑똑하게 만드는 게 아니라, 뛰어놀 울타리를 설계합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>08</div>
+      </div>
+    </section>
+
+    <!-- ===== 09 / 하네스 안의 스킬 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>HARNESS → SKILL</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">하네스 안의 동작</div>
+            <h1 class="ko-display display-lg">울타리는<br/>구조,<br/><span style="color: var(--accent);">스킬은 동작.</span></h1>
+            <p class="body-text">
+              하네스는 AI가 벗어나지 않게 잡아주는 구조이고,<br/>
+              스킬은 그 하네스 안에서 반복해서 쓸 수 있는 동작입니다.<br/>
+              지난주에는 작업장을 정했고, 이번 주에는 기술을 얹습니다.
+            </p>
+          </div>
+          <div class="col center">
+            <pre class="code"><span style="display:block;"><span class="hl">CLAUDE.md / AGENTS.md</span></span><span style="display:block;"><span class="cm"># 이 에이전트는 어떤</span></span><span style="display:block;"><span class="cm"># 작업장에서 일하는가</span></span><span style="display:block;"> </span><span style="display:block;"><span class="hl">SKILL.md</span></span><span style="display:block;"><span class="cm"># 이 에이전트는 어떤 일을</span></span><span style="display:block;"><span class="cm"># 반복해서 잘할 수 있는가</span></span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># 세계관 위에,</span></span><span style="display:block;"><span class="cm"># 반복 가능한 작은 스킬을 얹는다.</span></span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>09</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        2주차에서 학생들은 세계관과 말투는 빨리 채웠지만 능력 · 금지선 · 완료기준에서 멈췄다. 이번 주에는 순서를 뒤집는다는 점을 예고.
+      </div>
+    </section>
+
+    <!-- ===== 10 / 작성 순서 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>WRITE IN THIS ORDER</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">순서를 뒤집는다</div>
+            <h1 class="ko-display display-lg">말투는<br/><span style="color: var(--accent);">맨 마지막.</span></h1>
+            <p class="body-text">
+              먼저 이 스킬이 무엇을 할 수 있고,<br/>
+              무엇을 하면 안 되고, 언제 끝났는지를 정합니다.<br/>
+              세계관과 말투는 그다음에 붙입니다.
+            </p>
+          </div>
+          <pre class="code"><span style="display:block;"><span class="hl">1. 능력</span>      무엇을 할 수 있는가</span><span style="display:block;"><span class="hl">2. 금지선</span>    무엇을 하면 안 되는가</span><span style="display:block;"><span class="hl">3. 완료기준</span>  언제 끝났다고 보는가</span><span style="display:block;">4. 입력      무엇을 주면 되는가</span><span style="display:block;">5. 출력      어떤 형태로 받는가</span><span style="display:block;">6. 말투/세계관  어떤 캐릭터처럼</span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># 1~3을 못 쓰면</span></span><span style="display:block;"><span class="cm"># 아직 스킬이 아니라 프롬프트다.</span></span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>10</div>
+      </div>
+    </section>
+
+    <!-- ===== 11 / PART III DIVIDER — Agent Skills ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART III — MAGIC</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 03 / SECTION</div>
+            <h1 class="ko-display display-xl">에이전트에게<br/><span style="color: var(--accent);">마법을.</span></h1>
+            <p class="lead">"윙가르디움 레비오사" — 이름을 부르면 중간 과정이 생략됩니다.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="./assets/magic-wand.png" alt="윙가르디움 레비오사 — 마법의 이름을 부른다" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">AGENT SKILLS</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>11</div>
+      </div>
+    </section>
+
+    <!-- ===== 12 / 마법 비유 + 한계 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>THE METAPHOR & ITS LIMIT</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">스킬 = 이름 붙인 절차</div>
+            <h1 class="ko-display display-lg">팔의 각도를<br/>매번 설명하지<br/><span style="color: var(--accent);">않는다.</span></h1>
+            <p class="body-text">
+              마법의 이름을 부르면 중간 과정이 생략되고 결과가 나옵니다.<br/>
+              스킬도 반복되는 절차를 이름 붙여 다시 부를 수 있게 만든 것입니다.
+            </p>
+          </div>
+          <div class="col center" style="gap: clamp(0.8rem, 1.5vw, 1.2rem);">
+            <div class="label">단, 비유의 한계</div>
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">마법처럼 보이지만 설명서가 있다<span class="sub">스킬은 무지가 아니라 선택된 추상화다</span></span></li>
+              <li><span class="num">02</span><span class="text">안쪽을 다 몰라도 쓸 수 있다<span class="sub">하지만 잘 고치려면 구조를 알아야 한다</span></span></li>
+              <li><span class="num">03</span><span class="text">마법의 이름보다 중요한 것<span class="sub">언제 써야 하는지가 먼저다</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>12</div>
+      </div>
+    </section>
+
+    <!-- ===== 13 / 스킬 작성 기본 구조 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>SKELETON</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">스킬 작성의 기본 구조</div>
+            <h1 class="ko-display display-lg">폴더 하나,<br/>파일 하나면<br/><span style="color: var(--accent);">시작.</span></h1>
+            <p class="body-text">
+              <code style="font-family: var(--font-mono); color: var(--accent);">skills</code> 폴더 안에 스킬 이름의 폴더,<br/>
+              그 안에 <code style="font-family: var(--font-mono); color: var(--accent);">SKILL.md</code> 하나면 됩니다.<br/>
+              frontmatter에 이름과 설명, 본문에 절차를 적습니다.
+            </p>
+          </div>
+          <pre class="code"><span style="display:block;"><span class="cm"># 폴더 구조</span></span><span style="display:block;">skills/</span><span style="display:block;">└─ my-skill-name/</span><span style="display:block;">   └─ <span class="hl">SKILL.md</span></span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># SKILL.md frontmatter</span></span><span style="display:block;">---</span><span style="display:block;"><span class="hl">name:</span> my-skill-name</span><span style="display:block;"><span class="hl">description:</span> 언제 쓰는지 한 문장</span><span style="display:block;">---</span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># 본문: 언제 · 무엇을 ·</span></span><span style="display:block;"><span class="cm"># 무엇을 하면 안 되는지 · 결과</span></span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>13</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        참고 링크: NomaDamas/k-skill, Q00/ouroboros. 실제 스킬 폴더가 어떻게 생겼는지 하나만 열어서 보여주면 좋다.
+      </div>
+    </section>
+
+    <!-- ===== 14 / PART IV DIVIDER — 무엇을 스킬로 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PART IV — WHAT TO MAKE</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">— 04 / SECTION</div>
+            <h1 class="ko-display display-xl">무엇을<br/>스킬로<br/><span style="color: var(--accent);">만들까.</span></h1>
+            <p class="lead">반복 · 기준 · 정해진 입출력 — 세 가지가 모이면 스킬 후보입니다.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1542626991-cbc4e32524cc?w=1400&q=80" alt="Repeat" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">SKILL CANDIDATES</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>14</div>
+      </div>
+    </section>
+
+    <!-- ===== 15 / 예시 표 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>SKILL OR NOT</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div class="label">스킬 후보 판별</div>
+              <h1 class="ko-display display-md" style="margin-top: 0.4rem;">이건 스킬인가,<br/>프롬프트인가?</h1>
+            </div>
+            <div class="label">○ △ ×</div>
+          </div>
+          <div class="col" style="flex: 1; justify-content: center; gap: 0; margin-top: clamp(0.4rem, 1vw, 0.8rem);">
+            <div class="year-row">
+              <div class="y" style="color: var(--ink-muted);">△ 애매함</div>
+              <div>
+                <div class="y-title">전시 아이디어 30개 뽑기</div>
+                <div class="y-sub">반복은 가능하지만 기준이 없으면 결과가 얕아진다</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">○ 스킬 후보</div>
+              <div>
+                <div class="y-title">내 작업노트를 회의록 형식으로 정리하기</div>
+                <div class="y-sub">입력과 출력이 비교적 일정함</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">○ 스킬 후보</div>
+              <div>
+                <div class="y-title">이미지 레퍼런스를 보고 시각 요소 분석하기</div>
+                <div class="y-sub">반복 가능하고 기준을 만들 수 있음</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y" style="color: var(--ink-muted);">× 아님</div>
+              <div>
+                <div class="y-title">오늘 점심 메뉴 추천하기</div>
+                <div class="y-sub">이 수업의 작업 세계와 관계가 약함</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">○ 스킬 후보</div>
+              <div>
+                <div class="y-title">내가 만든 HTML 결과물을 비평하고 수정 제안하기</div>
+                <div class="y-sub">완료기준과 금지선을 붙이면 강력함</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>15</div>
+      </div>
+    </section>
+
+    <!-- ===== 16 / 좋은 스킬의 3요소 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>THREE ELEMENTS</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%;">
+          <div>
+            <div class="label">좋은 스킬의 3요소</div>
+            <h1 class="en-display display-md" style="margin-top: 0.4rem;">CAPABILITY ·<br/>LIMIT · DONE.</h1>
+          </div>
+          <div class="col" style="flex: 1; margin-top: clamp(0.4rem, 1vw, 0.8rem); gap: 0;">
+            <div class="elem-label">— 01 / 능력 · 무엇을 할 수 있는가</div>
+            <div class="compare-row">
+              <div class="compare-cell weak">
+                <span class="compare-tag">— 약한 줄</span>
+                좋은 아이디어를 내준다.
+              </div>
+              <div class="compare-cell strong">
+                <span class="compare-tag">+ 강한 줄</span>
+                작업노트에서 반복되는 이미지·소재·감정·기술 키워드를 추출하고 전시 아이디어 5개로 재조합한다.
+              </div>
+            </div>
+            <div class="elem-label">— 02 / 금지선 · 무엇을 하면 안 되는가</div>
+            <div class="compare-row">
+              <div class="compare-cell weak">
+                <span class="compare-tag">— 약한 줄</span>
+                이상한 결과를 만들지 않는다.
+              </div>
+              <div class="compare-cell strong">
+                <span class="compare-tag">+ 강한 줄</span>
+                사용자가 주지 않은 작가명·전시명·기관명은 사실처럼 꾸며내지 않는다.
+              </div>
+            </div>
+            <div class="elem-label">— 03 / 완료기준 · 언제 끝났는가</div>
+            <div class="compare-row">
+              <div class="compare-cell weak">
+                <span class="compare-tag">— 약한 줄</span>
+                잘 정리되면 끝난다.
+              </div>
+              <div class="compare-cell strong">
+                <span class="compare-tag">+ 강한 줄</span>
+                각 아이디어마다 제목·한 줄 설명·관객 경험·필요한 기술·가장 약한 지점이 포함되면 완료로 본다.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>16</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        세계관과 말투는 마지막에. 먼저 능력 · 금지선 · 완료기준을 정한다. 책상을 돌며 가장 먼저 묻는 질문: "이 스킬이 절대 하지 말아야 할 것 한 줄은?"
+      </div>
+    </section>
+
+    <!-- ===== 17 / PART V DIVIDER — 실습 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART V — HANDS-ON</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1400&q=80" alt="Hands on" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">HANDS-ON</div>
+          </div>
+          <div class="col center">
+            <div class="label">— 05 / SECTION</div>
+            <h1 class="ko-display display-xl">직접<br/>만들어<br/><span style="color: var(--accent);">본다.</span></h1>
+            <p class="lead">반복 업무 3개 → 하나 골라 SKILL.md → 실행하고 실패를 읽는다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>17</div>
+      </div>
+    </section>
+
+    <!-- ===== 18 / 실습 1 — 반복 업무 3개 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PRACTICE 01</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">실습 1 / 반복 업무 찾기</div>
+            <h1 class="ko-display display-lg">내 작업의<br/>반복 업무<br/><span style="color: var(--accent);">3개.</span></h1>
+            <p class="body-text">
+              매번 다시 설명하기 귀찮은 일은 무엇인가?<br/>
+              "이건 내 스타일이 아닌데" 싶은 지점은 어디인가?<br/>
+              잘 끝났다고 판단하는 기준은 무엇인가?
+            </p>
+          </div>
+          <pre class="code"><span style="display:block;"><span class="hl">## 내 작업에서 반복되는 일 3개</span></span><span style="display:block;"> </span><span style="display:block;">1. ______________________</span><span style="display:block;">2. ______________________</span><span style="display:block;">3. ______________________</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">## 오늘 스킬로 만들 하나</span></span><span style="display:block;"> </span><span style="display:block;">- ______________________</span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>18</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        약 15분. 지난주 만든 CLAUDE.md / AGENTS.md를 열어두고, 그 작업장에서 반복되는 일을 떠올리게 한다.
+      </div>
+    </section>
+
+    <!-- ===== 19 / 실습 2 — SKILL.md 템플릿 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PRACTICE 02</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">실습 2 / SKILL.md 초안</div>
+            <h1 class="ko-display display-lg">템플릿을<br/>빈칸부터<br/><span style="color: var(--accent);">채운다.</span></h1>
+            <p class="body-text">
+              능력 · 금지선 · 완료기준을 먼저,<br/>
+              입력 · 출력을 그다음,<br/>
+              말투 · 세계관은 가장 마지막에 채웁니다.
+            </p>
+          </div>
+          <pre class="code"><span style="display:block;">---</span><span style="display:block;"><span class="hl">name:</span> my-skill-name</span><span style="display:block;"><span class="hl">description:</span> 언제 쓰는지 한 문장</span><span style="display:block;">---</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">## 이 스킬이 필요한 순간</span></span><span style="display:block;"><span class="hl">## 능력</span></span><span style="display:block;"><span class="hl">## 금지선</span></span><span style="display:block;"><span class="hl">## 완료기준</span></span><span style="display:block;">## 입력</span><span style="display:block;">## 출력</span><span style="display:block;">## 말투 / 세계관</span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>19</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        약 15분. skills 폴더 → 스킬 이름 폴더 → SKILL.md 만들고 템플릿 붙여넣기. 빈칸 채우는 동안 책상을 돌며 금지선 한 줄을 먼저 묻는다.
+      </div>
+    </section>
+
+    <!-- ===== 20 / 실습 3 — 실행 루프 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PRACTICE 03 — THE LOOP</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">실습 3 / 실행 · 실패 읽기 · 보강</div>
+            <h1 class="ko-display display-lg">실패를 읽고<br/><span style="color: var(--accent);">한 줄<br/>보강한다.</span></h1>
+            <p class="body-text">
+              첫 버전은 대부분 부족합니다.<br/>
+              부족한 결과를 보고 금지선이나 완료기준을<br/>
+              한 줄 더하는 것이 오늘의 핵심입니다.
+            </p>
+          </div>
+          <ol class="loop-list">
+            <li>
+              <div>
+                <div class="l-title">1차 실행</div>
+                <span class="l-sub">스킬이 일을 어떻게 해석했는지 본다</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <div class="l-title">결과 관찰</div>
+                <span class="l-sub">의도와 어긋난 지점 1개를 고른다</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <div class="l-title">한 줄 보강</div>
+                <span class="l-sub">금지선 또는 완료기준을 한 줄 추가한다</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <div class="l-title">다시 실행</div>
+                <span class="l-sub">같은 입력으로 한 번 더 돌린다</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <div class="l-title">전/후 비교</div>
+                <span class="l-sub">한 줄이 결과를 어떻게 바꿨는지 확인</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>20</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        실패 읽기 질문: 일을 잘못 이해했나 / 입력이 부족했나 / 금지선이 없어 마음대로 했나 / 완료기준이 없어 애매하게 끝났나 / 프롬프트로 충분한 일을 억지로 스킬로 만든 건 아닌가.
+      </div>
+    </section>
+
+    <!-- ===== 21 / 공유 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>SHOW &amp; TELL</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">공유 &amp; 회고</div>
+            <h1 class="ko-display display-lg">능력,<br/>금지선,<br/><span style="color: var(--accent);">한 줄 보강.</span></h1>
+            <p class="body-text">결과물이 예쁜지보다, 내가 만든 기준이 AI의 행동을 얼마나 바꿨는지가 중요합니다.</p>
+          </div>
+          <div class="col center">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">내가 만든 스킬 이름 — 언제 쓰는가</span></li>
+              <li><span class="num">02</span><span class="text">능력 한 줄</span></li>
+              <li><span class="num">03</span><span class="text">금지선 한 줄</span></li>
+              <li><span class="num">04</span><span class="text">완료기준 한 줄</span></li>
+              <li><span class="num">05</span><span class="text">1차 실행에서 오해한 것 → 보강 후 달라진 것</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>21</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        각자 1분 공유. 시간이 빠듯하면 1 · 3 · 5번만. 서로의 "스킬 언어"가 어떻게 다른지를 보게 한다.
+      </div>
+    </section>
+
+
+    <!-- ===== 22 / NEXT — 다음 주 과제 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>END OF WK03</div>
+      </div>
+      <div class="body" style="justify-content: space-between;">
+        <div class="col">
+          <div class="label">NEXT — WEEK 04</div>
+          <h1 class="ko-display display-xl">나의 에이전트<br/><span style="color: var(--accent);">마법 목록.</span></h1>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: clamp(1.5rem, 3vw, 3rem); align-items: end;">
+          <div class="col" style="gap: 0.9rem;">
+            <p class="lead" style="max-width: 42ch;">
+              다음 주까지 내 에이전트에게 가르치고 싶은 스킬 3개를 적어옵니다.<br/>
+              각 스킬마다 능력 · 금지선 · 완료기준 세 줄만.
+            </p>
+            <pre class="code" style="font-size: clamp(0.72rem, 0.95vw, 0.88rem);"><span style="display:block;"><span class="hl">## 스킬 이름</span></span><span style="display:block;">- 능력:</span><span style="display:block;">- 금지선:</span><span style="display:block;">- 완료기준:</span></pre>
+          </div>
+          <div class="datestack" style="text-align: right;">
+            <span>WK</span><span class="slash">\</span><span>04</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>END / 22</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        다음 주 연결: 스킬을 더 안정적으로 관리하기 · DESIGN.md와 연결해 시각 결과물 기준 만들기 · 필요하면 MCP / Connector로 외부 데이터 연결 · 결과물을 공유 가능한 형태로 정리하기.
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Help overlay -->
+  <div class="help" id="help">
+    <div class="help-content">
+      <h3>KEYBOARD SHORTCUTS</h3>
+      <ul>
+        <li><kbd>→</kbd> <kbd>Space</kbd> 다음 슬라이드</li>
+        <li><kbd>←</kbd> 이전 슬라이드</li>
+        <li><kbd>Home</kbd> 처음으로</li>
+        <li><kbd>End</kbd> 마지막으로</li>
+        <li><kbd>N</kbd> 발표자 노트 토글</li>
+        <li><kbd>F</kbd> 전체화면</li>
+        <li><kbd>?</kbd> 이 도움말</li>
+        <li><kbd>Esc</kbd> 닫기</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    const help = document.getElementById('help');
+    let current = 0;
+    let notesVisible = false;
+
+    function go(idx) {
+      idx = Math.max(0, Math.min(slides.length - 1, idx));
+      slides[current].classList.remove('active');
+      slides[idx].classList.add('active');
+      current = idx;
+      progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+      const hash = '#' + (idx + 1);
+      if (location.hash !== hash) history.replaceState(null, '', hash);
+      applyNotes();
+    }
+    function applyNotes() {
+      slides.forEach(s => {
+        const n = s.querySelector('.speaker-note');
+        if (!n) return;
+        n.classList.toggle('visible', notesVisible && s.classList.contains('active'));
+      });
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown':
+          e.preventDefault(); go(current + 1); break;
+        case 'ArrowLeft': case 'PageUp':
+          e.preventDefault(); go(current - 1); break;
+        case 'Home': e.preventDefault(); go(0); break;
+        case 'End': e.preventDefault(); go(slides.length - 1); break;
+        case 'n': case 'N': notesVisible = !notesVisible; applyNotes(); break;
+        case 'f': case 'F':
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+          else document.exitFullscreen();
+          break;
+        case '?': help.classList.toggle('visible'); break;
+        case 'Escape': help.classList.remove('visible'); break;
+      }
+    });
+    help.addEventListener('click', () => help.classList.remove('visible'));
+
+    const initial = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(initial) && initial >= 1 && initial <= slides.length) go(initial - 1);
+    else progress.style.width = (1 / slides.length * 100) + '%';
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+    });
+
+    // ── Cover doc typing animation: trigger on hover ──
+    (function() {
+      const coverSlide = slides[0];
+      const mark = coverSlide && coverSlide.querySelector('.cover-mark');
+      if (!mark) return;
+      let cooldown = false;
+      function play() {
+        if (cooldown) return;
+        cooldown = true;
+        mark.classList.remove('is-typing');
+        void mark.offsetWidth;
+        mark.classList.add('is-typing');
+        setTimeout(() => { cooldown = false; }, 3500);
+      }
+      coverSlide.addEventListener('mouseenter', play);
+      coverSlide.addEventListener('touchstart', play, { passive: true });
+    })();
+  </script>
+</body>
+</html>

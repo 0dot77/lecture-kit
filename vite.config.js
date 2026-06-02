@@ -25,6 +25,7 @@ export default defineConfig({
         "papri-index": "courses/papri-ai-workshop/index.html",
         "papri-week01": "courses/papri-ai-workshop/week-01.html",
         "papri-week02": "courses/papri-ai-workshop/week-02.html",
+        "papri-week03": "courses/papri-ai-workshop/week-03.html",
         "fh-index": "courses/feed-hijacking/index.html",
         "fh-week01": "courses/feed-hijacking/week-01.html",
         "fh-week02": "courses/feed-hijacking/week-02.html",
