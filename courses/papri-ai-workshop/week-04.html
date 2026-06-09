@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEEK 04 — Papri AI Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=Archivo+Black&family=JetBrains+Mono:wght@400;600&display=swap" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    :root {
+      --navy: #1e2a4a;
+      --navy-deep: #161e3a;
+      --cream: #ede4d3;
+      --cream-light: #f5efe1;
+      --cream-dim-on-navy: rgba(237, 228, 211, 0.6);
+      --cream-faint-on-navy: rgba(237, 228, 211, 0.18);
+      --ink: #1a2542;
+      --ink-muted: rgba(26, 37, 66, 0.62);
+      --ink-faint: rgba(26, 37, 66, 0.18);
+      --accent: #d4623a;
+
+      --font-body: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+      --font-display-en: "Archivo Black", "Bebas Neue", "Pretendard Variable", sans-serif;
+      --font-display-ko: "Black Han Sans", "Pretendard Variable", sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      background: #000;
+      color: var(--cream);
+    }
+
+    .deck { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: clamp(1.4rem, 3vw, 2.8rem) clamp(2rem, 5vw, 4.5rem);
+      background: var(--navy);
+      color: var(--cream);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.cream { background: var(--cream); color: var(--ink); }
+
+    .rail {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: clamp(0.6rem, 0.8vw, 0.78rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--cream-dim-on-navy);
+    }
+    .slide.cream .rail { color: var(--ink-muted); }
+    .rail-bottom { padding-top: 0.9rem; border-top: 1px solid var(--cream-faint-on-navy); }
+    .slide.cream .rail-bottom { border-top-color: var(--ink-faint); }
+
+    .body {
+      flex: 1;
+      display: flex; flex-direction: column;
+      padding: clamp(1.2rem, 2.5vw, 2.5rem) 0;
+      overflow: hidden;
+      justify-content: center;
+    }
+
+    .ko-display {
+      font-family: var(--font-display-ko);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.015em;
+    }
+    .en-display {
+      font-family: var(--font-display-en);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .display-xl { font-size: clamp(3rem, 11vw, 9.5rem); }
+    .display-lg { font-size: clamp(2.5rem, 8vw, 6.5rem); }
+    .display-md { font-size: clamp(2rem, 6vw, 5rem); }
+    .display-sm { font-size: clamp(1.5rem, 4vw, 3.2rem); }
+
+    .label {
+      font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .lead {
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      line-height: 1.55;
+      max-width: 60ch;
+      opacity: 0.9;
+    }
+    .body-text {
+      font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+      line-height: 1.65;
+      opacity: 0.82;
+    }
+
+    .row { display: flex; gap: clamp(2rem, 4vw, 4rem); height: 100%; }
+    .col { display: flex; flex-direction: column; gap: clamp(1rem, 2vw, 1.5rem); }
+    .col.center { justify-content: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 4vw, 4rem); height: 100%; align-items: center; }
+    .grid-2.lopsided { grid-template-columns: 1.1fr 0.9fr; }
+    .grid-2.image-left { grid-template-columns: 0.9fr 1.1fr; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.2rem, 2.5vw, 2.2rem); height: 100%; }
+    .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(1rem, 2vw, 1.8rem); height: 100%; }
+
+    .photo {
+      position: relative;
+      width: 100%; height: 100%;
+      min-height: clamp(220px, 40vh, 460px);
+      background: var(--navy-deep);
+      overflow: hidden;
+      filter: grayscale(100%) contrast(1.1) brightness(0.85);
+    }
+    .slide.cream .photo { filter: grayscale(100%) contrast(1.05) brightness(0.92); }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo .photo-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        repeating-linear-gradient(45deg, transparent 0 12px, rgba(237,228,211,0.06) 12px 13px),
+        var(--navy-deep);
+      color: var(--cream-dim-on-navy);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .photo.tinted::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(30,42,74,0.35) 0%, rgba(30,42,74,0.55) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    /* Video embed */
+    .videoframe {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--navy-deep);
+      border: 1px solid var(--cream-faint-on-navy);
+      overflow: hidden;
+    }
+    .slide.cream .videoframe { border-color: var(--ink-faint); }
+    .videoframe iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      border: 0; display: block;
+    }
+
+    .num-list { display: flex; flex-direction: column; gap: clamp(0.6rem, 1.2vw, 1rem); list-style: none; }
+    .num-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: clamp(0.9rem, 1.8vw, 1.5rem);
+      align-items: baseline;
+      padding-bottom: clamp(0.5rem, 0.9vw, 0.85rem);
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .num-list li { border-bottom-color: var(--ink-faint); }
+    .num-list .num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .num-list .text {
+      font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .num-list .sub {
+      display: block; margin-top: 0.25rem;
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      font-weight: 400; opacity: 0.65;
+      letter-spacing: 0; text-transform: none;
+    }
+
+    .card {
+      border: 1px solid var(--cream-faint-on-navy);
+      padding: clamp(1.1rem, 1.8vw, 1.7rem);
+      display: flex; flex-direction: column;
+      gap: 0.55rem;
+      height: 100%;
+    }
+    .slide.cream .card { border-color: var(--ink-faint); }
+    .card .c-num {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    .card .c-title {
+      font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+    }
+    .card .c-title.mono { font-family: var(--font-mono); font-weight: 700; letter-spacing: 0; }
+    .card .c-body {
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      line-height: 1.55;
+      opacity: 0.78;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+    .tag {
+      font-size: clamp(0.7rem, 0.9vw, 0.82rem);
+      padding: 0.28rem 0.65rem;
+      border: 1px solid var(--cream-faint-on-navy);
+      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+    .slide.cream .tag { border-color: var(--ink-faint); }
+    .tag.solid { background: var(--accent); color: var(--cream-light); border-color: var(--accent); }
+
+    .code {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1.05vw, 0.95rem);
+      line-height: 1.7;
+      padding: clamp(1rem, 1.8vw, 1.5rem) clamp(1.1rem, 2vw, 1.7rem);
+      background: var(--navy-deep);
+      color: var(--cream);
+      border-left: 3px solid var(--accent);
+      overflow: auto;
+    }
+    .slide.cream .code { background: var(--navy); }
+    .code .cm { color: var(--cream-dim-on-navy); }
+    .code .hl { color: var(--accent); }
+
+    .datestack {
+      font-family: var(--font-display-en);
+      font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .datestack .slash { color: var(--accent); margin: 0 0.05em; }
+
+    .quote-block {
+      font-family: var(--font-display-ko);
+      font-size: clamp(2rem, 5.5vw, 4.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .quote-block .accent { color: var(--accent); }
+
+    /* Year band (re-purposed as layered table) */
+    .year-row {
+      display: grid;
+      grid-template-columns: minmax(190px, 30%) 1fr;
+      gap: clamp(1.2rem, 2.5vw, 2.5rem);
+      align-items: baseline;
+      padding: clamp(0.85rem, 1.6vw, 1.4rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .year-row:last-child { border-bottom: none; }
+    .slide.cream .year-row { border-bottom-color: var(--ink-faint); }
+    .year-row .y {
+      font-family: var(--font-mono);
+      font-size: clamp(0.85rem, 1.15vw, 1.05rem);
+      line-height: 1.2;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .year-row .y-title {
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .year-row .y-sub {
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      opacity: 0.72;
+      margin-top: 0.3rem;
+    }
+
+    .flow { display: flex; width: 100%; }
+    .flow-step {
+      flex: 1;
+      padding: clamp(1.1rem, 2vw, 1.7rem);
+      border: 1px solid var(--cream-faint-on-navy);
+      border-right: none;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .flow-step:last-child { border-right: 1px solid var(--cream-faint-on-navy); }
+    .slide.cream .flow-step { border-color: var(--ink-faint); }
+    .slide.cream .flow-step:last-child { border-right-color: var(--ink-faint); }
+    .flow-step.hi { background: var(--accent); color: var(--cream-light); border-color: var(--accent); }
+    .flow-step.hi + .flow-step { border-left-color: var(--accent); }
+    .flow-step .s-num { font-family: var(--font-display-en); font-size: 0.78rem; letter-spacing: 0.15em; opacity: 0.7; }
+    .flow-step .s-title {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+      letter-spacing: 0.02em; line-height: 1.05;
+    }
+    .flow-step .s-quote { font-size: clamp(0.78rem, 1vw, 0.95rem); line-height: 1.45; opacity: 0.85; font-style: italic; }
+
+    /* Compare strip: 약한 줄 / 강한 줄 */
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(0.8rem, 1.6vw, 1.4rem);
+      padding: clamp(0.7rem, 1.2vw, 1rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+      align-items: start;
+    }
+    .compare-row:last-child { border-bottom: none; }
+    .slide.cream .compare-row { border-bottom-color: var(--ink-faint); }
+    .compare-cell {
+      font-family: var(--font-mono);
+      font-size: clamp(0.78rem, 1.05vw, 0.96rem);
+      line-height: 1.55;
+      padding: clamp(0.5rem, 0.9vw, 0.8rem) clamp(0.7rem, 1.2vw, 1rem);
+      border-left: 2.5px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .compare-cell { border-left-color: var(--ink-faint); }
+    .compare-cell.weak { opacity: 0.55; text-decoration: line-through; text-decoration-thickness: 1px; }
+    .compare-cell.strong { border-left-color: var(--accent); color: inherit; opacity: 1; }
+    .compare-tag {
+      font-family: var(--font-display-en);
+      font-size: clamp(0.65rem, 0.85vw, 0.78rem);
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .compare-cell.weak .compare-tag { color: var(--cream-dim-on-navy); }
+    .slide.cream .compare-cell.weak .compare-tag { color: var(--ink-muted); }
+    .elem-label {
+      font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+      letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800;
+      color: var(--accent);
+      padding: clamp(0.5rem, 1vw, 0.85rem) 0 0.1rem;
+    }
+
+    /* Loop diagram: vertical numbered */
+    .loop-list {
+      display: flex; flex-direction: column;
+      gap: clamp(0.5rem, 1vw, 0.85rem);
+      counter-reset: loopstep;
+      list-style: none;
+    }
+    .loop-list li {
+      counter-increment: loopstep;
+      display: grid;
+      grid-template-columns: clamp(40px, 5vw, 60px) 1fr;
+      gap: clamp(0.8rem, 1.4vw, 1.2rem);
+      align-items: baseline;
+      padding: clamp(0.6rem, 1vw, 0.9rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+    }
+    .slide.cream .loop-list li { border-bottom-color: var(--ink-faint); }
+    .loop-list li::before {
+      content: counter(loopstep, decimal-leading-zero);
+      font-family: var(--font-display-en);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      color: var(--accent);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .loop-list .l-title {
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .loop-list .l-sub {
+      display: block; margin-top: 0.25rem;
+      font-size: clamp(0.82rem, 1.05vw, 0.98rem);
+      opacity: 0.72;
+      font-weight: 400;
+    }
+
+    /* Reference links */
+    .reflink {
+      display: block;
+      padding: clamp(0.5rem, 0.9vw, 0.8rem) 0;
+      border-bottom: 1px solid var(--cream-faint-on-navy);
+      text-decoration: none;
+      color: inherit;
+    }
+    .slide.cream .reflink { border-bottom-color: var(--ink-faint); }
+    .reflink:last-child { border-bottom: none; }
+    .reflink .r-name {
+      font-size: clamp(0.95rem, 1.4vw, 1.18rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .reflink .r-name .r-note {
+      font-weight: 400; opacity: 0.6;
+      font-size: clamp(0.78rem, 1vw, 0.92rem);
+      margin-left: 0.4rem;
+    }
+    .reflink .r-url {
+      display: block; margin-top: 0.2rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.7rem, 0.92vw, 0.84rem);
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .reflink:hover .r-name { color: var(--accent); }
+
+    .papri-logo {
+      height: clamp(34px, 3.6vw, 52px);
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .speaker-note {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-height: 38vh; overflow-y: auto;
+      background: var(--navy-deep);
+      border-top: 2px solid var(--accent);
+      color: var(--cream);
+      padding: 1.1rem 2rem;
+      font-size: 0.92rem; line-height: 1.6;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .speaker-note.visible { transform: translateY(0); }
+    .speaker-note .sn-label {
+      font-family: var(--font-display-en);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 50; transition: width 0.3s ease; }
+    .help {
+      position: fixed; inset: 0; background: rgba(22,30,58,0.96);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; color: var(--cream);
+    }
+    .help.visible { display: flex; }
+    .help-content { max-width: 500px; padding: 2rem; }
+    .help-content h3 { font-family: var(--font-display-en); font-size: 1.6rem; margin-bottom: 1.4rem; letter-spacing: 0.02em; }
+    .help-content kbd {
+      display: inline-block; padding: 0.2rem 0.55rem;
+      background: var(--navy-deep);
+      border: 1px solid var(--cream-faint-on-navy);
+      font-family: var(--font-mono); font-size: 0.82rem;
+      margin-right: 0.5rem; min-width: 2.4rem; text-align: center;
+    }
+    .help-content ul { list-style: none; }
+    .help-content li { padding: 0.45rem 0; font-size: 0.95rem; }
+
+    /* Cover cycle motif */
+    .cover-cycle {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap;
+      gap: clamp(0.6rem, 1.6vw, 1.4rem);
+      font-family: var(--font-display-en);
+      letter-spacing: 0.02em;
+    }
+    .cover-cycle .ck {
+      font-size: clamp(1.1rem, 2.6vw, 2.2rem);
+      line-height: 1;
+    }
+    .cover-cycle .ck.dim { opacity: 0.4; }
+    .cover-cycle .arr {
+      color: var(--accent);
+      font-size: clamp(1.2rem, 2.8vw, 2.4rem);
+      line-height: 1;
+    }
+
+    @media (max-width: 760px) {
+      .grid-2, .grid-2.lopsided, .grid-2.image-left, .grid-3 { grid-template-columns: 1fr; gap: 1.5rem; }
+      .grid-4 { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .row { flex-direction: column; }
+      .flow { flex-direction: column; }
+      .flow-step { border-right: 1px solid var(--cream-faint-on-navy); }
+      .photo { min-height: 200px; }
+      .year-row { grid-template-columns: 1fr; gap: 0.6rem; }
+      .compare-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      .slide { position: relative; opacity: 1; page-break-after: always; height: 100vh; }
+      .progress, .speaker-note, .help { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <!-- ===== 01 / COVER ===== -->
+    <section class="slide active">
+      <div class="rail">
+        <div></div>
+        <div>PRESENTATION</div>
+      </div>
+      <div class="body" style="justify-content: center; align-items: center; position: relative;">
+        <div class="cover-cycle" style="margin-bottom: clamp(1.4rem, 3vw, 2.6rem);">
+          <span class="ck">GO WIDE</span>
+          <span class="arr">→</span>
+          <span class="ck">REMIX</span>
+          <span class="arr">→</span>
+          <span class="ck">ITERATE</span>
+          <span class="arr">↻</span>
+        </div>
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; width: 100%; flex-wrap: wrap;">
+          <div class="datestack">
+            <span>2026</span><span class="slash">/</span><span>06</span>
+          </div>
+          <div style="text-align: center; flex: 1; min-width: 280px;">
+            <div class="label" style="margin-bottom: 0.6rem;">넓게 가고 · 섞고 · 반복한다</div>
+          </div>
+          <div class="datestack" style="text-align: right;">
+            <span>WEEK</span><span class="slash">\</span><span>04</span>
+          </div>
+        </div>
+        <h1 class="en-display display-xl" style="text-align: center; margin-top: clamp(0.5rem, 1.5vw, 1rem);">PAPRI<br/>AI WORKSHOP</h1>
+      </div>
+      <div class="rail rail-bottom">
+        <div>WORKSHOP — 2026</div>
+        <div>PRESENTED BY YOO TAEYANG</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        4주차 — 마지막 시간. 도구와 작업장과 스킬을 익힌 위에서, 이번 주에는 직접 만들고 세상에 내보낸다. 핵심 문장은 Go Wide, Remix, Iterate. 넓게 시도하고, 남의 것을 가져와 섞고, 실패를 읽고 다시 돌린다.
+      </div>
+    </section>
+
+    <!-- ===== 02 / RECAP — 4주의 흐름 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>RECAP — WEEK 01–04</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%; gap: clamp(0.9rem, 1.8vw, 1.4rem);">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+            <div>
+              <div class="label">4주의 흐름</div>
+              <h1 class="en-display" style="margin-top: 0.4rem; font-size: clamp(1.5rem, 4vw, 3rem); line-height: 0.95;">PROMPT → MANIFEST → SKILL → SHIP.</h1>
+            </div>
+            <div class="label">— 4 WEEKS</div>
+          </div>
+
+          <div class="flow" style="flex: 1;">
+            <div class="flow-step" style="gap: 0.4rem;">
+              <div class="s-num">— 01 / WEEK 01</div>
+              <div class="s-title">PROMPT</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1rem, 1.8vw, 1.5rem); line-height: 1.0; margin-top: 0.3rem; color: var(--ink);">말을<br/>걸어본 시간.</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.7rem, 0.9vw, 0.82rem); opacity: 0.55; border-top: 1px solid var(--ink-faint); padding-top: 0.55rem; color: var(--ink);">↺ 매번 다시 쓴다</div>
+            </div>
+            <div class="flow-step" style="gap: 0.4rem;">
+              <div class="s-num">— 02 / WEEK 02</div>
+              <div class="s-title">MANIFEST</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1rem, 1.8vw, 1.5rem); line-height: 1.0; margin-top: 0.3rem; color: var(--ink);">작업장의<br/>헌법.</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.7rem, 0.9vw, 0.82rem); opacity: 0.55; border-top: 1px solid var(--ink-faint); padding-top: 0.55rem; color: var(--ink);">CLAUDE.md · AGENTS.md</div>
+            </div>
+            <div class="flow-step" style="gap: 0.4rem;">
+              <div class="s-num">— 03 / WEEK 03</div>
+              <div class="s-title">SKILL</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1rem, 1.8vw, 1.5rem); line-height: 1.0; margin-top: 0.3rem; color: var(--ink);">다시 부를 수<br/>있는 기술.</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.7rem, 0.9vw, 0.82rem); opacity: 0.55; border-top: 1px solid var(--ink-faint); padding-top: 0.55rem; color: var(--ink);">SKILL.md</div>
+            </div>
+            <div class="flow-step hi" style="gap: 0.4rem;">
+              <div class="s-num">— 04 / WEEK 04 · TODAY</div>
+              <div class="s-title">SHIP</div>
+              <div style="font-family: var(--font-display-ko); font-size: clamp(1rem, 1.8vw, 1.5rem); line-height: 1.0; margin-top: 0.3rem;">직접 만들고<br/>내보낸다.</div>
+              <div style="flex: 1;"></div>
+              <div style="font-family: var(--font-mono); font-size: clamp(0.7rem, 0.9vw, 0.82rem); opacity: 0.78; border-top: 1px solid rgba(245,239,225,0.35); padding-top: 0.55rem;">↗ GO WIDE</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: clamp(1rem, 2.5vw, 2.5rem); align-items: center; padding: clamp(0.75rem, 1.4vw, 1.1rem) 0; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);">
+            <div>
+              <div class="label" style="color: var(--ink-muted);">지난 3주</div>
+              <div style="font-size: clamp(0.95rem, 1.35vw, 1.18rem); margin-top: 0.3rem; font-weight: 600;">도구와 작업장과 기술을 익혔다.</div>
+            </div>
+            <div style="font-family: var(--font-display-en); font-size: clamp(1.8rem, 3.2vw, 2.6rem); color: var(--accent); line-height: 1;">→</div>
+            <div>
+              <div class="label">이번 주</div>
+              <div style="font-size: clamp(0.95rem, 1.35vw, 1.18rem); margin-top: 0.3rem; font-weight: 700; color: var(--accent);">그 위에서 직접 만들고, 넓히고, 내보낸다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>02</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        세 주의 흐름을 한 줄로 잇는다. 프롬프트 → 매니페스트 → 스킬, 그리고 오늘은 직접 만들어 내보내는 SHIP. 마지막 칸이 오늘이라는 것만 분명히.
+      </div>
+    </section>
+
+    <!-- ===== 03 / 한 주간의 사용 후기 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>ONE WEEK IN</div>
+      </div>
+      <div class="body">
+        <div class="row">
+          <div class="col" style="flex: 0 0 38%; justify-content: center;">
+            <div class="label">지난 한 주</div>
+            <h1 class="ko-display display-md">한 주간의<br/><span style="color: var(--accent);">사용 후기.</span></h1>
+            <p class="body-text">스킬을 만든 뒤 한 주를 보냈습니다. 무엇이 달라졌고, 어디서 막혔는지 먼저 듣습니다.</p>
+          </div>
+          <div class="col center" style="flex: 1;">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">이번 주에 AI에게 가장 자주 시킨 일은 무엇인가<span class="sub">반복해서 부른 작업이 있었는지</span></span></li>
+              <li><span class="num">02</span><span class="text">만든 스킬이 실제로 도움이 됐는가<span class="sub">한 줄 보강으로 결과가 바뀐 순간</span></span></li>
+              <li><span class="num">03</span><span class="text">어디서 답답했는가<span class="sub">도구·작업장·스킬 중 막힌 지점</span></span></li>
+              <li><span class="num">04</span><span class="text">이번 주에 만들고 싶어진 것<span class="sub">오늘 실습으로 이어질 호기심</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>03</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        약 10분. 한 주 사용 후기를 돌아가며 듣는다. "만들고 싶어진 것" 신호를 메모해 두면 오늘 실습 주제로 바로 연결된다.
+      </div>
+    </section>
+
+    <!-- ===== 04 / KEY SENTENCE ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>TODAY'S SENTENCE</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%; justify-content: center; gap: clamp(1.4rem, 2.8vw, 2.2rem); max-width: 32ch;">
+          <div class="label">오늘의 한 문장</div>
+
+          <div style="font-family: var(--font-display-ko); font-size: clamp(1.5rem, 3.6vw, 2.9rem); line-height: 1.25; letter-spacing: -0.012em; font-weight: 400;">
+            <div><span style="color: var(--accent);">넓게</span> 가고,</div>
+            <div style="margin-top: clamp(0.5rem, 1vw, 0.9rem);"><span style="color: var(--accent);">섞고</span>,</div>
+            <div style="margin-top: clamp(0.5rem, 1vw, 0.9rem);"><span style="color: var(--accent);">반복</span>한다.</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: clamp(0.6rem, 1.2vw, 1rem); padding-top: clamp(0.8rem, 1.6vw, 1.3rem); border-top: 1px solid var(--cream-faint-on-navy); font-family: var(--font-mono); font-size: clamp(0.72rem, 0.92vw, 0.85rem); letter-spacing: 0.18em; color: var(--cream-dim-on-navy); text-transform: uppercase;">
+            <span>GO WIDE</span>
+            <span style="color: var(--accent);">·</span>
+            <span>REMIX</span>
+            <span style="color: var(--accent);">·</span>
+            <span>ITERATE</span>
+            <span style="flex: 1; height: 1px; background: var(--cream-faint-on-navy);"></span>
+            <span>SHIP IT</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>04</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        오늘 전체를 끌고 갈 문장. 완벽한 하나보다 넓게 여러 개. 처음부터 만들기보다 가져와 섞기. 한 번에 끝내기보다 실패를 읽고 다시 돌리기.
+      </div>
+    </section>
+
+    <!-- ===== 05 / PART I DIVIDER — 큰 전환점 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART I — THE SHIFT</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 01 / SECTION</div>
+            <h1 class="ko-display display-xl">큰<br/><span style="color: var(--accent);">전환점.</span></h1>
+            <p class="lead">바텀업에서 탑다운으로. 도구를 익히는 시대에서, 실제 작업으로 증명하는 시대로.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&q=80" alt="Shift" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">THE SHIFT</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>05</div>
+      </div>
+    </section>
+
+    <!-- ===== 06 / 탑다운 · PBL + youtube ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>TOP-DOWN &amp; PBL</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">방향이 뒤집힌다</div>
+            <h1 class="ko-display display-lg">바텀업이 아닌<br/><span style="color: var(--accent);">탑다운.</span></h1>
+            <p class="body-text">
+              작은 기능부터 쌓아 올리는 대신,<br/>
+              실제로 만들고 싶은 결과에서 시작합니다.<br/>
+              프로젝트가 먼저고(PBL), 필요한 기술은 그 안에서 익힙니다.
+            </p>
+            <div style="border-left: 2px solid var(--accent); padding-left: clamp(1rem, 2vw, 1.6rem); font-size: clamp(1rem, 1.6vw, 1.35rem); font-weight: 700; line-height: 1.4; color: var(--accent);">
+              이미 만들 것을 가진 사람이<br/>지금 가장 빠르게 간다.
+            </div>
+          </div>
+          <div class="col center">
+            <div class="videoframe">
+              <iframe src="https://www.youtube.com/embed/gE1oYwcFywg" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: clamp(0.7rem, 0.9vw, 0.82rem); color: var(--cream-dim-on-navy); letter-spacing: 0.04em;">youtu.be/gE1oYwcFywg</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>06</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        영상은 1–2분만 발췌. 핵심은 PBL — 프로젝트가 기술 학습을 끌고 간다. 실제 작업을 가진 사람이 도구를 가장 빨리 흡수한다는 점을 오늘 실습 동기로 연결.
+      </div>
+    </section>
+
+    <!-- ===== 07 / PART II DIVIDER — 업계의 신호 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART II — THE SIGNAL</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">— 02 / SECTION</div>
+            <h1 class="ko-display display-lg">세 무대가<br/>같은 단어를<br/><span style="color: var(--accent);">말했다.</span></h1>
+            <p class="lead">Nvidia GTC · Apple WWDC · Google I/O — 올해의 키워드는 하나로 모였습니다: 에이전트.</p>
+          </div>
+          <div class="col center">
+            <div class="grid-3" style="height: auto;">
+              <div class="card">
+                <div class="c-num">— GTC</div>
+                <div class="c-title">NVIDIA</div>
+                <div class="c-body">에이전트와 데스크톱 위의 자율 실행</div>
+              </div>
+              <div class="card">
+                <div class="c-num">— WWDC</div>
+                <div class="c-title">APPLE</div>
+                <div class="c-body">개인 기기 위의 온디바이스 지능</div>
+              </div>
+              <div class="card">
+                <div class="c-num">— I/O</div>
+                <div class="c-title">GOOGLE</div>
+                <div class="c-body">멀티 에이전트와 오케스트레이션</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>07</div>
+      </div>
+    </section>
+
+    <!-- ===== 08 / Harness → Agent + Orchestration ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>HARNESS → AGENT</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">무게중심이 옮겨간다</div>
+            <h1 class="ko-display display-lg">하네스에서<br/><span style="color: var(--accent);">에이전트로.</span></h1>
+            <p class="body-text">
+              울타리를 직접 짜던 단계에서,<br/>
+              스스로 판단하고 일하는 에이전트로 무게가 옮겨갑니다.<br/>
+              여러 에이전트를 지휘하는 오케스트레이션이 다음 주제입니다.
+            </p>
+          </div>
+          <pre class="code"><span style="display:block;"><span class="cm"># 지난 단계</span></span><span style="display:block;"><span class="hl">HARNESS</span>  울타리를 짠다</span><span style="display:block;">         (사람이 구조를 설계)</span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># 다음 단계</span></span><span style="display:block;"><span class="hl">AGENT</span>    스스로 일한다</span><span style="display:block;">         (목표를 주면 절차를 짠다)</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">ORCHESTRATION</span></span><span style="display:block;">         여러 에이전트를 지휘한다</span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>08</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        하네스는 우리가 4주간 익힌 그 울타리다. 이제 그 안에서 도는 에이전트가 스스로 절차를 짜고, 여러 에이전트가 협업하는 단계로 넘어간다는 신호.
+      </div>
+    </section>
+
+    <!-- ===== 09 / Hermes Agent + 실험과 반복 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>AGENT ON THE DESKTOP</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">데스크톱 위의 에이전트</div>
+            <h1 class="ko-display display-lg">내 책상에서<br/>도는<br/><span style="color: var(--accent);">에이전트.</span></h1>
+            <p class="body-text">
+              Hermes(Nvidia) 같은 데스크톱 앱은<br/>
+              에이전트를 한 사람의 작업 환경 안으로 들여옵니다.
+            </p>
+          </div>
+          <div class="col center">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">장기기억<span class="sub">대화를 넘어 작업 맥락을 계속 기억한다</span></span></li>
+              <li><span class="num">02</span><span class="text">Cron Job<span class="sub">정해진 시각에 스스로 작업을 실행한다</span></span></li>
+              <li><span class="num">03</span><span class="text">다중 에이전트 · 작업 위임<span class="sub">일을 쪼개 다른 에이전트에게 맡긴다</span></span></li>
+              <li><span class="num">04</span><span class="text">결국 핵심은 실험과 반복<span class="sub">작게 돌려보고, 실패를 읽고, 다시 돌린다</span></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>09</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        Hermes는 예시일 뿐, 방향을 보여주는 신호로 다룬다. 장기기억·자동실행·작업위임이 한 데스크톱 안에 들어온다. 그러나 어떤 도구든 핵심은 실험과 반복이라는 점으로 닫는다.
+      </div>
+    </section>
+
+    <!-- ===== 10 / PART III DIVIDER — 3주간의 여정 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PART III — THE JOURNEY</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">— 03 / SECTION</div>
+            <h1 class="ko-display display-xl">3주간의<br/><span style="color: var(--accent);">여정.</span></h1>
+            <p class="lead">도구 · 작업장 · 하네스 · 스킬 — 우리가 지나온 것들을 한 장에 모읍니다.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1400&q=80" alt="Journey" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">THE JOURNEY</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>10</div>
+      </div>
+    </section>
+
+    <!-- ===== 11 / 여정 지도 (layers) ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>WHAT WE LEARNED</div>
+      </div>
+      <div class="body">
+        <div class="row">
+          <div class="col" style="flex: 0 0 30%; justify-content: flex-start;">
+            <div class="label">— 한눈에</div>
+            <h1 class="ko-display display-md">우리가<br/>익힌 <span style="color: var(--accent);">것들.</span></h1>
+            <p class="body-text">하나하나 따로가 아니라, 위로 쌓이는 한 층 한 층이었습니다.</p>
+          </div>
+          <div class="col" style="flex: 1; justify-content: center; gap: 0;">
+            <div class="year-row">
+              <div class="y">TOOLS</div>
+              <div>
+                <div class="y-title">작업이 일어나는 자리</div>
+                <div class="y-sub">Terminal · Warp · Claude Code · Codex · Claude Design</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">MANIFEST</div>
+              <div>
+                <div class="y-title">이 폴더는 어떤 작업장인가</div>
+                <div class="y-sub">CLAUDE.md · AGENTS.md — 작업장의 상시 규칙</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">HARNESS</div>
+              <div>
+                <div class="y-title">에이전트가 뛰어놀 울타리</div>
+                <div class="y-sub">벗어나지 않게 잡아주는 구조</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">SKILL / HOOKS</div>
+              <div>
+                <div class="y-title">반복 가능한 절차와 자동 동작</div>
+                <div class="y-sub">SKILL.md — 이름 붙여 다시 부르는 기술</div>
+              </div>
+            </div>
+            <div class="year-row">
+              <div class="y">CLI</div>
+              <div>
+                <div class="y-title">명령 한 줄로 부르는 도구</div>
+                <div class="y-sub">터미널에서 직접 실행하는 작업 단위</div>
+              </div>
+            </div>
+            <div class="year-row" style="border-bottom: 2px solid var(--accent); border-top: 2px solid var(--accent);">
+              <div class="y" style="color: var(--accent);">MCP ★</div>
+              <div>
+                <div class="y-title" style="color: var(--accent);">외부 세계로 손을 뻗는 연결</div>
+                <div class="y-sub">데이터 · 서비스 · 도구를 에이전트에 연결 — 다음 단계</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>11</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        4주를 한 장으로 복기. 아래로 갈수록 외부와 연결되는 층이다. MCP는 오늘 깊게 다루지 않고, 각자 더 나아갈 방향으로만 짚는다.
+      </div>
+    </section>
+
+    <!-- ===== 12 / PART IV DIVIDER — 실습 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PART IV — BUILD</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1400&q=80" alt="Build" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">BUILD ONE</div>
+          </div>
+          <div class="col center">
+            <div class="label">— 04 / SECTION</div>
+            <h1 class="ko-display display-xl">직접<br/><span style="color: var(--accent);">만든다.</span></h1>
+            <p class="lead">사소한 호기심 하나를 골라, 작은 웹앱 하나로 만듭니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>12</div>
+      </div>
+    </section>
+
+    <!-- ===== 13 / 실습 1 — 나의 웹앱 하나 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PRACTICE 01</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">실습 1 / 나의 웹앱</div>
+            <h1 class="ko-display display-lg">호기심 하나를<br/><span style="color: var(--accent);">웹앱으로.</span></h1>
+            <p class="body-text">
+              거창할 필요 없습니다.<br/>
+              내 작은 문제, 궁금증, 관심 하나.<br/>
+              그것을 건드리는 작은 웹앱 하나를 만듭니다.
+            </p>
+          </div>
+          <pre class="code"><span style="display:block;"><span class="hl">## 무엇을</span>  내 호기심·문제·관심 하나</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">## 누구를 위해</span>  나 / 친구 / 특정한 한 명</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">## 화면 하나</span>  가장 중요한 한 장면</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">## 동작 하나</span>  눌렀을 때 일어나는 일</span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># 넓게 → 여러 아이디어 중 하나</span></span><span style="display:block;"><span class="cm"># 섞기 → 본 것을 가져와 조합</span></span><span style="display:block;"><span class="cm"># 반복 → 돌려보고 한 줄 고친다</span></span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>13</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        약 40분. 화면 하나·동작 하나로 범위를 좁힌다. 막히면 레퍼런스를 가져와 섞게 한다(Remix). 처음부터 예쁘게보다, 일단 돌아가는 것 하나를.
+      </div>
+    </section>
+
+    <!-- ===== 14 / 실습 2 — 소개하기 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>PRACTICE 02 — SHOW &amp; TELL</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">실습 2 / 소개하기</div>
+            <h1 class="ko-display display-lg">만든 것을<br/><span style="color: var(--accent);">보여준다.</span></h1>
+            <p class="body-text">완성도보다, 무엇을 시도했고 어디서 한 줄을 고쳤는지가 중요합니다.</p>
+          </div>
+          <div class="col center">
+            <ul class="num-list">
+              <li><span class="num">01</span><span class="text">무엇을 만들었나 — 한 문장</span></li>
+              <li><span class="num">02</span><span class="text">왜 이걸 골랐나 — 나의 호기심</span></li>
+              <li><span class="num">03</span><span class="text">어디서 섞었나 — 가져온 레퍼런스</span></li>
+              <li><span class="num">04</span><span class="text">한 번 더 돌린다면 — 다음 한 줄</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>14</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        각자 1–2분. 화면을 띄워 동작 하나만 보여주면 충분하다. 서로 다른 호기심이 어떤 웹앱이 됐는지 비교하게 한다.
+      </div>
+    </section>
+
+    <!-- ===== 15 / PART V DIVIDER — 내보내기 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART V — SHIP IT</div>
+      </div>
+      <div class="body">
+        <div class="grid-2">
+          <div class="col center">
+            <div class="label">— 05 / SECTION</div>
+            <h1 class="ko-display display-xl">세상에<br/><span style="color: var(--accent);">내보낸다.</span></h1>
+            <p class="lead">내 컴퓨터 안에만 있던 것을, 링크 하나로 누구나 열 수 있게 만듭니다.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1545987796-200677ee1011?w=1400&q=80" alt="Ship" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">SHIP IT</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>15</div>
+      </div>
+    </section>
+
+    <!-- ===== 16 / 호스팅 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>HOSTING</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">호스팅이란</div>
+            <h1 class="ko-display display-lg">링크 하나로<br/><span style="color: var(--accent);">공유한다.</span></h1>
+            <p class="body-text">
+              호스팅은 내 결과물을 인터넷 어딘가에 올려<br/>
+              누구나 주소로 열 수 있게 하는 것입니다.<br/>
+              Github에 올리고 Git Pages로 띄우면 끝입니다.
+            </p>
+            <div class="tags">
+              <span class="tag solid">GitHub Pages</span>
+              <span class="tag">Vercel</span>
+              <span class="tag">Cloudflare</span>
+            </div>
+          </div>
+          <pre class="code"><span style="display:block;"><span class="cm"># 흐름</span></span><span style="display:block;"><span class="hl">1.</span> 코드를 GitHub에 올린다</span><span style="display:block;">   git push</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">2.</span> Pages 또는 Vercel에 연결</span><span style="display:block;">   저장소 선택 → 배포</span><span style="display:block;"> </span><span style="display:block;"><span class="hl">3.</span> 주소 하나가 생긴다</span><span style="display:block;">   username.github.io/...</span><span style="display:block;"> </span><span style="display:block;"><span class="cm"># 이제 누구에게나 링크로 보낼 수 있다</span></span></pre>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>16</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        호스팅 개념을 한 문장으로: 내 파일을 인터넷 위 한 자리에 올려두는 것. GitHub Pages가 가장 쉽고, Vercel·Cloudflare는 더 빠르고 강력한 선택지. 시간이 되면 한 명 화면으로 배포 한 번 시연.
+      </div>
+    </section>
+
+    <!-- ===== 17 / PART VI DIVIDER — 더 나아가기 ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>PART VI — GO FURTHER</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 image-left">
+          <div class="col center">
+            <div class="label">— 06 / SECTION</div>
+            <h1 class="ko-display display-xl">더<br/><span style="color: var(--accent);">나아가기.</span></h1>
+            <p class="lead">Go Wide, Remix, Iterate — 그리고 내 컴퓨터 안에서 도는 LLM까지.</p>
+          </div>
+          <div class="photo tinted">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1400&q=80" alt="Go further" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="photo-fallback" style="display:none;">GO FURTHER</div>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>17</div>
+      </div>
+    </section>
+
+    <!-- ===== 18 / 로컬 LLM ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>LOCAL LLM</div>
+      </div>
+      <div class="body">
+        <div class="grid-2 lopsided">
+          <div class="col center">
+            <div class="label">내 기기 안의 모델</div>
+            <h1 class="ko-display display-lg">내 컴퓨터<br/>안의 <span style="color: var(--accent);">모델.</span></h1>
+            <p class="body-text">
+              클라우드 없이, 내 기기에서 도는 모델입니다.<br/>
+              열린 모델들이 빠르게 좋아지고 있어,<br/>
+              가벼운 작업은 이미 손안에서 처리할 수 있습니다.
+            </p>
+            <div class="tags">
+              <span class="tag">Gemma</span>
+              <span class="tag">SuperGemma</span>
+              <span class="tag">Qwen</span>
+            </div>
+          </div>
+          <div class="col center" style="gap: clamp(0.8rem, 1.6vw, 1.2rem);">
+            <div style="border-left: 2px solid var(--accent); padding-left: clamp(1rem, 2vw, 1.6rem); font-family: var(--font-display-ko); font-size: clamp(1.3rem, 2.6vw, 2.1rem); line-height: 1.25;">
+              내 컴퓨터에서 LLM을<br/>계속 쓴다면,<br/><span style="color: var(--accent);">무엇을 하고 싶은가?</span>
+            </div>
+            <p class="body-text" style="opacity: 0.7;">
+              사적인 글쓰기 · 오프라인 도구 · 나만의 데이터로 길들이기 — 답은 각자의 작업에서 나옵니다.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>18</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        로컬 LLM은 프라이버시·오프라인·커스터마이징이 강점. 모델 이름보다 "무엇에 쓰고 싶은가"를 끌어내는 게 핵심. 각자의 작업 맥락과 연결해 한 명씩 답하게 한다.
+      </div>
+    </section>
+
+    <!-- ===== 19 / 모두 오픈소스 ===== -->
+    <section class="slide">
+      <div class="rail">
+        <div></div>
+        <div>ALL OPEN</div>
+      </div>
+      <div class="body">
+        <div class="col" style="height: 100%; justify-content: center; gap: clamp(1.4rem, 3vw, 2.4rem);">
+          <div class="quote-block">
+            지금까지 본 것은<br/><span class="accent">모두 오픈소스.</span>
+          </div>
+          <p class="lead" style="max-width: 44ch;">
+            특별한 허가도, 비싼 라이선스도 필요 없습니다.<br/>
+            가져다 쓰고, 섞고, 다시 만들 수 있습니다.
+          </p>
+          <div style="display: flex; align-items: center; gap: clamp(0.6rem, 1.2vw, 1rem); font-family: var(--font-mono); font-size: clamp(0.8rem, 1vw, 0.95rem); letter-spacing: 0.18em; color: var(--cream-dim-on-navy); text-transform: uppercase;">
+            <span>GO WIDE</span><span style="color: var(--accent);">→</span>
+            <span>REMIX</span><span style="color: var(--accent);">→</span>
+            <span>ITERATE</span>
+            <span style="flex: 1; height: 1px; background: var(--cream-faint-on-navy);"></span>
+            <span style="color: var(--accent);">↻</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>19</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        오늘 보여준 도구·모델·예제가 대부분 오픈소스라는 점을 강조. 닫힌 마법이 아니라 열린 재료. 그래서 넓게 가져와 섞고 반복할 수 있다는 것으로 마무리 직전 메시지.
+      </div>
+    </section>
+
+    <!-- ===== 20 / END — THANK YOU ===== -->
+    <section class="slide cream">
+      <div class="rail">
+        <div></div>
+        <div>END OF WORKSHOP</div>
+      </div>
+      <div class="body" style="justify-content: center; align-items: center; text-align: center;">
+        <div class="col" style="align-items: center; gap: clamp(1rem, 2.5vw, 2rem);">
+          <div class="label">4 WEEKS · PAPRI AI WORKSHOP</div>
+          <h1 class="en-display display-xl">THANK YOU.</h1>
+          <div class="cover-cycle">
+            <span class="ck dim">GO WIDE</span>
+            <span class="arr">→</span>
+            <span class="ck dim">REMIX</span>
+            <span class="arr">→</span>
+            <span class="ck dim">ITERATE</span>
+            <span class="arr">↻</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail rail-bottom">
+        <img class="papri-logo" src="./assets/papri_logo.png" alt="PAPRI" />
+        <div>END / 20</div>
+      </div>
+      <div class="speaker-note">
+        <div class="sn-label">Speaker Note</div>
+        4주의 여정을 닫는 한 줄. 이제 각자의 자리에서 넓게 가고, 섞고, 반복하면 된다. 오늘 만든 웹앱 하나가 그 시작.
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Help overlay -->
+  <div class="help" id="help">
+    <div class="help-content">
+      <h3>KEYBOARD SHORTCUTS</h3>
+      <ul>
+        <li><kbd>→</kbd> <kbd>Space</kbd> 다음 슬라이드</li>
+        <li><kbd>←</kbd> 이전 슬라이드</li>
+        <li><kbd>Home</kbd> 처음으로</li>
+        <li><kbd>End</kbd> 마지막으로</li>
+        <li><kbd>N</kbd> 발표자 노트 토글</li>
+        <li><kbd>F</kbd> 전체화면</li>
+        <li><kbd>?</kbd> 이 도움말</li>
+        <li><kbd>Esc</kbd> 닫기</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    const help = document.getElementById('help');
+    let current = 0;
+    let notesVisible = false;
+
+    function go(idx) {
+      idx = Math.max(0, Math.min(slides.length - 1, idx));
+      slides[current].classList.remove('active');
+      slides[idx].classList.add('active');
+      current = idx;
+      progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+      const hash = '#' + (idx + 1);
+      if (location.hash !== hash) history.replaceState(null, '', hash);
+      applyNotes();
+    }
+    function applyNotes() {
+      slides.forEach(s => {
+        const n = s.querySelector('.speaker-note');
+        if (!n) return;
+        n.classList.toggle('visible', notesVisible && s.classList.contains('active'));
+      });
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key) {
+        case 'ArrowRight': case ' ': case 'PageDown':
+          e.preventDefault(); go(current + 1); break;
+        case 'ArrowLeft': case 'PageUp':
+          e.preventDefault(); go(current - 1); break;
+        case 'Home': e.preventDefault(); go(0); break;
+        case 'End': e.preventDefault(); go(slides.length - 1); break;
+        case 'n': case 'N': notesVisible = !notesVisible; applyNotes(); break;
+        case 'f': case 'F':
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+          else document.exitFullscreen();
+          break;
+        case '?': help.classList.toggle('visible'); break;
+        case 'Escape': help.classList.remove('visible'); break;
+      }
+    });
+    help.addEventListener('click', () => help.classList.remove('visible'));
+
+    const initial = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(initial) && initial >= 1 && initial <= slides.length) go(initial - 1);
+    else progress.style.width = (1 / slides.length * 100) + '%';
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+    });
+  </script>
+</body>
+</html>
