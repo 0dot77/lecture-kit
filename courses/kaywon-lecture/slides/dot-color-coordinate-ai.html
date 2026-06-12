@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점 · 색깔 · 좌표 · 인공지능 — LiDAR 기반 창작 · 계원예술대학교 특강</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Space+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+    <style>
+        /* ===========================================
+           THEME — hand-drawn sketchbook
+           Warm cream paper · ink line-art · bean mascot
+           orange data-flow · cyan annotations · RGB dots
+           (extracted from the lecture's 6 illustrations)
+           =========================================== */
+        :root {
+            --paper: #f4efe3;
+            --paper-2: #ece5d4;
+            --paper-3: #e3dac6;
+            --ink: #20201c;
+            --ink-soft: #4a463c;
+            --ink-dim: #8c8576;
+            --ink-faint: rgba(32, 32, 28, 0.14);
+
+            --orange: #ee6a2b;       /* the flowing data path */
+            --orange-soft: #f6a877;
+            --orange-mist: rgba(238, 106, 43, 0.14);
+            --cyan: #2f9bc9;         /* secondary annotation */
+            --cyan-soft: #a9d8ea;
+            --cyan-mist: rgba(47, 155, 201, 0.14);
+
+            --rgb-r: #e0473f;
+            --rgb-g: #4ca65a;
+            --rgb-b: #3f63d6;
+
+            --hand: 'Pretendard Variable', 'Pretendard', sans-serif;
+            --pen: 'Nanum Pen Script', 'Pretendard Variable', cursive;
+            --mono: 'Space Mono', monospace;
+            --body: 'Pretendard Variable', 'Pretendard', sans-serif;
+
+            --title-size: clamp(2.6rem, 8vw, 7rem);
+            --h2-size: clamp(2rem, 5.4vw, 4.2rem);
+            --h3-size: clamp(1.2rem, 2.8vw, 2rem);
+            --body-size: clamp(0.92rem, 1.5vw, 1.18rem);
+            --small-size: clamp(0.78rem, 1.1vw, 0.98rem);
+            --label-size: clamp(0.66rem, 0.95vw, 0.82rem);
+
+            --slide-padding: clamp(1.6rem, 4.5vw, 4.5rem);
+            --content-gap: clamp(0.75rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.35rem, 1vw, 0.85rem);
+
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --dur: 0.7s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--body);
+            background: var(--paper);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+        /* ===========================================
+           SLIDE BASE — vertical scroll-snap, dotted paper
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--paper);
+            background-image: radial-gradient(rgba(32,32,28,0.05) 1.1px, transparent 1.1px);
+            background-size: 26px 26px;
+            background-position: -8px -8px;
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Corner marks */
+        .corner-tl, .corner-tr {
+            position: absolute;
+            top: clamp(14px, 1.8vw, 24px);
+            z-index: 10;
+        }
+        .corner-tl {
+            left: clamp(18px, 2.5vw, 34px);
+            font-family: var(--pen);
+            font-size: clamp(1rem, 1.5vw, 1.35rem);
+            color: var(--ink-soft);
+            letter-spacing: 0.02em;
+            display: flex; align-items: center; gap: 0.45em;
+        }
+        .corner-tl .bean { width: 0.95em; color: var(--ink); transform: translateY(-1px); }
+        .corner-tr {
+            right: clamp(18px, 2.5vw, 34px);
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            color: var(--ink-dim);
+            letter-spacing: 0.16em;
+        }
+        .corner-tr b { color: var(--orange); font-weight: 700; }
+
+        /* Bottom dotted strip */
+        .bottom-strip {
+            position: absolute;
+            bottom: clamp(15px, 2vw, 26px);
+            left: clamp(18px, 2.5vw, 34px);
+            right: clamp(18px, 2.5vw, 34px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-family: var(--pen);
+            font-size: clamp(0.95rem, 1.3vw, 1.2rem);
+            color: var(--ink-dim);
+            z-index: 10;
+        }
+        .bottom-strip .dline {
+            flex: 1; height: 0;
+            border-top: 2px dotted var(--ink-faint);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--hand);
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.035em;
+            color: var(--ink);
+        }
+        h2 {
+            font-family: var(--hand);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.14;
+            letter-spacing: -0.03em;
+            color: var(--ink);
+            margin-bottom: var(--content-gap);
+        }
+        h3 {
+            font-family: var(--hand);
+            font-size: var(--h3-size);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        p, li {
+            font-family: var(--body);
+            font-size: var(--body-size);
+            line-height: 1.62;
+            color: var(--ink-soft);
+            font-weight: 400;
+        }
+        strong { color: var(--ink); font-weight: 600; }
+        .o { color: var(--orange); font-weight: 600; }
+        .c { color: var(--cyan); font-weight: 600; }
+        .hl { /* marker highlight */
+            background: linear-gradient(180deg, transparent 58%, var(--orange-mist) 58%);
+            padding: 0 0.08em;
+        }
+        .hl-c { background: linear-gradient(180deg, transparent 58%, var(--cyan-mist) 58%); padding: 0 0.08em; }
+
+        .pen { font-family: var(--pen); }
+        .mono { font-family: var(--mono); }
+
+        .eyebrow {
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            display: inline-flex; align-items: center; gap: 0.6em;
+        }
+        .eyebrow::before { content: "✱"; color: var(--orange); font-size: 1.1em; }
+
+        .lead {
+            font-family: var(--body);
+            font-size: clamp(1rem, 1.9vw, 1.45rem);
+            line-height: 1.6;
+            color: var(--ink);
+            font-weight: 400;
+        }
+        .caption {
+            font-family: var(--pen);
+            font-size: clamp(1rem, 1.5vw, 1.32rem);
+            color: var(--ink-dim);
+            line-height: 1.25;
+        }
+
+        /* ===========================================
+           HAND-DRAWN COMPONENTS
+           asymmetric border-radius + offset ink shadow
+           =========================================== */
+        .sketch {
+            border: 2.5px solid var(--ink);
+            border-radius: 255px 14px 235px 16px / 16px 235px 18px 255px;
+            background: var(--paper);
+        }
+        .sketch-2 { border-radius: 14px 240px 18px 230px / 230px 16px 250px 18px; }
+        .shadow-ink { box-shadow: 7px 8px 0 -1px var(--ink); }
+        .shadow-orange { box-shadow: 7px 8px 0 -1px var(--orange); }
+        .shadow-cyan { box-shadow: 7px 8px 0 -1px var(--cyan); }
+
+        .tag {
+            font-family: var(--hand);
+            font-weight: 700;
+            font-size: var(--small-size);
+            padding: 0.18em 0.7em;
+            border: 2px solid var(--ink);
+            border-radius: 40px 12px 36px 10px / 10px 32px 12px 40px;
+            background: var(--paper);
+            color: var(--ink);
+            display: inline-block;
+            line-height: 1.3;
+        }
+        .tag.o { background: var(--orange); color: #fff; border-color: var(--ink); }
+        .tag.c { background: var(--cyan); color: #fff; border-color: var(--ink); }
+
+        .card {
+            border: 2.5px solid var(--ink);
+            border-radius: 230px 16px 250px 14px / 14px 250px 16px 230px;
+            background: var(--paper);
+            padding: clamp(1rem, 2vw, 1.6rem) clamp(1.1rem, 2.2vw, 1.7rem);
+            display: flex; flex-direction: column; gap: 0.5rem;
+            box-shadow: 6px 7px 0 -1px var(--ink);
+        }
+        .card:nth-child(2n) { border-radius: 16px 235px 14px 245px / 245px 14px 235px 16px; }
+        .card h4 {
+            font-family: var(--hand); font-weight: 700;
+            font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+            color: var(--ink); line-height: 1.15;
+        }
+        .card .k {
+            font-family: var(--mono); font-size: var(--label-size);
+            letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange);
+        }
+        .card p { font-size: var(--small-size); color: var(--ink-soft); }
+
+        /* recurring bean mascot */
+        .bean { display: inline-block; color: var(--ink); }
+        .bean svg { display: block; width: 100%; height: auto; }
+
+        /* hand arrow (decorative svg stroke, wobbled) */
+        .flowline { color: var(--orange); }
+
+        ul.ticks { list-style: none; display: flex; flex-direction: column; gap: clamp(0.5rem, 1.1vw, 0.95rem); }
+        ul.ticks li {
+            position: relative; padding-left: 1.7em;
+            font-family: var(--body); color: var(--ink); line-height: 1.5;
+        }
+        ul.ticks li::before {
+            content: "→"; position: absolute; left: 0; top: 0.02em;
+            font-family: var(--mono); color: var(--orange); font-weight: 700;
+        }
+        ul.ticks li::marker { content: ""; }
+
+        .num-list { list-style: none; display: flex; flex-direction: column; gap: clamp(0.7rem, 1.5vw, 1.2rem); }
+        .num-list li { display: grid; grid-template-columns: clamp(2.4rem,4vw,3.4rem) 1fr; gap: clamp(0.7rem,1.4vw,1.1rem); align-items: start; }
+        .num-list .n {
+            font-family: var(--hand); font-weight: 700;
+            font-size: clamp(1.8rem, 3.4vw, 2.7rem); color: var(--orange);
+            line-height: 0.95; border-right: 2.5px solid var(--ink); padding-right: clamp(0.5rem,1vw,0.9rem);
+        }
+        .num-list h4 { font-family: var(--hand); font-weight: 700; font-size: clamp(1.1rem,2vw,1.5rem); color: var(--ink); }
+        .num-list p { font-size: var(--small-size); }
+
+        /* media frames — taped polaroid feel */
+        .frame {
+            border: 2.5px solid var(--ink);
+            background: var(--paper);
+            padding: clamp(0.4rem, 0.9vw, 0.7rem);
+            box-shadow: 8px 9px 0 -1px var(--ink);
+            position: relative;
+        }
+        .frame img, .frame iframe { display: block; width: 100%; }
+        .frame.dark { background: #14140f; }
+        .tape {
+            position: absolute; top: -13px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+            width: clamp(64px, 9vw, 104px); height: 22px;
+            background: var(--cyan-mist); border: 1.5px dashed var(--cyan);
+            border-radius: 2px;
+        }
+        .img-fallback {
+            display: none; align-items: center; justify-content: center;
+            background: var(--paper-2); color: var(--ink-dim);
+            font-family: var(--pen); font-size: 1.1rem;
+            border-radius: 4px;
+        }
+
+        a.link {
+            font-family: var(--mono); font-size: var(--small-size);
+            color: var(--cyan); text-decoration: none;
+            border-bottom: 1.5px solid var(--cyan-soft);
+            word-break: break-all;
+        }
+        a.link::before { content: "↗ "; }
+
+        /* ===========================================
+           LAYOUT HELPERS
+           =========================================== */
+        .stack { display: flex; flex-direction: column; gap: var(--element-gap); }
+        .stack-lg { display: flex; flex-direction: column; gap: var(--content-gap); }
+        .row { display: flex; align-items: center; gap: clamp(0.6rem, 1.4vw, 1.2rem); }
+        .wrap { display: flex; flex-wrap: wrap; gap: clamp(0.4rem, 0.9vw, 0.7rem); }
+        .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.4rem, 3vw, 3rem); align-items: center; height: 100%; }
+        .split-60 { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(1.4rem, 3vw, 2.6rem); align-items: center; height: 100%; }
+        .split-40 { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(1.4rem, 3vw, 2.6rem); align-items: center; height: 100%; }
+        .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .center-col { display: flex; flex-direction: column; height: 100%; justify-content: center; }
+
+        .rule { height: 0; border-top: 2.5px solid var(--ink); flex: 1; }
+        .rule-dot { height: 0; border-top: 2.5px dotted var(--ink-faint); flex: 1; }
+
+        /* RGB dot trio */
+        .rgb-dots { display: inline-flex; gap: 0.32em; align-items: center; }
+        .rgb-dots i { width: 0.62em; height: 0.62em; border-radius: 50%; border: 1.5px solid var(--ink); display: inline-block; }
+        .rgb-dots .r { background: var(--rgb-r); }
+        .rgb-dots .g { background: var(--rgb-g); }
+        .rgb-dots .b { background: var(--rgb-b); }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+           =========================================== */
+        .reveal { opacity: 0; transform: translateY(22px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.13s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.21s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.29s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.37s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.45s; }
+        .slide.visible .reveal:nth-child(7) { transition-delay: 0.53s; }
+        .reveal-pop { opacity: 0; transform: scale(0.9) rotate(-2deg); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+        .slide.visible .reveal-pop { opacity: 1; transform: scale(1) rotate(0); }
+
+        /* ===========================================
+           TITLE / DIVIDER / THANKS
+           =========================================== */
+        .slide.title { background: var(--paper); }
+        .slide.title h1 { font-size: clamp(2.9rem, 11.5vw, 9rem); line-height: 1.05; }
+
+        .slide.divider .slide-content { justify-content: center; }
+        .divider-num {
+            font-family: var(--mono); font-size: clamp(0.9rem, 1.4vw, 1.2rem);
+            letter-spacing: 0.2em; color: var(--orange); margin-bottom: 0.6rem;
+        }
+        .slide.divider h1 { font-size: clamp(2.4rem, 8vw, 6.5rem); }
+
+        .slide.thanks h1 { font-size: clamp(4rem, 16vw, 13rem); line-height: 0.9; }
+
+        /* ===========================================
+           INTERACTIVE WIDGETS
+           =========================================== */
+        .widget-hint {
+            font-family: var(--pen);
+            font-size: clamp(1rem, 1.5vw, 1.3rem);
+            color: var(--cyan);
+            display: inline-flex; align-items: center; gap: 0.45em;
+        }
+        .widget-hint::before { content: "☞"; font-size: 1.15em; }
+
+        canvas.stage {
+            display: block; width: 100%; height: 100%;
+            touch-action: none; cursor: grab;
+        }
+        canvas.stage:active { cursor: grabbing; }
+
+        .canvas-box {
+            border: 2.5px solid var(--ink);
+            border-radius: 235px 16px 250px 14px / 14px 250px 16px 235px;
+            background: var(--paper);
+            box-shadow: 7px 8px 0 -1px var(--ink);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* range slider — hand drawn */
+        input[type=range].sketch-range {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 14px; background: transparent; cursor: pointer;
+        }
+        input[type=range].sketch-range::-webkit-slider-runnable-track {
+            height: 4px; background: var(--ink); border-radius: 4px;
+        }
+        input[type=range].sketch-range::-moz-range-track { height: 4px; background: var(--ink); border-radius: 4px; }
+        input[type=range].sketch-range::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 26px; height: 26px; margin-top: -11px;
+            background: var(--orange); border: 2.5px solid var(--ink); border-radius: 50%;
+            box-shadow: 2px 2px 0 -0.5px var(--ink);
+        }
+        input[type=range].sketch-range::-moz-range-thumb {
+            width: 26px; height: 26px; background: var(--orange);
+            border: 2.5px solid var(--ink); border-radius: 50%;
+        }
+
+        /* pipeline stepper */
+        .pipe-track { display: grid; grid-template-columns: repeat(7, auto); align-items: center; justify-content: start; gap: clamp(0.2rem,0.8vw,0.6rem); }
+        .pipe-node {
+            font-family: var(--hand); font-weight: 700;
+            font-size: clamp(1.05rem, 2vw, 1.6rem);
+            padding: 0.4em 0.85em; cursor: pointer;
+            border: 2.5px solid var(--ink); background: var(--paper); color: var(--ink);
+            border-radius: 200px 14px 220px 12px / 12px 220px 14px 200px;
+            transition: background 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
+        }
+        .pipe-node:nth-of-type(1) { }
+        .pipe-node.active { background: var(--orange); color: #fff; transform: translateY(-3px); box-shadow: 4px 5px 0 -1px var(--ink); }
+        .pipe-node.done { border-color: var(--orange); }
+        .pipe-link { width: clamp(20px, 4vw, 60px); height: 3px; background: repeating-linear-gradient(90deg, var(--ink-faint) 0 6px, transparent 6px 11px); }
+        .pipe-link.lit { background: repeating-linear-gradient(90deg, var(--orange) 0 7px, transparent 7px 12px); }
+        .pipe-caption {
+            margin-top: clamp(1rem,2vw,1.6rem); min-height: 4.5em;
+            font-family: var(--body); font-size: var(--body-size); color: var(--ink); line-height: 1.6;
+            border-left: 3px solid var(--orange); padding-left: 1rem;
+        }
+        .pipe-caption .lbl { font-family: var(--hand); font-weight: 700; color: var(--orange); font-size: 1.15em; display:block; margin-bottom: 0.15em; }
+
+        /* peel layers */
+        .peel-stage { position: relative; width: 100%; aspect-ratio: 4/3; max-height: 46vh; }
+        .peel-layer {
+            position: absolute; inset: 0; margin: auto; width: 70%; height: auto; aspect-ratio: 3/2;
+            border: 2px solid var(--ink); background: var(--paper);
+            transition: transform 0.12s linear, opacity 0.12s linear;
+        }
+        .peel-tag {
+            position: absolute; z-index: 15; font-family: var(--mono); font-weight: 700; font-size: 0.82rem;
+            padding: 1px 8px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+            opacity: 0; transition: opacity 0.2s; box-shadow: 2px 2px 0 -0.5px rgba(32,32,28,0.4);
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 720px) {
+            :root { --slide-padding: clamp(1rem, 3vw, 2.6rem); --content-gap: clamp(0.5rem,1.5vw,1rem); }
+        }
+        @media (max-height: 600px) {
+            .bottom-strip { display: none; }
+        }
+        @media (max-width: 760px) {
+            .split, .split-60, .split-40 { grid-template-columns: 1fr; }
+            .cards-3 { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+            html { scroll-behavior: auto; }
+        }
+
+        .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--orange); z-index: 1000; transition: width 0.2s ease; width: 0; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- ===== shared SVG defs: wobble filter + bean mascot ===== -->
+    <svg class="svg-defs" aria-hidden="true">
+        <defs>
+            <filter id="wobble" x="-6%" y="-6%" width="112%" height="112%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="7" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+            </filter>
+            <symbol id="bean" viewBox="0 0 120 178">
+                <path d="M60 8 C35 8 25 40 25 80 C25 120 35 152 60 152 C85 152 95 120 95 80 C95 40 85 8 60 8 Z" fill="currentColor"/>
+                <path d="M27 96 C13 100 7 108 5 119" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+                <path d="M93 96 C107 100 113 108 115 119" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+                <path d="M47 151 L45 174" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+                <path d="M73 151 L75 174" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <!-- ========================================================
+         SLIDE 01 — TITLE
+         ======================================================== -->
+    <section class="slide title">
+        <span class="corner-tr"><b>01</b> / 31</span>
+        <div class="slide-content" style="justify-content:center;">
+            <div style="max-width:min(96%,1180px); margin:0 auto; width:100%;">
+                <div class="eyebrow reveal" style="margin-bottom:clamp(1rem,2vw,1.6rem);">LiDAR-BASED CREATION · 계원예술대학교 특강</div>
+
+                <!-- animated pipeline hero -->
+                <div class="reveal" style="margin-bottom:clamp(1.2rem,2.5vw,2rem);">
+                    <svg viewBox="0 0 1000 150" style="width:100%; height:auto; max-height:20vh;" aria-label="점 색깔 좌표 인공지능 흐름">
+                        <line class="flowpath" x1="40" y1="78" x2="940" y2="78" fill="none" stroke="var(--orange)" stroke-width="4" stroke-linecap="round" stroke-dasharray="3 14" filter="url(#wobble)"/>
+                        <!-- 점 -->
+                        <circle cx="60" cy="78" r="9" fill="var(--ink)"/>
+                        <text x="60" y="120" text-anchor="middle" font-family="Pretendard Variable" font-weight="800" font-size="30" fill="var(--ink)">점</text>
+                        <!-- 색깔 -->
+                        <g transform="translate(330,78)">
+                            <circle cx="-16" cy="0" r="9" fill="var(--rgb-r)" stroke="var(--ink)" stroke-width="2"/>
+                            <circle cx="2" cy="0" r="9" fill="var(--rgb-g)" stroke="var(--ink)" stroke-width="2"/>
+                            <circle cx="20" cy="0" r="9" fill="var(--rgb-b)" stroke="var(--ink)" stroke-width="2"/>
+                            <text x="2" y="42" text-anchor="middle" font-family="Pretendard Variable" font-weight="800" font-size="30" fill="var(--ink)">색깔</text>
+                        </g>
+                        <!-- 좌표 -->
+                        <g transform="translate(620,78)" stroke="var(--ink)" stroke-width="2.5" fill="none">
+                            <path d="M-18 14 L-18 -16 M-18 14 L14 14 M-18 14 L-2 26"/>
+                            <circle cx="6" cy="-6" r="3.5" fill="var(--cyan)"/>
+                            <text x="0" y="42" text-anchor="middle" font-family="Pretendard Variable" font-weight="800" font-size="30" fill="var(--ink)" stroke="none">좌표</text>
+                        </g>
+                        <!-- AI -->
+                        <g transform="translate(905,78)">
+                            <rect x="-26" y="-24" width="52" height="48" rx="6" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.5" filter="url(#wobble)"/>
+                            <text x="0" y="8" text-anchor="middle" font-family="Space Mono" font-weight="700" font-size="20" fill="var(--ink)">AI</text>
+                        </g>
+                        <!-- bean riding -->
+                        <g transform="translate(150,40)"><use href="#bean" width="34" color="var(--ink)"/></g>
+                    </svg>
+                </div>
+
+                <h1 class="reveal">점 · 색깔 · 좌표<br><span style="color:var(--orange);">· 인공지능</span></h1>
+                <p class="lead reveal pen" style="font-size:clamp(1.2rem,2.4vw,2rem); margin-top:clamp(0.6rem,1.4vw,1.2rem); color:var(--ink-soft);">
+                    하나의 점에서 시작하는 LiDAR 기반 창작 이야기
+                </p>
+            </div>
+        </div>
+        <div class="bottom-strip">
+            <span>유태양 — Technical Director / Creative Builder</span>
+            <span class="dline"></span>
+            <span>Kaywon Univ.</span>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 02 — INSTRUCTOR
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 강사</span>
+        <span class="corner-tr"><b>02</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.8rem,1.8vw,1.5rem);">
+                <div class="row reveal"><span class="eyebrow">Speaker</span><span class="rule-dot"></span></div>
+                <div class="reveal">
+                    <h2 style="margin-bottom:0.2rem;">유태양</h2>
+                    <p class="pen" style="font-size:clamp(1.1rem,1.9vw,1.6rem); color:var(--cyan);">Technical Director / Creative Builder</p>
+                </div>
+                <p class="reveal" style="max-width:60ch;">미디어와 기술로 <strong>창작을 위한 도구</strong>, 아티스트를 위한 도구를 만들고 연구한다. <span class="hl">현실과 가상의 인터페이스</span>에 관심을 두고 실험을 이어간다.</p>
+                <div class="cards-3 reveal" style="margin-top:clamp(0.4rem,1vw,0.8rem);">
+                    <div class="card">
+                        <span class="k">Lecturer</span>
+                        <h4>한국예술종합학교</h4>
+                        <p>무용원 · 영상원 강사</p>
+                    </div>
+                    <div class="card">
+                        <span class="k">Tech Lead</span>
+                        <h4>봄랩</h4>
+                        <p>기술 개발 팀장</p>
+                    </div>
+                    <div class="card">
+                        <span class="k">Tech Director</span>
+                        <h4>파프리스튜디오 · YEPS</h4>
+                        <p>테크니컬 디렉터</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 03 — THESIS MAP (illustration 01 + pipeline stepper)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 오늘의 길</span>
+        <span class="corner-tr"><b>03</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-60" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">The Throughline</div>
+                        <h2 style="margin-bottom:0.4rem;">점 → 색깔 → 좌표 → AI</h2>
+                        <p>단일한 점에서 시작해 RGB, XYZ, 인공지능으로 확장한다. 기술 용어는 최대한 덜어내고, <span class="hl">창작자로서 LiDAR를 점유하는 방법</span>을 이야기한다.</p>
+                    </div>
+                    <div class="reveal" data-widget="pipeline">
+                        <div class="pipe-track">
+                            <button class="pipe-node active" data-i="0">점</button>
+                            <span class="pipe-link lit"></span>
+                            <button class="pipe-node" data-i="1">색깔</button>
+                            <span class="pipe-link"></span>
+                            <button class="pipe-node" data-i="2">좌표</button>
+                            <span class="pipe-link"></span>
+                            <button class="pipe-node" data-i="3">AI</button>
+                        </div>
+                        <div class="pipe-caption"></div>
+                        <div class="widget-hint" style="margin-top:0.7rem;">단계를 눌러 보세요</div>
+                    </div>
+                </div>
+                <div class="frame sketch reveal-pop" style="border-radius:0; transform:rotate(1.2deg);">
+                    <span class="tape"></span>
+                    <img src="./assets/01-dot-color-coordinate-ai.png" alt="점에서 색깔, 좌표, AI 해석으로 이어지는 일러스트레이션" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="img-fallback" style="height:30vh;">illustration 01</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 04 — DIVIDER 01
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>04</b> / 31</span>
+        <div class="slide-content">
+            <div class="reveal" style="margin-bottom:1.4rem;"><span class="bean" style="width:clamp(60px,9vw,120px); display:inline-block; transform:rotate(-4deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <div class="divider-num reveal">PART 01</div>
+            <h1 class="reveal">스크린을 유영하는 것들</h1>
+            <p class="caption reveal" style="margin-top:1rem; font-size:clamp(1.1rem,1.8vw,1.5rem);">포인트 클라우드를 바라보는 감각</p>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 05 — 수림 triptych (오초롱)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 감각</span>
+        <span class="corner-tr"><b>05</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.8rem,1.6vw,1.3rem);">
+                <div class="reveal" style="max-width:64ch;">
+                    <h3 style="margin-bottom:0.4rem;">기억, 꿈, 그리움</h3>
+                    <p>LiDAR로 만들어진 포인트 클라우드 이미지를 바라보며 느끼는 감정은 흥미롭게 닮아 있다. <span class="hl-c">감각적인 응시</span> — 이 느낌을 배제할 수는 없다.</p>
+                </div>
+                <div class="reveal" style="display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(0.6rem,1.4vw,1.1rem);">
+                    <div class="frame dark" style="transform:rotate(-1.5deg);"><img src="./assets/surim-01.jpg" alt="오초롱 공연 포인트 클라우드 키비주얼 1" loading="lazy" style="aspect-ratio:3/2; object-fit:cover;"></div>
+                    <div class="frame dark" style="transform:rotate(0.8deg);"><img src="./assets/surim-02.jpg" alt="오초롱 공연 포인트 클라우드 키비주얼 2" loading="lazy" style="aspect-ratio:3/2; object-fit:cover;"></div>
+                    <div class="frame dark" style="transform:rotate(-0.6deg);"><img src="./assets/surim-03.jpg" alt="오초롱 공연 포인트 클라우드 키비주얼 3" loading="lazy" style="aspect-ratio:3/2; object-fit:cover;"></div>
+                </div>
+                <p class="caption reveal" style="text-align:center;">전통 기반 작가 <strong style="color:var(--ink-soft);">오초롱</strong> 공연의 키비주얼로 사용된 포인트 클라우드</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 06 — DIVIDER 02
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>06</b> / 31</span>
+        <div class="slide-content">
+            <div class="reveal" style="margin-bottom:1.4rem;"><span class="bean" style="width:clamp(60px,9vw,120px); display:inline-block; transform:rotate(3deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <div class="divider-num reveal">PART 02</div>
+            <h1 class="reveal">스크린을 넘어 공간으로</h1>
+            <p class="caption reveal" style="margin-top:1rem; font-size:clamp(1.1rem,1.8vw,1.5rem);">공간을 실측한다 · Location Based</p>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 07 — 공간 실측 (LiDAR ray-scan interactive)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 공간 실측</span>
+        <span class="corner-tr"><b>07</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-40">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Spatial Scanning</div>
+                        <h2 style="margin-bottom:0.4rem;">공간을<br>실측한다</h2>
+                    </div>
+                    <p class="reveal">작품 설치는 스크린을 넘어 <strong>현실 공간</strong>에 존재한다. Location Based 작업에는 늘 공간 실측의 아쉬움이 남았다.</p>
+                    <p class="reveal">실측 데이터가 있어야 현실이든 가상이든 같은 컨디션에서 구현할 수 있다. <span class="hl">LiDAR 스캐닝</span>이 이를 정교하게 해낸다.</p>
+                    <div class="widget-hint reveal">마우스를 움직여 공간을 스캔해 보세요</div>
+                </div>
+                <div class="canvas-box reveal-pop" style="aspect-ratio:4/3; max-height:64vh;">
+                    <canvas class="stage" data-widget="rayscan"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 08 — YOUTUBE · 문문문 공간 실측
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">▶ 영상 · 문문문</span>
+        <span class="corner-tr"><b>08</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="tag o">CASE</span><h3>문문문 — 실제 공간 실측</h3></div>
+                <div class="reveal frame" style="width:min(100%,920px); aspect-ratio:16/9; max-height:62vh; margin:0 auto;">
+                    <iframe src="https://www.youtube.com/embed/fiV-wvf3iKo" style="height:100%; border:0;" title="문문문 공간 실측" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <a class="link reveal" href="https://youtu.be/fiV-wvf3iKo" target="_blank" rel="noopener" style="text-align:center;">youtu.be/fiV-wvf3iKo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 09 — DIVIDER 03
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>09</b> / 31</span>
+        <div class="slide-content">
+            <div class="reveal" style="margin-bottom:1.4rem;"><span class="bean" style="width:clamp(60px,9vw,120px); display:inline-block; transform:rotate(-5deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <div class="divider-num reveal">PART 03</div>
+            <h1 class="reveal">왜 포인트는<br>정적이어야만 할까?</h1>
+            <p class="caption reveal" style="margin-top:1rem; font-size:clamp(1.1rem,1.8vw,1.5rem);">움직이고 싶다는 욕망</p>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 10 — Azure Kinect (The Cafe frames)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 움직이는 점</span>
+        <span class="corner-tr"><b>10</b> / 31</span>
+        <div class="slide-content">
+            <div class="split" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Azure Kinect</div>
+                        <h2 style="margin-bottom:0.4rem;">한 프레임씩<br>움직임을 담다</h2>
+                    </div>
+                    <p class="reveal">멋진 비주얼도, 공간 실측도 해봤지만 무언가를 <strong>움직이고 싶다는 욕망</strong>이 남는다. Azure Kinect로 프레임마다 촬영해 포인트 클라우드 비디오를 시도한다.</p>
+                    <div class="wrap reveal">
+                        <span class="tag">.mkv · Matroska Video</span>
+                        <span class="tag c">협업작 · The Cafe</span>
+                    </div>
+                </div>
+                <div class="reveal" style="display:grid; gap:clamp(0.6rem,1.2vw,1rem);">
+                    <div class="frame dark" style="transform:rotate(-1deg);"><img src="./assets/cafe-01.png" alt="The Cafe 포인트 클라우드 비디오 프레임 1" loading="lazy" style="aspect-ratio:16/9; object-fit:cover; max-height:33vh;"></div>
+                    <div class="frame dark" style="transform:rotate(0.8deg);"><img src="./assets/cafe-02.png" alt="The Cafe 포인트 클라우드 비디오 프레임 2" loading="lazy" style="aspect-ratio:16/9; object-fit:cover; max-height:33vh;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 11 — YOUTUBE · The Cafe
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">▶ 영상 · The Cafe</span>
+        <span class="corner-tr"><b>11</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="tag o">CASE</span><h3>The Cafe — 포인트 클라우드 비디오</h3></div>
+                <div class="reveal frame" style="width:min(100%,920px); aspect-ratio:16/9; max-height:62vh; margin:0 auto;">
+                    <iframe src="https://www.youtube.com/embed/odpHCp5f4Ps" style="height:100%; border:0;" title="The Cafe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <a class="link reveal" href="https://youtu.be/odpHCp5f4Ps" target="_blank" rel="noopener" style="text-align:center;">youtu.be/odpHCp5f4Ps</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 12 — DIVIDER 04
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>12</b> / 31</span>
+        <div class="slide-content">
+            <div class="reveal" style="margin-bottom:1.4rem;"><span class="bean" style="width:clamp(60px,9vw,120px); display:inline-block; transform:rotate(4deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <div class="divider-num reveal">PART 04</div>
+            <h1 class="reveal">요즘 시도하는 것들</h1>
+            <p class="caption reveal" style="margin-top:1rem; font-size:clamp(1.1rem,1.8vw,1.5rem);">가상부터 현실까지</p>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 13 — 세 가지 방향
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 실험</span>
+        <span class="corner-tr"><b>13</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(1rem,2vw,1.6rem);">
+                <div class="reveal">
+                    <div class="eyebrow" style="margin-bottom:0.5rem;">Now Experimenting</div>
+                    <h2>세 가지 방향</h2>
+                    <p style="margin-top:0.4rem;">포인트 클라우드와 가우시안 스플랫팅을 가상부터 현실까지 적극적으로 접목하는 실험을 진행 중이다.</p>
+                </div>
+                <ol class="num-list reveal">
+                    <li><span class="n">1</span><div><h4>비주얼로</h4><p>보이는 결과물 그 자체를 위한 시도</p></div></li>
+                    <li><span class="n">2</span><div><h4>거리를 추정하는 방식으로</h4><p>나와 사물 사이의 거리를 읽어내는 도구</p></div></li>
+                    <li><span class="n">3</span><div><h4>앱을 만드는 방식으로</h4><p>포인트 클라우드 데이터를 직접 얻어내는 앱</p></div></li>
+                </ol>
+                <p class="caption reveal">작품 제작 — 도구 제작 — 실험으로 다양하게 활용한다</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 14 — YOUTUBE · Daily Immersive
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">▶ 영상 · Daily Immersive</span>
+        <span class="corner-tr"><b>14</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="tag o">CASE</span><h3>Daily Immersive</h3></div>
+                <div class="reveal frame" style="width:min(100%,920px); aspect-ratio:16/9; max-height:62vh; margin:0 auto;">
+                    <iframe src="https://www.youtube.com/embed/ADpiOF7nMAM" style="height:100%; border:0;" title="Daily Immersive" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <a class="link reveal" href="https://youtu.be/ADpiOF7nMAM" target="_blank" rel="noopener" style="text-align:center;">youtu.be/ADpiOF7nMAM</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 15 — YOUTUBE · ML-Sharp app (Dirstify)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">▶ 영상 · ML-Sharp 앱</span>
+        <span class="corner-tr"><b>15</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="tag o">CASE</span><h3>ML-Sharp로 만든 앱 — Dirstify</h3></div>
+                <div class="reveal frame" style="width:min(100%,920px); aspect-ratio:16/9; max-height:60vh; margin:0 auto;">
+                    <iframe src="https://www.youtube.com/embed/ILCCHqnKJuY" style="height:100%; border:0;" title="ML-Sharp Daily Immersive app" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <p class="caption reveal" style="text-align:center;">ML-Sharp를 활용한 daily immersive 제작 앱</p>
+                <a class="link reveal" href="https://youtu.be/ILCCHqnKJuY" target="_blank" rel="noopener" style="text-align:center;">youtu.be/ILCCHqnKJuY</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 16 — DIVIDER 05
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>16</b> / 31</span>
+        <div class="slide-content">
+            <div class="reveal" style="margin-bottom:1.4rem;"><span class="bean" style="width:clamp(60px,9vw,120px); display:inline-block; transform:rotate(-3deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <div class="divider-num reveal">PART 05</div>
+            <h1 class="reveal">TouchDesigner와<br>실시간 렌더링</h1>
+            <p class="caption reveal" style="margin-top:1rem; font-size:clamp(1.1rem,1.8vw,1.5rem);">노드로 잇는 실시간의 가능성</p>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 17 — TD란
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> TouchDesigner</span>
+        <span class="corner-tr"><b>17</b> / 31</span>
+        <div class="slide-content">
+            <div class="split" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Real-time Renderer</div>
+                        <h2>렌더링에<br>걸리는 시간이<br><span style="color:var(--orange);">없다</span></h2>
+                    </div>
+                    <p class="reveal">TouchDesigner는 10년 전부터 실시간 렌더링과 인터랙티브를 가능케 하는 툴로 각광받는다. 렌더링이 곧 실시간이다.</p>
+                    <p class="reveal"><span class="hl">노드 기반 프로그래밍</span>으로, 프로그래밍에 익숙하지 않은 사람에게도 가능성을 연다.</p>
+                </div>
+                <div class="reveal-pop" style="display:flex; align-items:center; justify-content:center;">
+                    <!-- node-graph doodle -->
+                    <svg viewBox="0 0 360 300" style="width:100%; max-width:380px; height:auto;">
+                        <g filter="url(#wobble)" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.5">
+                            <rect x="20" y="30" width="96" height="50" rx="8"/>
+                            <rect x="20" y="130" width="96" height="50" rx="8"/>
+                            <rect x="150" y="80" width="96" height="50" rx="8"/>
+                            <rect x="150" y="200" width="96" height="50" rx="8"/>
+                            <rect x="270" y="120" width="72" height="50" rx="8" fill="var(--orange)"/>
+                        </g>
+                        <g fill="none" stroke="var(--orange)" stroke-width="3" stroke-linecap="round" filter="url(#wobble)">
+                            <path d="M116 55 C140 55 130 105 150 105"/>
+                            <path d="M116 155 C140 155 130 110 150 110"/>
+                            <path d="M246 105 C262 105 258 140 270 142"/>
+                            <path d="M246 225 C266 225 258 160 270 150"/>
+                        </g>
+                        <g font-family="Space Mono" font-size="12" fill="var(--ink)" text-anchor="middle">
+                            <text x="68" y="60">TOP</text>
+                            <text x="68" y="160">CHOP</text>
+                            <text x="198" y="110">SOP</text>
+                            <text x="198" y="230">DAT</text>
+                            <text x="306" y="150" fill="#fff">OUT</text>
+                        </g>
+                        <g transform="translate(300,40)"><use href="#bean" width="30" color="var(--ink)"/></g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 18 — TD 세 강점
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> TD의 강점</span>
+        <span class="corner-tr"><b>18</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(1rem,2vw,1.6rem);">
+                <h2 class="reveal">왜 TouchDesigner인가</h2>
+                <div class="cards-3 reveal">
+                    <div class="card shadow-orange">
+                        <span class="k">Real-time</span>
+                        <h4>실시간 렌더링</h4>
+                        <p>렌더링 시간이 없다. 최적화가 필요하지만, AI가 그마저 꽤 많은 것을 해결해 준다.</p>
+                    </div>
+                    <div class="card shadow-cyan">
+                        <span class="k">Artist-friendly</span>
+                        <h4>아티스트 친화</h4>
+                        <p>오퍼레이터를 바로 꺼내 쓴다. 도구로 작업 영역을 쉽게 확장한다.</p>
+                    </div>
+                    <div class="card shadow-ink">
+                        <span class="k">Network</span>
+                        <h4>얼기설기 연결</h4>
+                        <p>아두이노·LiDAR 하드웨어부터 Ableton·Bitwig 소프트웨어까지 잇는다.</p>
+                    </div>
+                </div>
+                <div class="reveal" style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
+                    <span class="caption">미디어아트의 공용어 —</span>
+                    <span class="tag">OSC</span><span class="tag">NDI</span><span class="tag">MQTT</span>
+                    <span class="caption">같은 네트워크 프로토콜로 작업한다</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE — 점에서 색깔로, 색깔에서 좌표로 (illustration 02)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 점 · 색깔 · 좌표</span>
+        <span class="corner-tr"><b>19</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-60" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">How LiDAR Sees</div>
+                        <h2 style="margin-bottom:0.4rem;">점에서 색깔로,<br>색깔에서 좌표로</h2>
+                    </div>
+                    <p class="reveal">LiDAR 장비는 카메라(IR)로 닿는 물체의 위치를 찍고 돌아온다. 돌아온 값으로 <span class="hl">거리와 공간 좌표</span>를 계산한다.</p>
+                    <p class="reveal">그 점을 색으로 재구성하면 <strong>포인트 클라우드</strong>가 된다. 색(RGBA)과 좌표(XYZ) — 이 두 데이터를 지금부터 하나씩 들여다본다.</p>
+                </div>
+                <div class="frame sketch reveal-pop" style="border-radius:0; transform:rotate(-1.2deg);">
+                    <span class="tape"></span>
+                    <img src="./assets/02-point-color-coordinate.png" alt="LiDAR가 점을 찍고 RGBA 색깔층을 거쳐 XYZ 좌표로 가는 일러스트레이션" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="img-fallback" style="height:30vh;">illustration 02</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE — 점 → 색깔 (RGBA peel interactive)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 점 → 색깔</span>
+        <span class="corner-tr"><b>20</b> / 31</span>
+        <div class="slide-content">
+            <div class="split" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Point → Color</div>
+                        <h2 style="margin-bottom:0.4rem;">색깔은<br>네 개의 층이다</h2>
+                    </div>
+                    <p class="reveal">빛이 물체에 닿고 돌아온 값을 <strong>색</strong>으로 재구성한다. 이때 색은 단순한 색이 아니다. <span class="rgb-dots"><i class="r"></i><i class="g"></i><i class="b"></i></span> <span class="hl">RGBA — 네 개의 층</span>이 진 이미지다.</p>
+                    <p class="reveal">스테레오 사운드가 양쪽에 같은 소리를 내보내듯, 각 채널의 픽셀 개수는 같다. 모든 픽셀의 RGBA 채널 수는 동일하다.</p>
+                    <div class="widget-hint reveal">슬라이더로 색의 층을 분리해 보세요</div>
+                </div>
+                <div class="reveal-pop stack" style="gap:0.9rem;">
+                    <div class="canvas-box" style="padding:clamp(0.6rem,1.4vw,1rem); box-shadow:7px 8px 0 -1px var(--cyan);">
+                        <div class="peel-stage" data-widget="peel">
+                            <canvas class="peel-layer" data-ch="a"></canvas>
+                            <canvas class="peel-layer" data-ch="b"></canvas>
+                            <canvas class="peel-layer" data-ch="g"></canvas>
+                            <canvas class="peel-layer" data-ch="r"></canvas>
+                            <canvas class="peel-layer" data-ch="rgb"></canvas>
+                            <span class="peel-tag" data-t="r" style="color:var(--rgb-r); border-color:var(--rgb-r);">R</span>
+                            <span class="peel-tag" data-t="g" style="color:var(--rgb-g); border-color:var(--rgb-g);">G</span>
+                            <span class="peel-tag" data-t="b" style="color:var(--rgb-b); border-color:var(--rgb-b);">B</span>
+                            <span class="peel-tag" data-t="a">A</span>
+                        </div>
+                    </div>
+                    <input type="range" class="sketch-range" min="0" max="100" value="0" data-widget="peel-slider" aria-label="RGBA 층 분리">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 20 — 색깔 → 좌표 (3D point cloud orbit)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 색깔 → 좌표</span>
+        <span class="corner-tr"><b>21</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-40">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Color → Coordinate</div>
+                        <h2 style="margin-bottom:0.4rem;">점을 공간에<br>뿌려두면</h2>
+                    </div>
+                    <p class="reveal">돌아온 값으로 거리와 방향을 계산해 <span class="hl-c">XYZ 3차원 좌표</span>를 얻는다. 그 좌표에 점을 뿌리면 — 이것이 <strong>포인트 클라우드</strong>다.</p>
+                    <p class="reveal">실시간이라는 것은, 이 점들을 <strong>지금 이 순간 조정하고 변주</strong>할 수 있다는 뜻이다.</p>
+                    <div class="widget-hint reveal">드래그해서 시점을 돌려보세요</div>
+                </div>
+                <div class="canvas-box reveal-pop" style="aspect-ratio:1/1; max-height:66vh; box-shadow:7px 8px 0 -1px var(--orange);">
+                    <canvas class="stage" data-widget="orbit"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 21 — OUSTER workshop + realtime devices (Kaywon 2023)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 인터랙티브의 맛</span>
+        <span class="corner-tr"><b>22</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-60" style="align-items:center;">
+                <div class="frame sketch reveal-pop" style="border-radius:0; transform:rotate(-1deg);">
+                    <span class="tape"></span>
+                    <img src="./assets/ouster-workshop.png" alt="TouchDesigner with LiDAR — Ouster OS0-32 활용 워크샵 화면" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="img-fallback" style="height:30vh;">ouster workshop</div>
+                </div>
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <span class="tag c" style="margin-bottom:0.7rem;">2023 · 계원예대 워크샵</span>
+                        <h2 style="margin-bottom:0.4rem;">여기서<br>인터랙티브의<br>맛을 본다</h2>
+                    </div>
+                    <p class="reveal">2023년 계원예대 학생들과 진행한 워크샵 — <strong>Ouster OS0-32</strong>로 실제 공간을 실시간 포인트 클라우드로 받아냈다.</p>
+                    <div class="reveal">
+                        <p class="caption" style="margin-bottom:0.5rem;">실시간으로 다룰 수 있는 장비들 —</p>
+                        <div class="wrap">
+                            <span class="tag">Orbbec</span>
+                            <span class="tag">Intel Realsense</span>
+                            <span class="tag">TDLidar · Phone App</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 22 — DIVIDER 06
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>23</b> / 31</span>
+        <div class="slide-content">
+            <div class="reveal" style="margin-bottom:1.4rem;"><span class="bean" style="width:clamp(60px,9vw,120px); display:inline-block; transform:rotate(5deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <div class="divider-num reveal">PART 06</div>
+            <h1 class="reveal">더 나아가기</h1>
+            <p class="caption reveal" style="margin-top:1rem; font-size:clamp(1.1rem,1.8vw,1.5rem);">스플랫 · 4DGS · 그리고 AI</p>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 23 — Gaussian Splatting (illustration 03 + splat morph)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> Gaussian Splatting</span>
+        <span class="corner-tr"><b>24</b> / 31</span>
+        <div class="slide-content">
+            <div class="split" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Gaussian Splatting</div>
+                        <h2 style="margin-bottom:0.4rem;">점을 번지는<br>타원으로</h2>
+                    </div>
+                    <p class="reveal">점을 그대로 두지 않는다. <span class="hl">번지는 타원(splat)</span>으로 표면을 채운다. 겹쳐진 표면은 시점이 자유롭고, 렌더가 빠르다.</p>
+                    <div class="wrap reveal">
+                        <span class="tag">나이언틱 · 포켓몬고</span>
+                        <span class="tag">피크민 블룸</span>
+                        <span class="tag c">Post Shot</span>
+                    </div>
+                    <div class="reveal frame sketch" style="border-radius:0; transform:rotate(-1deg); width:min(100%,330px); align-self:flex-start;">
+                        <img src="./assets/03-gaussian-splatting.png" alt="점 구름이 가우시안 그라인더를 거쳐 겹쳐진 표면이 되는 일러스트레이션" loading="lazy" style="max-height:22vh; object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                        <div class="img-fallback" style="height:16vh;">illustration 03</div>
+                    </div>
+                    <div class="widget-hint reveal">슬라이더로 점을 번지게 해보세요</div>
+                </div>
+                <div class="reveal-pop stack" style="gap:0.9rem;">
+                    <div class="canvas-box" style="aspect-ratio:4/3; max-height:50vh; box-shadow:7px 8px 0 -1px var(--cyan);">
+                        <canvas class="stage" data-widget="splat" style="cursor:default;"></canvas>
+                    </div>
+                    <input type="range" class="sketch-range" min="0" max="100" value="8" data-widget="splat-slider" aria-label="점에서 스플랫으로">
+                    <div class="row" style="justify-content:space-between;">
+                        <span class="caption">점 구름</span>
+                        <span class="caption">겹쳐진 표면</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 24 — ML-Sharp (illustration 04)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> ML-Sharp</span>
+        <span class="corner-tr"><b>25</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-40">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">Apple · ML-Sharp</div>
+                        <h2 style="margin-bottom:0.4rem;">이미지 한 장<br>으로 충분히</h2>
+                    </div>
+                    <p class="reveal">맥도 약진 중이다. 자체 모델을 기반으로 <span class="hl">이미지 한 장</span>에서 가우시안 스플랫팅이 가능해졌다.</p>
+                    <div class="reveal" style="font-family:var(--mono); font-size:var(--small-size); color:var(--ink-soft); line-height:2;">
+                        이미지 한 장 <span class="o">→</span> 깊이 측정 <span class="o">→</span> 3D 재료 <span class="o">→</span> 앱 실행
+                    </div>
+                </div>
+                <div class="frame sketch reveal-pop" style="border-radius:0; transform:rotate(1deg);">
+                    <span class="tape"></span>
+                    <img src="./assets/04-ml-sharp.png" alt="ML-Sharp: 이미지 한 장에서 깊이를 측정해 3D 재료를 만드는 일러스트레이션" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="img-fallback" style="height:30vh;">illustration 04</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 25 — 4DGS (illustration 05 + Gracia link)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 4DGS</span>
+        <span class="corner-tr"><b>26</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-60" style="align-items:center;">
+                <div class="frame sketch reveal-pop" style="border-radius:0; transform:rotate(-1.2deg);">
+                    <span class="tape"></span>
+                    <img src="./assets/05-4dgs.png" alt="4DGS: 3D 스플랫이 시간축을 따라 움직이고 공연·XR로 이어지는 일러스트레이션" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="img-fallback" style="height:30vh;">illustration 05</div>
+                </div>
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">4D Gaussian Splatting</div>
+                        <h2 style="margin-bottom:0.4rem;">시간축을<br>더하다</h2>
+                    </div>
+                    <p class="reveal">경량화된 가우시안 스플랫팅으로 <strong>공연·XR</strong>에 접목한다. 볼류메트릭 캡처 → 4D Gaussian Splatting. 시간축으로 움직이고, 시점이 이동한다.</p>
+                    <a class="link reveal" href="https://gracia.ai/store/creator/DNE/9ee301ea-fcd4-4041-b82e-ee3c1c461352" target="_blank" rel="noopener">gracia.ai — 볼류메트릭 4DGS</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 26 — YOUTUBE · 4DGS (Gracia volumetric)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">▶ 영상 · 4DGS</span>
+        <span class="corner-tr"><b>27</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="tag o">CASE</span><h3>볼류메트릭 캡처 · 4D Gaussian Splatting</h3></div>
+                <div class="reveal frame" style="width:min(100%,920px); aspect-ratio:16/9; max-height:62vh; margin:0 auto;">
+                    <iframe src="https://www.youtube.com/embed/p--xk9n1eIM" style="height:100%; border:0;" title="4DGS volumetric capture" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <a class="link reveal" href="https://youtu.be/p--xk9n1eIM" target="_blank" rel="noopener" style="text-align:center;">youtu.be/p--xk9n1eIM</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 27 — AI · World Model / Robotics (illustration 06)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> AI로 나아간다면</span>
+        <span class="corner-tr"><b>28</b> / 31</span>
+        <div class="slide-content">
+            <div class="split-60" style="align-items:center;">
+                <div class="stack-lg">
+                    <div class="reveal">
+                        <div class="eyebrow" style="margin-bottom:0.5rem;">World Model</div>
+                        <h2 style="margin-bottom:0.4rem;">현실을 스캔해<br>세계를 만든다</h2>
+                    </div>
+                    <p class="reveal">현실을 스캔해 <span class="hl">세계 모델</span>을 만든다. 데이터가 있다면, 그 데이터를 기반으로 한 <strong>상상의 세계</strong>도 구현할 수 있지 않을까.</p>
+                    <p class="reveal">현실 스캔 <span class="o">→</span> 세계 모델 <span class="o">→</span> 로봇 행동 <span class="c">→</span> 다시 피드백으로 돌아온다.</p>
+                </div>
+                <div class="frame sketch reveal-pop" style="border-radius:0; transform:rotate(1.4deg);">
+                    <span class="tape"></span>
+                    <img src="./assets/06-world-model-robotics.png" alt="현실 스캔에서 세계 모델, 로봇 행동, 피드백으로 순환하는 일러스트레이션" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="img-fallback" style="height:30vh;">illustration 06</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 28 — AI references
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 레퍼런스</span>
+        <span class="corner-tr"><b>29</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(1rem,2vw,1.6rem);">
+                <h2 class="reveal">지금 보고 있는 것들</h2>
+                <div class="reveal" style="display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(0.8rem,1.6vw,1.3rem);">
+                    <div class="card"><span class="k">Scene</span><h4>World Labs · Marble</h4><p>이미지·텍스트에서 3D 월드를 생성</p></div>
+                    <div class="card"><span class="k">Web</span><h4>Web XR</h4><p>브라우저에서 펼치는 몰입형 경험</p></div>
+                    <div class="card"><span class="k">Embodied</span><h4>Robotics · Simulations</h4><p>스캔한 세계 위에서 로봇이 학습한다</p></div>
+                    <div class="card"><span class="k">Synthetic</span><h4>Nvidia · Nemotron</h4><p>LLM으로 재구성한 한국인 합성 데이터</p></div>
+                </div>
+                <div class="reveal row" style="gap:0.8rem; flex-wrap:wrap;">
+                    <span class="tag o">Apple</span>
+                    <a class="link" href="https://x.com/HussneM27687/status/2064496847327273470" target="_blank" rel="noopener">x.com · Apple 관련 데모</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 29 — RECAP (closing throughline)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl"><span class="bean"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span> 정리</span>
+        <span class="corner-tr"><b>30</b> / 31</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(1.2rem,2.5vw,2rem); align-items:flex-start;">
+                <h2 class="reveal">하나의 점에서, 여기까지</h2>
+                <div class="reveal wrap" style="align-items:center; gap:clamp(0.5rem,1.4vw,1rem); font-family:var(--hand); font-weight:700; font-size:clamp(1.4rem,3.6vw,2.8rem);">
+                    <span>점</span><span class="o">→</span>
+                    <span>색깔 <span class="rgb-dots"><i class="r"></i><i class="g"></i><i class="b"></i></span></span><span class="o">→</span>
+                    <span>좌표 <span class="mono" style="font-size:0.55em; color:var(--cyan);">XYZ</span></span><span class="o">→</span>
+                    <span style="color:var(--orange);">인공지능</span>
+                </div>
+                <p class="reveal lead" style="max-width:62ch;">기술 용어 뒤에 숨지 않고, <span class="hl">창작자로서 LiDAR를 점유하는 방법</span>. 점을 어떻게 바라보고, 어디까지 데려갈지는 — 결국 만드는 사람의 몫이다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 30 — THANKS
+         ======================================================== -->
+    <section class="slide thanks">
+        <span class="corner-tr"><b>31</b> / 31</span>
+        <div class="slide-content" style="justify-content:center; align-items:flex-start;">
+            <div class="reveal" style="margin-bottom:1rem;"><span class="bean" style="width:clamp(70px,11vw,150px); display:inline-block; transform:rotate(-3deg);"><svg viewBox="0 0 120 178"><use href="#bean"/></svg></span></div>
+            <h1 class="reveal">Thank you</h1>
+        </div>
+    </section>
+
+    <script>
+    /* ============================================================
+       SLIDE PRESENTATION CONTROLLER
+       ============================================================ */
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.current = 0;
+            this.bar = document.getElementById('progressBar');
+            this.observe();
+            this.keys();
+            this.touch();
+        }
+        observe() {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting && e.intersectionRatio > 0.5) {
+                        e.target.classList.add('visible');
+                        const i = Array.from(this.slides).indexOf(e.target);
+                        if (i !== -1) { this.current = i; this.progress(); }
+                    }
+                });
+            }, { threshold: [0.5] });
+            this.slides.forEach(s => io.observe(s));
+        }
+        progress() { this.bar.style.width = ((this.current + 1) / this.slides.length) * 100 + '%'; }
+        goTo(i) { i = Math.max(0, Math.min(this.slides.length - 1, i)); this.slides[i].scrollIntoView({ behavior: 'smooth' }); }
+        next() { this.goTo(this.current + 1); }
+        prev() { this.goTo(this.current - 1); }
+        keys() {
+            document.addEventListener('keydown', (e) => {
+                if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); this.next(); }
+                else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+                else if (e.key === 'Home') { e.preventDefault(); this.goTo(0); }
+                else if (e.key === 'End') { e.preventDefault(); this.goTo(this.slides.length - 1); }
+                else if (e.key === 'f' || e.key === 'F') {
+                    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                    else document.exitFullscreen();
+                }
+            });
+        }
+        touch() {
+            let y0 = 0, x0 = 0;
+            document.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; }, { passive: true });
+            document.addEventListener('touchend', (e) => {
+                const dy = e.changedTouches[0].clientY - y0, dx = e.changedTouches[0].clientX - x0;
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) { dy < 0 ? this.next() : this.prev(); }
+            }, { passive: true });
+        }
+    }
+    new SlidePresentation();
+
+    /* ============================================================
+       INTERACTIVE WIDGETS
+       ============================================================ */
+    const PALETTE = { ink:'#20201c', orange:'#ee6a2b', cyan:'#2f9bc9', paper:'#f4efe3',
+                      r:'#e0473f', g:'#4ca65a', b:'#3f63d6' };
+
+    function fit(canvas) {
+        const r = canvas.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        canvas.width = Math.max(1, Math.round(r.width * dpr));
+        canvas.height = Math.max(1, Math.round(r.height * dpr));
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { w: r.width, h: r.height, ctx };
+    }
+    function whenVisible(el, on, off) {
+        const io = new IntersectionObserver((es) => {
+            es.forEach(e => { (e.isIntersecting && e.intersectionRatio > 0.4) ? on() : (off && off()); });
+        }, { threshold: [0.4] });
+        io.observe(el);
+    }
+
+    const Widgets = {
+        /* ---- 1. pipeline stepper ---- */
+        pipeline(el) {
+            const texts = [
+                ['점', 'LiDAR가 쏜 빛이 물체에 닿고 돌아온다. 그 하나의 점에서 모든 것이 시작한다.'],
+                ['색깔', '돌아온 값을 색으로 재구성한다. 색은 RGBA — 빨강·초록·파랑·투명도 네 개의 층이다.'],
+                ['좌표', '거리와 방향으로 3차원 XYZ 좌표를 계산한다. 점을 공간에 뿌리면 포인트 클라우드다.'],
+                ['인공지능', '좌표와 색의 데이터를 AI가 읽는다. 스캔한 현실에서 상상의 공간이 자라난다.'],
+            ];
+            const nodes = [...el.querySelectorAll('.pipe-node')];
+            const links = [...el.querySelectorAll('.pipe-link')];
+            const cap = el.querySelector('.pipe-caption');
+            const set = (idx) => {
+                nodes.forEach((n, i) => { n.classList.toggle('active', i === idx); n.classList.toggle('done', i < idx); });
+                links.forEach((l, i) => l.classList.toggle('lit', i < idx));
+                cap.innerHTML = '<span class="lbl">' + texts[idx][0] + '</span>' + texts[idx][1];
+            };
+            nodes.forEach((n, i) => { n.addEventListener('click', () => set(i)); n.addEventListener('mouseenter', () => set(i)); });
+            set(0);
+        },
+
+        /* ---- 2. LiDAR ray-scan ---- */
+        rayscan(el) {
+            let W, H, ctx, raf = 0, running = false;
+            let ex = 0.5, ey = 0.86;          // emitter (normalized)
+            const pts = [];                    // accumulated {x,y,c}
+            const CAP = 3200;
+            let walls = [];
+            function build() {
+                const m = 0.1;
+                const x0 = m, x1 = 1 - m, y0 = 0.12, y1 = 0.9;
+                walls = [
+                    [x0,y0, x1,y0], [x1,y0, x1,y1], [x1,y1, x0,y1], [x0,y1, x0,y0], // room
+                ];
+                // a chair-ish box obstacle
+                const bx0=0.36,bx1=0.58,by0=0.42,by1=0.7;
+                walls.push([bx0,by0,bx1,by0],[bx1,by0,bx1,by1],[bx1,by1,bx0,by1],[bx0,by1,bx0,by0]);
+                // a slab
+                walls.push([0.64,0.3,0.84,0.3],[0.84,0.3,0.84,0.5],[0.84,0.5,0.64,0.5],[0.64,0.5,0.64,0.3]);
+            }
+            function rayHit(ox, oy, dx, dy) {
+                let best = Infinity, hx = 0, hy = 0;
+                for (const w of walls) {
+                    const x3 = w[0], y3 = w[1], x4 = w[2], y4 = w[3];
+                    const den = (dx) * (y3 - y4) - (dy) * (x3 - x4);
+                    if (Math.abs(den) < 1e-9) continue;
+                    const t = ((x3 - ox) * (y3 - y4) - (y3 - oy) * (x3 - x4)) / den;
+                    const u = ((x3 - ox) * (dy) - (y3 - oy) * (dx)) / den;
+                    if (t > 0.001 && u >= 0 && u <= 1 && t < best) { best = t; hx = ox + dx * t; hy = oy + dy * t; }
+                }
+                return best < Infinity ? [hx, hy, best] : null;
+            }
+            function scan() {
+                const N = 150;
+                for (let i = 0; i < N; i++) {
+                    const a = (i / N) * Math.PI * 2 + Math.random() * 0.02;
+                    const h = rayHit(ex, ey, Math.cos(a), Math.sin(a));
+                    if (h && pts.length < CAP) {
+                        const t = Math.min(1, h[2] / 0.9);
+                        // colour by distance: near=orange, far=cyan
+                        const c = i % 9 === 0 ? PALETTE.ink : (t > 0.5 ? PALETTE.cyan : PALETTE.orange);
+                        pts.push([h[0], h[1], c]);
+                    }
+                }
+            }
+            function draw() {
+                if (!running) return;
+                scan();
+                ctx.clearRect(0, 0, W, H);
+                // walls (faint)
+                ctx.strokeStyle = 'rgba(32,32,28,0.18)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (const w of walls) { ctx.moveTo(w[0]*W, w[1]*H); ctx.lineTo(w[2]*W, w[3]*H); }
+                ctx.stroke();
+                // accumulated points
+                for (const p of pts) {
+                    ctx.fillStyle = p[2];
+                    ctx.fillRect(p[0]*W - 1, p[1]*H - 1, 2.2, 2.2);
+                }
+                // emitter rays (sample)
+                ctx.strokeStyle = 'rgba(238,106,43,0.12)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i < 40; i++) {
+                    const a = (i / 40) * Math.PI * 2;
+                    const h = rayHit(ex, ey, Math.cos(a), Math.sin(a));
+                    if (h) { ctx.moveTo(ex*W, ey*H); ctx.lineTo(h[0]*W, h[1]*H); }
+                }
+                ctx.stroke();
+                // emitter
+                ctx.fillStyle = PALETTE.ink;
+                ctx.beginPath(); ctx.arc(ex*W, ey*H, 6, 0, 7); ctx.fill();
+                ctx.fillStyle = PALETTE.orange;
+                ctx.beginPath(); ctx.arc(ex*W, ey*H, 3, 0, 7); ctx.fill();
+                // counter
+                ctx.fillStyle = 'rgba(32,32,28,0.4)';
+                ctx.font = '12px "Space Mono", monospace';
+                ctx.fillText(pts.length + ' pts', 12, H - 12);
+                raf = requestAnimationFrame(draw);
+            }
+            function move(cx, cy) {
+                const r = el.getBoundingClientRect();
+                ex = Math.max(0.12, Math.min(0.88, (cx - r.left) / r.width));
+                ey = Math.max(0.55, Math.min(0.88, (cy - r.top) / r.height));
+            }
+            el.addEventListener('pointermove', (e) => move(e.clientX, e.clientY));
+            el.addEventListener('pointerdown', (e) => { pts.length = 0; move(e.clientX, e.clientY); });
+            function size() { const f = fit(el); W = f.w; H = f.h; ctx = f.ctx; }
+            window.addEventListener('resize', () => { if (running) size(); });
+            build();
+            whenVisible(el, () => { size(); if (!running) { running = true; draw(); } }, () => { running = false; cancelAnimationFrame(raf); });
+        },
+
+        /* ---- 3. RGBA peel ---- */
+        peel(el) {
+            const layers = {
+                rgb: el.querySelector('[data-ch="rgb"]'),
+                r: el.querySelector('[data-ch="r"]'),
+                g: el.querySelector('[data-ch="g"]'),
+                b: el.querySelector('[data-ch="b"]'),
+                a: el.querySelector('[data-ch="a"]'),
+            };
+            const tags = {
+                r: el.querySelector('[data-t="r"]'), g: el.querySelector('[data-t="g"]'),
+                b: el.querySelector('[data-t="b"]'), a: el.querySelector('[data-t="a"]'),
+            };
+            // procedural source scene drawn into each channel
+            function paint(ctx, w, h, mode) {
+                ctx.clearRect(0, 0, w, h);
+                // every plane sits on paper, so the channels read as distinct tinted layers
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = '#f4efe3'; ctx.fillRect(0, 0, w, h);
+                const shapes = [
+                    // x,y,r, R,G,B
+                    [0.32,0.40,0.26, 224,71,63],
+                    [0.58,0.46,0.28, 76,166,90],
+                    [0.70,0.34,0.22, 63,99,214],
+                    [0.46,0.66,0.22, 240,170,90],
+                ];
+                for (const s of shapes) {
+                    let col;
+                    if (mode === 'r') col = 'rgba(224,71,63,' + (s[3]/255).toFixed(2) + ')';
+                    else if (mode === 'g') col = 'rgba(76,166,90,' + (s[4]/255).toFixed(2) + ')';
+                    else if (mode === 'b') col = 'rgba(63,99,214,' + (s[5]/255).toFixed(2) + ')';
+                    else if (mode === 'a') col = 'rgba(40,40,36,0.82)';
+                    else col = 'rgba(' + s[3] + ',' + s[4] + ',' + s[5] + ',0.82)';
+                    ctx.beginPath();
+                    ctx.arc(s[0]*w, s[1]*h, s[2]*Math.min(w,h), 0, 7);
+                    ctx.fillStyle = col; ctx.fill();
+                }
+                // channel letter watermark for the separated planes
+                if (mode === 'r' || mode === 'g' || mode === 'b' || mode === 'a') {
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.fillStyle = 'rgba(32,32,28,0.16)';
+                    ctx.font = '700 ' + Math.round(h*0.34) + 'px "Space Mono", monospace';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+                    ctx.fillText(mode.toUpperCase(), w*0.04, h*0.96);
+                }
+            }
+            function render() {
+                Object.entries(layers).forEach(([k, cv]) => {
+                    if (!cv) return;
+                    const r = cv.getBoundingClientRect();
+                    const dpr = Math.min(2, window.devicePixelRatio || 1);
+                    cv.width = Math.max(1, r.width*dpr); cv.height = Math.max(1, r.height*dpr);
+                    const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+                    paint(ctx, r.width, r.height, k);
+                });
+            }
+            el._render = render;
+            el._setSep = function (t) {
+                // t 0..1 : cascade the 4 channel planes apart (R front → A back), fade the composite
+                const gapY = 46, gapX = 20;
+                const order = ['r','g','b','a'];   // visual top → bottom
+                const stage = el.getBoundingClientRect();
+                order.forEach((k, i) => {
+                    const dy = (i - 1.5) * gapY * t;
+                    const dx = (i - 1.5) * gapX * t;
+                    layers[k].style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+                    layers[k].style.opacity = (0.32 + 0.53 * t).toFixed(2);   // translucent stack → layered look
+                    layers[k].style.zIndex = 8 - i;   // R in front, A at back
+                    if (tags[k]) {
+                        tags[k].style.opacity = t > 0.12 ? 1 : 0;
+                        const lr = layers[k].getBoundingClientRect();
+                        tags[k].style.left = (lr.left - stage.left - 8) + 'px';
+                        tags[k].style.top = (lr.top - stage.top + lr.height * 0.5 - 13) + 'px';
+                    }
+                });
+                layers.rgb.style.opacity = (1 - t).toFixed(2);
+                layers.rgb.style.zIndex = 12;
+            };
+            window.addEventListener('resize', () => { render(); el._setSep(el._sep || 0); });
+            whenVisible(el, () => { render(); el._setSep(el._sep || 0); });
+        },
+
+        /* ---- 4. 3D point-cloud orbit ---- */
+        orbit(el) {
+            let W, H, ctx, raf = 0, running = false;
+            let yaw = -0.6, pitch = -0.32, autoY = 0;
+            let dragging = false, lastX = 0, lastY = 0, idle = 0;
+            const pts = [];
+            function box(cx, cy, cz, sx, sy, sz, n) {
+                for (let i = 0; i < n; i++) {
+                    pts.push([cx + (Math.random()-0.5)*sx, cy + (Math.random()-0.5)*sy, cz + (Math.random()-0.5)*sz]);
+                }
+            }
+            // a chair (continuity with the splatting illustration)
+            box(0, 0.0, 0, 1.0, 0.12, 1.0, 360);      // seat
+            box(0, 0.62, -0.44, 1.0, 1.1, 0.12, 320);  // backrest
+            box(-0.42,-0.6,-0.42, 0.12,1.0,0.12, 90);  // legs
+            box( 0.42,-0.6,-0.42, 0.12,1.0,0.12, 90);
+            box(-0.42,-0.6, 0.42, 0.12,1.0,0.12, 90);
+            box( 0.42,-0.6, 0.42, 0.12,1.0,0.12, 90);
+            const ys = pts.map(p => p[1]); const ymin = Math.min(...ys), ymax = Math.max(...ys);
+            function lerpCol(t) {
+                // cyan(low) -> orange(high)
+                const a = [47,155,201], b = [238,106,43];
+                return 'rgb(' + a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',') + ')';
+            }
+            function draw() {
+                if (!running) return;
+                if (!dragging) { idle++; if (idle > 40) autoY += 0.0045; }
+                ctx.clearRect(0, 0, W, H);
+                const cx = W/2, cy = H/2, scale = Math.min(W, H) * 0.32;
+                const cyaw = Math.cos(yaw+autoY), syaw = Math.sin(yaw+autoY);
+                const cp = Math.cos(pitch), sp = Math.sin(pitch);
+                const proj = [];
+                for (const p of pts) {
+                    let x = p[0], y = p[1], z = p[2];
+                    let x1 = x*cyaw - z*syaw, z1 = x*syaw + z*cyaw;
+                    let y1 = y*cp - z1*sp, z2 = y*sp + z1*cp;
+                    const persp = 2.6 / (2.6 + z2);
+                    proj.push([cx + x1*scale*persp, cy - y1*scale*persp, z2, (p[1]-ymin)/(ymax-ymin)]);
+                }
+                proj.sort((a,b) => b[2] - a[2]);
+                // axes
+                drawAxis(cx, cy, scale, cyaw, syaw, cp, sp);
+                for (const p of proj) {
+                    const sz = 1.4 + (p[2]+1)*1.1;
+                    ctx.fillStyle = lerpCol(p[3]);
+                    ctx.beginPath(); ctx.arc(p[0], p[1], sz, 0, 7); ctx.fill();
+                }
+                raf = requestAnimationFrame(draw);
+            }
+            function drawAxis(cx, cy, scale, cyaw, syaw, cp, sp) {
+                const L = 1.5;
+                const axes = [[L,0,0,PALETTE.r,'X'],[0,L,0,PALETTE.g,'Y'],[0,0,L,PALETTE.b,'Z']];
+                ctx.lineWidth = 2;
+                for (const ax of axes) {
+                    let x1 = ax[0]*cyaw - ax[2]*syaw, z1 = ax[0]*syaw + ax[2]*cyaw;
+                    let y1 = ax[1]*cp - z1*sp;
+                    const persp = 2.6/(2.6 + (ax[1]*sp + z1*cp));
+                    const ex = cx + x1*scale*persp, ey = cy - y1*scale*persp;
+                    ctx.strokeStyle = ax[3]; ctx.globalAlpha = 0.7;
+                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex, ey); ctx.stroke();
+                    ctx.globalAlpha = 1; ctx.fillStyle = ax[3];
+                    ctx.font = 'bold 12px "Space Mono", monospace';
+                    ctx.fillText(ax[4], ex + 3, ey);
+                }
+            }
+            el.addEventListener('pointerdown', (e) => { dragging = true; idle = 0; lastX = e.clientX; lastY = e.clientY; el.setPointerCapture(e.pointerId); });
+            el.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                yaw += (e.clientX - lastX) * 0.01; pitch += (e.clientY - lastY) * 0.01;
+                pitch = Math.max(-1.3, Math.min(1.3, pitch));
+                lastX = e.clientX; lastY = e.clientY;
+            });
+            el.addEventListener('pointerup', () => { dragging = false; idle = 0; });
+            el.addEventListener('pointercancel', () => { dragging = false; });
+            function size() { const f = fit(el); W = f.w; H = f.h; ctx = f.ctx; }
+            window.addEventListener('resize', () => { if (running) size(); });
+            whenVisible(el, () => { size(); if (!running) { running = true; draw(); } }, () => { running = false; cancelAnimationFrame(raf); });
+        },
+
+        /* ---- 5. point -> splat morph ---- */
+        splat(el) {
+            let W, H, ctx, raf = 0, running = false, t = 0.08;
+            const pts = [];
+            // project a 3D chair to a fixed nice angle, store 2D + a colour seed
+            (function build() {
+                const raw = [];
+                function box(cx, cy, cz, sx, sy, sz, n) {
+                    for (let i = 0; i < n; i++) raw.push([cx+(Math.random()-0.5)*sx, cy+(Math.random()-0.5)*sy, cz+(Math.random()-0.5)*sz]);
+                }
+                box(0,0,0,1.0,0.12,1.0,200); box(0,0.62,-0.44,1.0,1.1,0.12,180);
+                box(-0.42,-0.6,-0.42,0.12,1.0,0.12,55); box(0.42,-0.6,-0.42,0.12,1.0,0.12,55);
+                box(-0.42,-0.6,0.42,0.12,1.0,0.12,55); box(0.42,-0.6,0.42,0.12,1.0,0.12,55);
+                const yaw=-0.7, pitch=-0.3, cyaw=Math.cos(yaw),syaw=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+                const ys = raw.map(p=>p[1]); const ymin=Math.min(...ys),ymax=Math.max(...ys);
+                for (const p of raw) {
+                    let x1=p[0]*cyaw-p[2]*syaw, z1=p[0]*syaw+p[2]*cyaw;
+                    let y1=p[1]*cp-z1*sp, z2=p[1]*sp+z1*cp;
+                    const persp=2.6/(2.6+z2);
+                    pts.push({ x:x1*persp, y:-y1*persp, z:z2, h:(p[1]-ymin)/(ymax-ymin) });
+                }
+            })();
+            function col(h, alpha) {
+                const a=[47,155,201], b=[238,106,43];
+                return 'rgba(' + a.map((v,i)=>Math.round(v+(b[i]-v)*h)).join(',') + ',' + alpha + ')';
+            }
+            function draw() {
+                if (!running) return;
+                ctx.clearRect(0, 0, W, H);
+                const cx = W/2, cy = H/2, scale = Math.min(W,H)*0.34;
+                // far first
+                const sorted = [...pts].sort((a,b)=>b.z-a.z);
+                for (const p of sorted) {
+                    const px = cx + p.x*scale, py = cy + p.y*scale;
+                    const R = 1.5 + t * (Math.min(W,H)*0.05);
+                    if (t < 0.06) {
+                        ctx.fillStyle = col(p.h, 0.95);
+                        ctx.beginPath(); ctx.arc(px, py, 1.6, 0, 7); ctx.fill();
+                    } else {
+                        const g = ctx.createRadialGradient(px, py, 0, px, py, R);
+                        g.addColorStop(0, col(p.h, 0.5));
+                        g.addColorStop(1, col(p.h, 0));
+                        ctx.fillStyle = g;
+                        ctx.beginPath(); ctx.ellipse(px, py, R, R*0.78, p.h*3, 0, 7); ctx.fill();
+                    }
+                }
+                raf = requestAnimationFrame(draw);
+            }
+            el._setT = (v) => { t = v; };
+            function size() { const f = fit(el); W = f.w; H = f.h; ctx = f.ctx; }
+            window.addEventListener('resize', () => { if (running) size(); });
+            whenVisible(el, () => { size(); if (!running) { running = true; draw(); } }, () => { running = false; cancelAnimationFrame(raf); });
+        },
+    };
+
+    // boot widgets + wire sliders
+    document.querySelectorAll('[data-widget="pipeline"]').forEach(el => Widgets.pipeline(el));
+    document.querySelectorAll('[data-widget="rayscan"]').forEach(el => Widgets.rayscan(el));
+    document.querySelectorAll('[data-widget="orbit"]').forEach(el => Widgets.orbit(el));
+    document.querySelectorAll('[data-widget="splat"]').forEach(el => Widgets.splat(el));
+    document.querySelectorAll('[data-widget="peel"]').forEach(el => Widgets.peel(el));
+
+    document.querySelectorAll('[data-widget="peel-slider"]').forEach(sl => {
+        const stage = sl.closest('.stack').querySelector('[data-widget="peel"]');
+        const apply = () => { const t = sl.value/100; stage._sep = t; if (stage._setSep) stage._setSep(t); };
+        sl.addEventListener('input', apply);
+    });
+    document.querySelectorAll('[data-widget="splat-slider"]').forEach(sl => {
+        const cv = sl.closest('.stack').querySelector('[data-widget="splat"]');
+        const apply = () => { if (cv._setT) cv._setT(sl.value/100); };
+        sl.addEventListener('input', apply);
+        apply();
+    });
+    </script>
+</body>
+</html>

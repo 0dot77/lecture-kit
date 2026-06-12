@@ -51,6 +51,8 @@ export default defineConfig({
         "nca-week15": "courses/nca-touchdesigner/week-15.html",
         "yonsei-lecture-index": "courses/yonsei-lecture/index.html",
         "yonsei-interface-slides": "courses/yonsei-lecture/slides/interface.html",
+        "kaywon-lecture-index": "courses/kaywon-lecture/index.html",
+        "kaywon-dcca-slides": "courses/kaywon-lecture/slides/dot-color-coordinate-ai.html",
       },
     },
   },
