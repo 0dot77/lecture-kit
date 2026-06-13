@@ -53,6 +53,8 @@ export default defineConfig({
         "yonsei-interface-slides": "courses/yonsei-lecture/slides/interface.html",
         "kaywon-lecture-index": "courses/kaywon-lecture/index.html",
         "kaywon-dcca-slides": "courses/kaywon-lecture/slides/dot-color-coordinate-ai.html",
+        "seongnam-pm-index": "courses/seongnam-projection-mapping/index.html",
+        "seongnam-pm-week01-slides": "courses/seongnam-projection-mapping/slides/week-01.html",
       },
     },
   },

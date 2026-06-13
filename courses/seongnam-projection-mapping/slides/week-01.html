@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝션 맵핑 소개 — 성남미디어센터 · Week 01</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+    <style>
+        /* ===========================================
+           THEME — clean black & white
+           Pure white paper · ink-black type · hairlines
+           =========================================== */
+        :root {
+            --paper: #ffffff;
+            --paper-2: #f4f4f2;
+            --paper-3: #eeeeb;
+            --ink: #0a0a0a;
+            --ink-soft: #3a3a38;
+            --ink-dim: #8a8a86;
+            --ink-faint: rgba(10, 10, 10, 0.12);
+            --line: rgba(10, 10, 10, 0.16);
+
+            --body: 'Pretendard Variable', 'Pretendard', sans-serif;
+            --mono: 'Space Mono', monospace;
+
+            --title-size: clamp(2.6rem, 8vw, 6.6rem);
+            --h2-size: clamp(2rem, 5.2vw, 4rem);
+            --h3-size: clamp(1.2rem, 2.8vw, 1.9rem);
+            --body-size: clamp(0.95rem, 1.5vw, 1.2rem);
+            --small-size: clamp(0.8rem, 1.1vw, 0.98rem);
+            --label-size: clamp(0.64rem, 0.92vw, 0.8rem);
+
+            --slide-padding: clamp(1.6rem, 4.5vw, 4.5rem);
+            --content-gap: clamp(0.8rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.4rem, 1vw, 0.85rem);
+
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --dur: 0.7s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--body);
+            background: var(--paper);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===========================================
+           SLIDE BASE — vertical scroll-snap
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--paper);
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Corner marks */
+        .corner-tl, .corner-tr {
+            position: absolute;
+            top: clamp(14px, 1.8vw, 26px);
+            z-index: 10;
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+        }
+        .corner-tl { left: clamp(18px, 2.5vw, 38px); }
+        .corner-tr { right: clamp(18px, 2.5vw, 38px); }
+        .corner-tr b { color: var(--ink); font-weight: 700; }
+
+        /* Bottom strip */
+        .bottom-strip {
+            position: absolute;
+            bottom: clamp(15px, 2vw, 28px);
+            left: clamp(18px, 2.5vw, 38px);
+            right: clamp(18px, 2.5vw, 38px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            z-index: 10;
+        }
+        .bottom-strip .dline { flex: 1; height: 0; border-top: 1px solid var(--line); }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--body);
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.04em;
+            color: var(--ink);
+        }
+        h2 {
+            font-family: var(--body);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.035em;
+            color: var(--ink);
+            margin-bottom: var(--content-gap);
+        }
+        h3 {
+            font-family: var(--body);
+            font-size: var(--h3-size);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        p, li {
+            font-family: var(--body);
+            font-size: var(--body-size);
+            line-height: 1.62;
+            color: var(--ink-soft);
+            font-weight: 400;
+        }
+        strong { color: var(--ink); font-weight: 700; }
+        .hl { background: linear-gradient(180deg, transparent 58%, var(--ink-faint) 58%); padding: 0 0.08em; }
+        .mono { font-family: var(--mono); }
+
+        .eyebrow {
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            display: inline-flex; align-items: center; gap: 0.6em;
+        }
+        .eyebrow::before { content: ""; width: 1.6em; height: 1px; background: var(--ink); display: inline-block; }
+
+        .lead {
+            font-family: var(--body);
+            font-size: clamp(1.05rem, 2vw, 1.5rem);
+            line-height: 1.55;
+            color: var(--ink);
+            font-weight: 400;
+        }
+        .caption {
+            font-family: var(--mono);
+            font-size: var(--small-size);
+            color: var(--ink-dim);
+            line-height: 1.4;
+            letter-spacing: 0.02em;
+        }
+
+        /* ===========================================
+           COMPONENTS — squared, hairline, monochrome
+           =========================================== */
+        .tag {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: var(--small-size);
+            padding: 0.28em 0.8em;
+            border: 1.5px solid var(--ink);
+            background: var(--paper);
+            color: var(--ink);
+            display: inline-block;
+            line-height: 1.3;
+            letter-spacing: 0.04em;
+        }
+        .tag.fill { background: var(--ink); color: var(--paper); }
+
+        .card {
+            border: 1.5px solid var(--ink);
+            background: var(--paper);
+            padding: clamp(1rem, 2vw, 1.6rem) clamp(1.1rem, 2.2vw, 1.7rem);
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .card .k {
+            font-family: var(--mono); font-size: var(--label-size);
+            letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim);
+        }
+        .card h4 {
+            font-family: var(--body); font-weight: 700;
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+            color: var(--ink); line-height: 1.15;
+        }
+        .card p { font-size: var(--small-size); color: var(--ink-soft); }
+
+        ul.ticks { list-style: none; display: flex; flex-direction: column; gap: clamp(0.55rem, 1.2vw, 1rem); }
+        ul.ticks li {
+            position: relative; padding-left: 1.7em;
+            font-family: var(--body); color: var(--ink); line-height: 1.5;
+        }
+        ul.ticks li::before {
+            content: "—"; position: absolute; left: 0; top: 0;
+            font-family: var(--mono); color: var(--ink); font-weight: 700;
+        }
+
+        .num-list { list-style: none; display: flex; flex-direction: column; gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .num-list li { display: grid; grid-template-columns: clamp(2.4rem,4vw,3.4rem) 1fr; gap: clamp(0.8rem,1.5vw,1.2rem); align-items: start; }
+        .num-list .n {
+            font-family: var(--mono); font-weight: 700;
+            font-size: clamp(1.4rem, 2.6vw, 2.1rem); color: var(--ink);
+            line-height: 1; border-right: 1.5px solid var(--ink); padding-right: clamp(0.6rem,1.1vw,1rem);
+        }
+        .num-list h4 { font-family: var(--body); font-weight: 700; font-size: clamp(1.1rem,2vw,1.5rem); color: var(--ink); margin-bottom: 0.15em; }
+        .num-list p { font-size: var(--small-size); }
+
+        /* media frames — clean white border */
+        .frame {
+            border: 1.5px solid var(--ink);
+            background: var(--paper);
+            padding: clamp(0.4rem, 0.8vw, 0.65rem);
+            position: relative;
+        }
+        .frame img, .frame iframe { display: block; width: 100%; }
+        .frame .cap {
+            font-family: var(--mono); font-size: var(--label-size);
+            letter-spacing: 0.1em; color: var(--ink-dim);
+            padding: 0.55em 0.2em 0.15em; text-transform: uppercase;
+        }
+
+        .video-frame {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            border: 1.5px solid var(--ink); background: #000; overflow: hidden;
+        }
+        .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+        a.link {
+            font-family: var(--mono); font-size: var(--small-size);
+            color: var(--ink); text-decoration: none;
+            border-bottom: 1.5px solid var(--ink);
+            word-break: break-all;
+        }
+        a.link::before { content: "↗ "; }
+
+        /* ===========================================
+           LAYOUT HELPERS
+           =========================================== */
+        .wrapw { max-width: min(96%, 1180px); margin: 0 auto; width: 100%; }
+        .stack { display: flex; flex-direction: column; gap: var(--element-gap); }
+        .stack-lg { display: flex; flex-direction: column; gap: var(--content-gap); }
+        .row { display: flex; align-items: center; gap: clamp(0.6rem, 1.4vw, 1.2rem); }
+        .wrap { display: flex; flex-wrap: wrap; gap: clamp(0.4rem, 0.9vw, 0.7rem); }
+        .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.4rem, 3vw, 3rem); align-items: center; height: 100%; }
+        .split-60 { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(1.4rem, 3vw, 2.6rem); align-items: center; height: 100%; }
+        .split-vid { display: grid; grid-template-columns: 1.55fr 1fr; gap: clamp(1.4rem, 3vw, 2.6rem); align-items: center; height: 100%; }
+        .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .center-col { display: flex; flex-direction: column; height: 100%; justify-content: center; }
+
+        .rule { height: 0; border-top: 1.5px solid var(--ink); flex: 1; }
+        .rule-dot { height: 0; border-top: 1px dotted var(--line); flex: 1; }
+
+        /* media-type cards (projector / signal) */
+        .media-card { display: flex; flex-direction: column; border: 1.5px solid var(--ink); background: var(--paper); }
+        .media-card .pic { aspect-ratio: 4/3; overflow: hidden; border-bottom: 1.5px solid var(--ink); background: var(--paper-2); }
+        .media-card .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .media-card .body { padding: clamp(0.7rem,1.3vw,1.1rem) clamp(0.8rem,1.4vw,1.2rem); display: flex; flex-direction: column; gap: 0.35rem; }
+        .media-card .k { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
+        .media-card h4 { font-family: var(--body); font-weight: 800; font-size: clamp(1.05rem,2vw,1.45rem); letter-spacing: -0.02em; }
+        .media-card p { font-size: var(--small-size); line-height: 1.5; }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+           =========================================== */
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.40s; }
+        .slide.visible .reveal:nth-child(7) { transition-delay: 0.47s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { transition: none; opacity: 1; transform: none; }
+        }
+
+        /* ===========================================
+           TITLE / DIVIDER / THANKS
+           =========================================== */
+        .slide.title h1 { font-size: clamp(2.9rem, 10vw, 8rem); line-height: 1.02; }
+        .slide.title .hero-img { position: absolute; inset: 0; z-index: 0; }
+        .slide.title .hero-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.16; filter: grayscale(1) contrast(1.05); }
+        .slide.title .slide-content { z-index: 2; }
+
+        .slide.divider .slide-content { justify-content: center; }
+        .divider-num { font-family: var(--mono); font-size: clamp(0.85rem, 1.4vw, 1.15rem); letter-spacing: 0.24em; color: var(--ink-dim); margin-bottom: 0.7rem; }
+        .slide.divider h1 { font-size: clamp(2.4rem, 8vw, 6rem); }
+        .slide.divider .bignum {
+            position: absolute; right: clamp(2rem,6vw,7rem); bottom: clamp(1rem,4vw,4rem);
+            font-family: var(--mono); font-weight: 700; font-size: clamp(7rem, 26vw, 24rem);
+            color: var(--paper-3); line-height: 0.8; z-index: 0; letter-spacing: -0.04em;
+        }
+
+        .slide.thanks h1 { font-size: clamp(4rem, 16vw, 13rem); line-height: 0.9; }
+
+        /* wireless TX/RX diagram */
+        .wave { display: inline-flex; align-items: center; gap: 4px; }
+        .wave i { display: block; width: 4px; border-radius: 4px; background: var(--ink); }
+
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--ink); z-index: 1000; transition: width 0.2s ease; width: 0; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- ========================================================
+         SLIDE 01 — TITLE
+         ======================================================== -->
+    <section class="slide title">
+        <span class="corner-tr"><b>01</b> / 28</span>
+        <div class="hero-img"><img src="../assets/projection-hero.jpg" alt="건축물 프로젝션 맵핑"></div>
+        <div class="slide-content" style="justify-content:center;">
+            <div class="wrapw">
+                <div class="eyebrow reveal" style="margin-bottom:clamp(1.2rem,2.5vw,2rem);">성남미디어센터 · 프로젝션 맵핑 · Week 01</div>
+                <h1 class="reveal">프로젝션 맵핑<br>소개</h1>
+                <p class="lead reveal" style="margin-top:clamp(1rem,2vw,1.6rem); max-width:46ch;">
+                    빛으로 공간의 표면을 다시 그리는 일. 12주의 첫 시간을 연다.
+                </p>
+            </div>
+        </div>
+        <div class="bottom-strip">
+            <span>유태양</span>
+            <span class="dline"></span>
+            <span>Seongnam Media Center</span>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">강사 소개</span>
+        <span class="corner-tr"><b>02</b> / 28</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.9rem,1.8vw,1.6rem);">
+                <div class="row reveal"><span class="eyebrow">Instructor</span><span class="rule-dot"></span></div>
+                <h2 class="reveal" style="margin-bottom:0.1rem;">유태양</h2>
+                <p class="reveal" style="max-width:56ch;">미디어와 기술로 무대와 전시를 만든다. 실시간 영상, 프로젝션 맵핑, 인터랙티브 설치를 다룬다.</p>
+                <div class="cards-3 reveal" style="margin-top:clamp(0.4rem,1vw,0.8rem);">
+                    <div class="card">
+                        <span class="k">Tech Lead</span>
+                        <h4>봄랩</h4>
+                        <p>기술개발팀장</p>
+                    </div>
+                    <div class="card">
+                        <span class="k">Tech Director</span>
+                        <h4>파프리스튜디오</h4>
+                        <p>테크니컬 디렉터</p>
+                    </div>
+                    <div class="card">
+                        <span class="k">Lecturer</span>
+                        <h4>한국예술종합학교</h4>
+                        <p>무용원 · 영상원 강사</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide divider">
+        <span class="corner-tr"><b>03</b> / 28</span>
+        <span class="bignum">01</span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 01</div>
+                <h1 class="reveal">참여자 소개</h1>
+                <ul class="ticks reveal" style="margin-top:clamp(1rem,2vw,1.8rem); max-width:50ch;">
+                    <li>이 수업을 수강하게 된 이유</li>
+                    <li>무엇을 기대하고 오셨는지</li>
+                    <li>12주 동안 도전하고 싶은 것</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">12주간의 여정</span>
+        <span class="corner-tr"><b>04</b> / 28</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(1rem,2vw,1.8rem);">
+                <div class="reveal">
+                    <span class="eyebrow">The Journey</span>
+                    <h2 style="margin-top:0.5rem; margin-bottom:0;">우리가 함께 갈 길</h2>
+                </div>
+                <ol class="num-list reveal">
+                    <li>
+                        <span class="n">01</span>
+                        <div>
+                            <h4>TouchDesigner 학습</h4>
+                            <p>노드로 영상을 만드는 도구의 인터페이스와 기본기를 익힌다.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="n">02</span>
+                        <div>
+                            <h4>TouchDesigner를 활용한 프로젝션 맵핑</h4>
+                            <p>실제 공간과 사물의 표면에 영상을 맞춰 투사한다.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="n">03</span>
+                        <div>
+                            <h4>TouchDesigner를 활용한 인터랙티브 아트</h4>
+                            <p>센서와 오디오에 반응하는 작업으로 확장한다.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+<section class="slide divider">
+        <span class="corner-tr"><b>05</b> / 28</span>
+        <span class="bignum">02</span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 02</div>
+                <h1 class="reveal">작업물 소개</h1>
+                <p class="lead reveal" style="margin-top:clamp(0.8rem,1.6vw,1.4rem); max-width:42ch;">전시와 무대에서 만든 작업들을 먼저 본다.</p>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 전시</span>
+        <span class="corner-tr"><b>06</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/ImLdgx33H5E" title="간송미술문화재단 미디어아트전" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">전시 · 미디어아트</span>
+                    <h3>간송미술문화재단<br>미디어아트전</h3>
+                    <p>전통 유물을 미디어로 재해석한 전시. 영상 콘텐츠 제작과 공간 연출을 맡았다.</p>
+                    <a class="link" href="https://youtu.be/ImLdgx33H5E" target="_blank" rel="noopener">youtu.be/ImLdgx33H5E</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 전시</span>
+        <span class="corner-tr"><b>07</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/MTuS7LPrIqs" title="국립전주박물관 신기술 융합 콘텐츠" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">전시 · 신기술 융합</span>
+                    <h3>국립전주박물관<br>신기술 융합 콘텐츠</h3>
+                    <p>실감형 기술로 소장품의 이야기를 풀어낸 콘텐츠. 영상과 인터랙션을 결합했다.</p>
+                    <a class="link" href="https://youtu.be/MTuS7LPrIqs" target="_blank" rel="noopener">youtu.be/MTuS7LPrIqs</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 전시</span>
+        <span class="corner-tr"><b>08</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/y8A0jzB0t5k" title="국립농업박물관 기획전" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">전시 · 기획전</span>
+                    <h3>국립농업박물관<br>기획전</h3>
+                    <p>농업의 시간을 영상으로 풀어낸 기획전. 전시 공간에 맞춘 영상 연출을 진행했다.</p>
+                    <a class="link" href="https://youtu.be/y8A0jzB0t5k" target="_blank" rel="noopener">youtu.be/y8A0jzB0t5k</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 전시</span>
+        <span class="corner-tr"><b>09</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/pdZAHatom6Q" title="대한민국역사박물관" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">전시 · 상설</span>
+                    <h3>대한민국역사박물관</h3>
+                    <p>근현대사를 미디어로 전달하는 전시 콘텐츠. 대형 화면과 영상 연출을 담당했다.</p>
+                    <a class="link" href="https://youtu.be/pdZAHatom6Q" target="_blank" rel="noopener">youtu.be/pdZAHatom6Q</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 공연</span>
+        <span class="corner-tr"><b>10</b> / 28</span>
+        <div class="slide-content">
+            <div class="stack-lg" style="height:100%; justify-content:center;">
+                <div class="reveal">
+                    <span class="eyebrow">Performance</span>
+                    <h3 style="margin-top:0.5rem;">공연 〈재래〉</h3>
+                    <p style="max-width:60ch; margin-top:0.3rem;">무대 배경에 점으로 흩어진 형상을 투사한 공연. 영상이 무대의 한 요소로 호흡한다.</p>
+                </div>
+                <div class="reveal" style="display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(0.6rem,1.4vw,1.1rem);">
+                    <div class="frame"><img src="../assets/jaerae-01.jpg" alt="공연 재래 무대 1"></div>
+                    <div class="frame"><img src="../assets/jaerae-02.jpg" alt="공연 재래 무대 2"></div>
+                    <div class="frame"><img src="../assets/jaerae-03.jpg" alt="공연 재래 무대 3"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 강의</span>
+        <span class="corner-tr"><b>11</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/s12L1_x3BxI" title="무용원·영상원 강의 프로젝션 맵핑 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">강의 · 프로젝션 맵핑</span>
+                    <h3>무용원 · 영상원<br>프로젝션 맵핑 수업</h3>
+                    <p>학생들과 함께 신체와 공간에 영상을 투사한 수업 기록.</p>
+                    <a class="link" href="https://youtu.be/s12L1_x3BxI" target="_blank" rel="noopener">youtu.be/s12L1_x3BxI</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">작업물 · 강의</span>
+        <span class="corner-tr"><b>12</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/5vE0Mdkk8jc" title="무용원·영상원 강의 프로젝션 맵핑 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">강의 · 프로젝션 맵핑</span>
+                    <h3>무용원 · 영상원<br>프로젝션 맵핑 수업</h3>
+                    <p>움직이는 몸 위로 영상을 맞춰 투사하는 실습 장면.</p>
+                    <a class="link" href="https://youtu.be/5vE0Mdkk8jc" target="_blank" rel="noopener">youtu.be/5vE0Mdkk8jc</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide divider">
+        <span class="corner-tr"><b>13</b> / 28</span>
+        <span class="bignum">03</span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 03</div>
+                <h1 class="reveal">프로젝션 맵핑<br>소개</h1>
+                <p class="lead reveal" style="margin-top:clamp(0.8rem,1.6vw,1.4rem); max-width:44ch;">무엇이고, 무엇으로 만드는가.</p>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">프로젝션 맵핑이란</span>
+        <span class="corner-tr"><b>14</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-60">
+                <div class="stack reveal">
+                    <span class="eyebrow">Definition</span>
+                    <h2 style="margin-bottom:0.3rem;">표면에 빛을<br>다시 맞추는 일</h2>
+                    <p style="max-width:42ch;">평면 스크린이 아니라 <strong>실제 공간의 표면</strong> — 건물, 사물, 신체 — 에 영상을 정확히 맞춰 투사하는 기법이다.</p>
+                    <p style="max-width:42ch;">대상의 형태를 측정하고, 영상의 좌표를 그 형태에 맞게 변형해 빛으로 덧입힌다.</p>
+                </div>
+                <div class="reveal">
+                    <div class="frame">
+                        <img src="../assets/projection-mapping-diagram.png" alt="프로젝션 맵핑 원리 다이어그램">
+                        <div class="cap">입력 영상 → 표면 측정 → 좌표 맞춤 → 투사</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">사용 도구 · 프로젝터</span>
+        <span class="corner-tr"><b>15</b> / 28</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.9rem,1.8vw,1.5rem);">
+                <div class="reveal">
+                    <span class="eyebrow">Tools · Projector</span>
+                    <h3 style="margin-top:0.5rem;">빛을 쏘는 장치 — 세 가지 방식</h3>
+                </div>
+                <div class="cards-3 reveal">
+                    <div class="media-card">
+                        <div class="pic"><img src="../assets/laser-projector.jpg" alt="레이저 프로젝터"></div>
+                        <div class="body">
+                            <span class="k">Laser</span>
+                            <h4>레이저</h4>
+                            <p>레이저를 광원으로 쓴다. 밝고 수명이 길며, 켜자마자 최대 밝기에 도달한다. 대형·상설 전시에 적합하다.</p>
+                        </div>
+                    </div>
+                    <div class="media-card">
+                        <div class="pic"><img src="../assets/dlp-projector.jpg" alt="DLP 프로젝터"></div>
+                        <div class="body">
+                            <span class="k">DLP</span>
+                            <h4>DLP</h4>
+                            <p>미세한 거울 칩이 빛을 반사해 화면을 만든다. 명암비가 높고 잔상이 적어 빠른 영상에 강하다.</p>
+                        </div>
+                    </div>
+                    <div class="media-card">
+                        <div class="pic"><img src="../assets/lcd-projector.jpg" alt="LCD 프로젝터"></div>
+                        <div class="body">
+                            <span class="k">LCD</span>
+                            <h4>LCD</h4>
+                            <p>액정 패널을 통과한 빛으로 화면을 만든다. 색이 풍부하고 가격이 합리적이라 보급형에 흔하다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">사용 도구 · 신호 전송</span>
+        <span class="corner-tr"><b>16</b> / 28</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(0.9rem,1.8vw,1.5rem);">
+                <div class="reveal">
+                    <span class="eyebrow">Tools · Signal</span>
+                    <h3 style="margin-top:0.5rem;">영상을 프로젝터까지 보내는 길</h3>
+                </div>
+                <div class="cards-3 reveal">
+                    <div class="media-card">
+                        <div class="pic"><img src="../assets/hdmi.jpg" alt="HDMI 커넥터"></div>
+                        <div class="body">
+                            <span class="k">HDMI</span>
+                            <h4>HDMI</h4>
+                            <p>영상과 음성을 한 케이블로 전송하는 가장 보편적인 규격.</p>
+                        </div>
+                    </div>
+                    <div class="media-card">
+                        <div class="pic"><img src="../assets/displayport.jpg" alt="DisplayPort 커넥터"></div>
+                        <div class="body">
+                            <span class="k">DisplayPort</span>
+                            <h4>DP</h4>
+                            <p>고해상도·고주사율에 강하다. 여러 디스플레이 연결에 유리하다.</p>
+                        </div>
+                    </div>
+                    <div class="media-card">
+                        <div class="pic" style="display:flex; align-items:center; justify-content:center; background:var(--paper);">
+                            <svg viewBox="0 0 320 240" style="width:82%; height:auto;" aria-label="무선 송수신 다이어그램">
+                                <rect x="20" y="96" width="64" height="48" fill="none" stroke="#0a0a0a" stroke-width="2.5"/>
+                                <text x="52" y="125" text-anchor="middle" font-family="Space Mono" font-weight="700" font-size="16" fill="#0a0a0a">TX</text>
+                                <rect x="236" y="96" width="64" height="48" fill="none" stroke="#0a0a0a" stroke-width="2.5"/>
+                                <text x="268" y="125" text-anchor="middle" font-family="Space Mono" font-weight="700" font-size="16" fill="#0a0a0a">RX</text>
+                                <g fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round">
+                                    <path d="M96 120 q14 -22 28 0 M96 120 q22 -34 44 0 M96 120 q30 -46 60 0"/>
+                                    <path d="M224 120 q-14 -22 -28 0 M224 120 q-22 -34 -44 0 M224 120 q-30 -46 -60 0"/>
+                                </g>
+                                <circle cx="160" cy="120" r="4" fill="#0a0a0a"/>
+                            </svg>
+                        </div>
+                        <div class="body">
+                            <span class="k">Wireless</span>
+                            <h4>무선 송수신기</h4>
+                            <p>송신기와 수신기로 케이블 없이 영상을 보낸다. 프로젝터가 닿기 어려운 위치에 둘 때 쓴다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">사용 도구 · 소프트웨어</span>
+        <span class="corner-tr"><b>17</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-60">
+                <div class="stack reveal">
+                    <span class="eyebrow">Tools · Software</span>
+                    <h2 style="margin-bottom:0.3rem;">TouchDesigner</h2>
+                    <p style="max-width:42ch;">노드를 연결해 <strong>실시간 영상</strong>을 만드는 비주얼 프로그래밍 도구. 이 수업의 중심 도구다.</p>
+                    <p style="max-width:42ch;">영상·센서·오디오를 입력으로 받아 그 자리에서 처리하고, 프로젝터로 내보낸다.</p>
+                </div>
+                <div class="reveal">
+                    <div class="frame" style="padding:clamp(1rem,2.2vw,1.8rem); background:var(--paper-2);">
+                        <svg viewBox="0 0 520 300" style="width:100%; height:auto;" aria-label="TouchDesigner 노드 그래프">
+                            <defs>
+                                <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                                    <path d="M0 0 L8 4.5 L0 9" fill="none" stroke="#0a0a0a" stroke-width="1.6"/>
+                                </marker>
+                            </defs>
+                            <g font-family="Space Mono" font-size="13" font-weight="700" fill="#0a0a0a">
+                                <g>
+                                    <rect x="14" y="40" width="116" height="48" fill="#fff" stroke="#0a0a0a" stroke-width="2"/>
+                                    <rect x="14" y="40" width="10" height="48" fill="#0a0a0a"/>
+                                    <text x="80" y="69" text-anchor="middle">INPUT</text>
+                                </g>
+                                <g>
+                                    <rect x="14" y="166" width="116" height="48" fill="#fff" stroke="#0a0a0a" stroke-width="2"/>
+                                    <rect x="14" y="166" width="10" height="48" fill="#0a0a0a"/>
+                                    <text x="80" y="195" text-anchor="middle">AUDIO</text>
+                                </g>
+                                <g>
+                                    <rect x="200" y="102" width="120" height="50" fill="#fff" stroke="#0a0a0a" stroke-width="2"/>
+                                    <rect x="200" y="102" width="10" height="50" fill="#0a0a0a"/>
+                                    <text x="265" y="132" text-anchor="middle">PROCESS</text>
+                                </g>
+                                <g>
+                                    <rect x="390" y="102" width="116" height="50" fill="#0a0a0a" stroke="#0a0a0a" stroke-width="2"/>
+                                    <text x="448" y="132" text-anchor="middle" fill="#fff">OUTPUT</text>
+                                </g>
+                            </g>
+                            <g fill="none" stroke="#0a0a0a" stroke-width="2" marker-end="url(#arr)">
+                                <path d="M130 64 C170 64 170 118 198 122"/>
+                                <path d="M130 190 C170 190 170 138 198 134"/>
+                                <path d="M320 127 L388 127"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide divider">
+        <span class="corner-tr"><b>18</b> / 28</span>
+        <span class="bignum">04</span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 04</div>
+                <h1 class="reveal">레퍼런스</h1>
+                <p class="lead reveal" style="margin-top:clamp(0.8rem,1.6vw,1.4rem); max-width:46ch;">표면이 달라지면 맵핑도 달라진다. 네 가지 방식을 본다.</p>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 기본</span>
+        <span class="corner-tr"><b>19</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/HB5nJB9R8Qw" title="일반적인 프로젝션 맵핑" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 01</span>
+                    <h3>일반적인<br>프로젝션 맵핑</h3>
+                    <p>오브젝트 위에 영상을 맞춰 입히는 가장 기본적인 형태.</p>
+                    <a class="link" href="https://youtu.be/HB5nJB9R8Qw" target="_blank" rel="noopener">youtu.be/HB5nJB9R8Qw</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 건축물 투사</span>
+        <span class="corner-tr"><b>20</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/93wiNPh4WFw" title="건축물 투사 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 02 · 건축물</span>
+                    <h3>건축물 투사</h3>
+                    <p>건물의 입면을 캔버스로 삼는다. 창문과 기둥의 구조를 영상으로 해체하고 다시 짓는다.</p>
+                    <a class="link" href="https://youtu.be/93wiNPh4WFw" target="_blank" rel="noopener">youtu.be/93wiNPh4WFw</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 건축물 투사</span>
+        <span class="corner-tr"><b>21</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/_M8Tky5442c" title="건축물 투사 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 03 · 건축물</span>
+                    <h3>건축물 투사</h3>
+                    <p>대형 건물 전체를 무대로 쓰는 스케일. 구조를 정확히 측정해야 빛이 어긋나지 않는다.</p>
+                    <a class="link" href="https://youtu.be/_M8Tky5442c" target="_blank" rel="noopener">youtu.be/_M8Tky5442c</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 사람에 투사</span>
+        <span class="corner-tr"><b>22</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/ruvqxi43V-0" title="사람에 투사 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 04 · 신체</span>
+                    <h3>사람에 투사</h3>
+                    <p>움직이는 몸 위로 영상을 맞춘다. 무대 위 신체가 곧 스크린이 된다.</p>
+                    <a class="link" href="https://youtu.be/ruvqxi43V-0" target="_blank" rel="noopener">youtu.be/ruvqxi43V-0</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 사람에 투사</span>
+        <span class="corner-tr"><b>23</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/goXVY2u0BBg" title="사람에 투사 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 05 · 신체</span>
+                    <h3>사람에 투사</h3>
+                    <p>의상과 신체를 영상으로 덧입혀 순간마다 다른 모습을 만든다.</p>
+                    <a class="link" href="https://youtu.be/goXVY2u0BBg" target="_blank" rel="noopener">youtu.be/goXVY2u0BBg</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 사람에 투사</span>
+        <span class="corner-tr"><b>24</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/D6EPGutC9Z0" title="사람에 투사 3" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 06 · 신체</span>
+                    <h3>사람에 투사</h3>
+                    <p>춤과 영상이 한 호흡으로 맞물린다. 트래킹이 정교할수록 경계가 사라진다.</p>
+                    <a class="link" href="https://youtu.be/D6EPGutC9Z0" target="_blank" rel="noopener">youtu.be/D6EPGutC9Z0</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 인터랙티브</span>
+        <span class="corner-tr"><b>25</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/lX6JcybgDFo" title="인터랙티브 프로젝션 맵핑 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 07 · 인터랙티브</span>
+                    <h3>인터랙티브가<br>가미된 방식</h3>
+                    <p>움직이는 큐브에 영상이 실시간으로 따라붙는다. 맵핑이 트래킹과 만나는 지점.</p>
+                    <a class="link" href="https://youtu.be/lX6JcybgDFo" target="_blank" rel="noopener">youtu.be/lX6JcybgDFo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">레퍼런스 · 인터랙티브</span>
+        <span class="corner-tr"><b>26</b> / 28</span>
+        <div class="slide-content">
+            <div class="split-vid">
+                <div class="reveal">
+                    <div class="video-frame">
+                        <iframe src="https://www.youtube.com/embed/3c258CgSTSw" title="인터랙티브 프로젝션 맵핑 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="stack reveal">
+                    <span class="eyebrow">Reference 08 · 인터랙티브</span>
+                    <h3>인터랙티브가<br>가미된 방식</h3>
+                    <p>관객의 움직임이 영상을 바꾼다. 우리가 12주 끝에 닿을 지점이다.</p>
+                    <a class="link" href="https://youtu.be/3c258CgSTSw" target="_blank" rel="noopener">youtu.be/3c258CgSTSw</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide">
+        <span class="corner-tl">이야기 나누기</span>
+        <span class="corner-tr"><b>27</b> / 28</span>
+        <div class="slide-content">
+            <div class="center-col" style="gap:clamp(1rem,2vw,1.8rem);">
+                <div class="reveal">
+                    <span class="eyebrow">AI &amp; Media Art</span>
+                    <h2 style="margin-top:0.5rem; margin-bottom:0;">AI와 미디어아트</h2>
+                </div>
+                <div class="split reveal" style="align-items:stretch;">
+                    <div class="card">
+                        <span class="k">Question 01</span>
+                        <h4 style="font-size:clamp(1.2rem,2.2vw,1.7rem);">AI를 어떻게 쓰고 있는가</h4>
+                        <p>각자 작업과 일상에서 AI를 어떻게 활용하는지 이야기한다.</p>
+                    </div>
+                    <div class="card">
+                        <span class="k">Question 02</span>
+                        <h4 style="font-size:clamp(1.2rem,2.2vw,1.7rem);">AI와 미디어아트의 결합</h4>
+                        <p>이미지·영상·3D 생성이 창작 과정에 어떻게 들어오는지 살핀다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="slide thanks">
+        <span class="corner-tr"><b>28</b> / 28</span>
+        <div class="slide-content" style="justify-content:center; align-items:flex-start;">
+            <div class="wrapw">
+                <h1 class="reveal">Thank you</h1>
+            </div>
+        </div>
+        <div class="bottom-strip">
+            <span>성남미디어센터 · 프로젝션 맵핑</span>
+            <span class="dline"></span>
+            <span>Week 01</span>
+        </div>
+    </section>
+
+    <script>
+    /* ============================================================
+       SLIDE PRESENTATION CONTROLLER
+       ============================================================ */
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.current = 0;
+            this.bar = document.getElementById('progressBar');
+            this.observe();
+            this.keys();
+            this.touch();
+        }
+        observe() {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting && e.intersectionRatio > 0.5) {
+                        e.target.classList.add('visible');
+                        const i = Array.from(this.slides).indexOf(e.target);
+                        if (i !== -1) { this.current = i; this.progress(); }
+                    }
+                });
+            }, { threshold: [0.5] });
+            this.slides.forEach(s => io.observe(s));
+        }
+        progress() { this.bar.style.width = ((this.current + 1) / this.slides.length) * 100 + '%'; }
+        goTo(i) { i = Math.max(0, Math.min(this.slides.length - 1, i)); this.slides[i].scrollIntoView({ behavior: 'smooth' }); }
+        next() { this.goTo(this.current + 1); }
+        prev() { this.goTo(this.current - 1); }
+        keys() {
+            document.addEventListener('keydown', (e) => {
+                if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); this.next(); }
+                else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+                else if (e.key === 'Home') { e.preventDefault(); this.goTo(0); }
+                else if (e.key === 'End') { e.preventDefault(); this.goTo(this.slides.length - 1); }
+                else if (e.key === 'f' || e.key === 'F') {
+                    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                    else document.exitFullscreen();
+                }
+            });
+        }
+        touch() {
+            let y0 = 0, x0 = 0;
+            document.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; }, { passive: true });
+            document.addEventListener('touchend', (e) => {
+                const dy = e.changedTouches[0].clientY - y0, dx = e.changedTouches[0].clientX - x0;
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) { dy < 0 ? this.next() : this.prev(); }
+            }, { passive: true });
+        }
+    }
+    new SlidePresentation();
+    </script>
+</body>
+</html>
