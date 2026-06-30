@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>포항 XR 교육</title>
+    <link rel="stylesheet" href="/shared/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+  </head>
+  <body class="min-h-screen grid-bg-page">
+    <!-- Panel frame -->
+    <div class="page-frame"></div>
+    <div class="page-screw-bl"></div>
+    <div class="page-screw-br"></div>
+
+    <div class="max-w-4xl mx-auto px-6 py-16" style="position: relative; z-index: 1;">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 mb-8 text-sm" style="color: var(--color-text-dim);">
+        <span style="color: var(--color-text-muted);">포항 XR 교육</span>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-led sig-led-green sig-led-pulse"></span>
+          <span class="sig-cable sig-cable-green"></span>
+          <span class="sig-led sig-led-blue sig-led-pulse" style="animation-delay: 0.4s;"></span>
+          <span class="sig-cable sig-cable-blue"></span>
+          <span class="sig-led sig-led-orange sig-led-pulse" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <div class="sig-label mb-2">XR Education — 2026</div>
+        <h1 class="text-4xl font-bold tracking-tight mb-3">
+          포항 XR 교육
+        </h1>
+        <p style="color: var(--color-text-muted)" class="text-base">
+          XR · 실시간 그래픽 · 인터랙티브 미디어
+        </p>
+
+        <div class="accent-line mt-8" style="background: linear-gradient(90deg, var(--color-accent-green), var(--color-accent-blue), var(--color-accent-orange), transparent);"></div>
+      </header>
+
+      <!-- Curriculum List -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="sig-knob"></span>
+          <h2 class="text-lg font-semibold">커리큘럼</h2>
+          <div class="sig-cable sig-cable-green" style="max-width: 40px;"></div>
+        </div>
+
+        <div class="grid gap-3" id="week-list">
+          <!-- Week 01 -->
+          <a href="./slides/week-01.html" class="course-panel group">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="flex-shrink-0 font-mono text-sm font-bold" style="color: var(--color-text-dim); width: 2rem;">01</span>
+              <span class="sig-led sig-led-green" style="width: 5px; height: 5px;"></span>
+              <h3 class="font-semibold group-hover:text-[var(--color-accent-green)] transition-colors">
+                Week 01 · 제6의 섬
+              </h3>
+            </div>
+            <p class="text-sm ml-[3.3rem]" style="color: var(--color-text-muted);">
+              강사·작업 소개, 8회차 과정 안내, TouchDesigner와 8th Wall, 그리고 첫 실습
+            </p>
+            <div class="flex items-center gap-2 mt-4 ml-[3.3rem] flex-wrap">
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-green) 15%, transparent); color: var(--color-accent-green);">슬라이드</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-blue) 15%, transparent); color: var(--color-accent-blue);">TouchDesigner</span>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-accent-orange) 15%, transparent); color: var(--color-accent-orange);">8th Wall</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { init } from "/shared/components.js";
+      init();
+    </script>
+  </body>
+</html>

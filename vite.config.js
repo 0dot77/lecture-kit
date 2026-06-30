@@ -55,6 +55,8 @@ export default defineConfig({
         "kaywon-dcca-slides": "courses/kaywon-lecture/slides/dot-color-coordinate-ai.html",
         "seongnam-pm-index": "courses/seongnam-projection-mapping/index.html",
         "seongnam-pm-week01-slides": "courses/seongnam-projection-mapping/slides/week-01.html",
+        "pohang-xr-index": "courses/pohang-xr/index.html",
+        "pohang-xr-week01-slides": "courses/pohang-xr/slides/week-01.html",
       },
     },
   },
