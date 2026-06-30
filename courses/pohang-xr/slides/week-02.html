@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오퍼레이터, 신호를 잇는다 — 포항 XR 교육 · Week 02</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+    <style>
+        /* ===========================================
+           THEME — brutalist / electric
+           near-black paper · violet + lime · barcodes
+           =========================================== */
+        :root {
+            --bg: #0a0a0b;
+            --bg-2: #121214;
+            --bg-3: #1b1b1f;
+            --ink: #f4f4f1;
+            --ink-soft: #b9b9b4;
+            --ink-dim: #74746f;
+            --line: rgba(244, 244, 241, 0.16);
+            --line-soft: rgba(244, 244, 241, 0.09);
+
+            --violet: #6e2bff;
+            --violet-2: #9a6bff;
+            --lime: #ccff00;
+            --lime-deep: #b6e600;
+
+            --body: 'Pretendard Variable', 'Pretendard', sans-serif;
+            --head: 'Anton', 'Pretendard Variable', sans-serif;
+            --mono: 'Space Mono', monospace;
+
+            --title-size: clamp(3rem, 11vw, 9rem);
+            --h2-size: clamp(2rem, 5.6vw, 4.4rem);
+            --h3-size: clamp(1.2rem, 2.8vw, 1.9rem);
+            --body-size: clamp(0.95rem, 1.5vw, 1.2rem);
+            --small-size: clamp(0.8rem, 1.1vw, 0.98rem);
+            --label-size: clamp(0.62rem, 0.9vw, 0.78rem);
+
+            --slide-padding: clamp(1.6rem, 4.5vw, 4.5rem);
+            --content-gap: clamp(0.8rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.4rem, 1vw, 0.85rem);
+
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --dur: 0.7s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--body);
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background: var(--lime); color: #0a0a0b; }
+
+        /* ===========================================
+           SLIDE BASE — vertical scroll-snap
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg);
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* faint grid texture */
+        .slide::before {
+            content: "";
+            position: absolute; inset: 0; z-index: 0;
+            background-image:
+                linear-gradient(var(--line-soft) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+            background-size: clamp(48px, 7vw, 96px) clamp(48px, 7vw, 96px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Corner marks */
+        .corner-tl, .corner-tr {
+            position: absolute;
+            top: clamp(14px, 1.8vw, 26px);
+            z-index: 10;
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+        }
+        .corner-tl { left: clamp(18px, 2.5vw, 38px); }
+        .corner-tr { right: clamp(18px, 2.5vw, 38px); }
+        .corner-tr b { color: var(--lime); font-weight: 700; }
+
+        /* Bottom strip */
+        .bottom-strip {
+            position: absolute;
+            bottom: clamp(15px, 2vw, 28px);
+            left: clamp(18px, 2.5vw, 38px);
+            right: clamp(18px, 2.5vw, 38px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            z-index: 10;
+        }
+        .bottom-strip .dline { flex: 1; height: 0; border-top: 1px solid var(--line); }
+
+        /* Barcode strip */
+        .barcode {
+            height: clamp(26px, 3vw, 40px);
+            width: clamp(120px, 16vw, 200px);
+            background-image: repeating-linear-gradient(90deg,
+                var(--ink) 0, var(--ink) 2px,
+                transparent 2px, transparent 4px,
+                var(--ink) 4px, var(--ink) 5px,
+                transparent 5px, transparent 9px,
+                var(--ink) 9px, var(--ink) 12px,
+                transparent 12px, transparent 14px);
+            opacity: 0.85;
+        }
+        .barcode.lime { background-image: repeating-linear-gradient(90deg,
+                var(--lime) 0, var(--lime) 2px,
+                transparent 2px, transparent 4px,
+                var(--lime) 4px, var(--lime) 5px,
+                transparent 5px, transparent 9px,
+                var(--lime) 9px, var(--lime) 12px,
+                transparent 12px, transparent 14px); }
+
+        /* Sticker label */
+        .sticker {
+            display: inline-block;
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: var(--small-size);
+            letter-spacing: 0.04em;
+            background: var(--ink);
+            color: #0a0a0b;
+            padding: 0.32em 0.8em;
+            transform: rotate(-3deg);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+        }
+        .sticker.lime { background: var(--lime); }
+        .sticker.violet { background: var(--violet); color: var(--ink); }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--body);
+            font-size: var(--title-size);
+            font-weight: 900;
+            line-height: 0.98;
+            letter-spacing: -0.045em;
+            color: var(--ink);
+        }
+        h2 {
+            font-family: var(--body);
+            font-size: var(--h2-size);
+            font-weight: 900;
+            line-height: 1.04;
+            letter-spacing: -0.04em;
+            color: var(--ink);
+            margin-bottom: var(--content-gap);
+        }
+        h3 {
+            font-family: var(--body);
+            font-size: var(--h3-size);
+            font-weight: 800;
+            line-height: 1.18;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        .display {
+            font-family: var(--head);
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            line-height: 0.9;
+            text-transform: uppercase;
+        }
+        .outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--ink);
+            text-stroke: 1.5px var(--ink);
+        }
+        .outline.lime { -webkit-text-stroke-color: var(--lime); text-stroke-color: var(--lime); }
+        .outline.violet { -webkit-text-stroke-color: var(--violet-2); text-stroke-color: var(--violet-2); }
+        .fill-lime { color: var(--lime); }
+        .fill-violet { color: var(--violet-2); }
+
+        p, li {
+            font-family: var(--body);
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--ink-soft);
+            font-weight: 400;
+        }
+        strong { color: var(--ink); font-weight: 700; }
+        .hl { color: #0a0a0b; background: var(--lime); padding: 0 0.14em; font-weight: 600; }
+        .hl-v { color: var(--ink); background: var(--violet); padding: 0 0.14em; font-weight: 600; }
+        .mono { font-family: var(--mono); }
+
+        .eyebrow {
+            font-family: var(--mono);
+            font-size: var(--label-size);
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--lime);
+            display: inline-flex; align-items: center; gap: 0.6em;
+        }
+        .eyebrow::before { content: ""; width: 1.6em; height: 2px; background: var(--lime); display: inline-block; }
+
+        .lead {
+            font-family: var(--body);
+            font-size: clamp(1.05rem, 2vw, 1.5rem);
+            line-height: 1.5;
+            color: var(--ink);
+            font-weight: 400;
+        }
+        .caption {
+            font-family: var(--mono);
+            font-size: var(--small-size);
+            color: var(--ink-dim);
+            line-height: 1.4;
+            letter-spacing: 0.02em;
+        }
+
+        /* ===========================================
+           COMPONENTS — squared, hairline
+           =========================================== */
+        .tag {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: var(--small-size);
+            padding: 0.28em 0.8em;
+            border: 1.5px solid var(--ink);
+            background: transparent;
+            color: var(--ink);
+            display: inline-block;
+            line-height: 1.3;
+            letter-spacing: 0.04em;
+        }
+        .tag.lime { border-color: var(--lime); color: var(--lime); }
+        .tag.violet { border-color: var(--violet-2); color: var(--violet-2); }
+        .tag.fill { background: var(--lime); border-color: var(--lime); color: #0a0a0b; }
+
+        .card {
+            border: 1.5px solid var(--line);
+            background: var(--bg-2);
+            padding: clamp(1rem, 2vw, 1.6rem) clamp(1.1rem, 2.2vw, 1.7rem);
+            display: flex; flex-direction: column; gap: 0.5rem;
+            position: relative;
+        }
+        .card .k {
+            font-family: var(--mono); font-size: var(--label-size);
+            letter-spacing: 0.16em; text-transform: uppercase; color: var(--lime);
+        }
+        .card h4 {
+            font-family: var(--body); font-weight: 800;
+            font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+            color: var(--ink); line-height: 1.15; letter-spacing: -0.02em;
+        }
+        .card p { font-size: var(--small-size); color: var(--ink-soft); }
+        .card.accent { border-color: var(--violet); }
+
+        ul.ticks { list-style: none; display: flex; flex-direction: column; gap: clamp(0.55rem, 1.2vw, 1rem); }
+        ul.ticks li {
+            position: relative; padding-left: 1.7em;
+            font-family: var(--body); color: var(--ink); line-height: 1.5;
+        }
+        ul.ticks li::before {
+            content: "▸"; position: absolute; left: 0; top: 0;
+            font-family: var(--mono); color: var(--lime); font-weight: 700;
+        }
+
+        .num-list { list-style: none; display: flex; flex-direction: column; gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .num-list li { display: grid; grid-template-columns: clamp(2.4rem,4vw,3.4rem) 1fr; gap: clamp(0.8rem,1.5vw,1.2rem); align-items: start; }
+        .num-list .n {
+            font-family: var(--head); font-weight: 400;
+            font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--violet-2);
+            line-height: 1; border-right: 2px solid var(--line); padding-right: clamp(0.6rem,1.1vw,1rem);
+        }
+        .num-list h4 { font-family: var(--body); font-weight: 800; font-size: clamp(1.1rem,2vw,1.5rem); color: var(--ink); margin-bottom: 0.15em; letter-spacing: -0.02em; }
+        .num-list p { font-size: var(--small-size); }
+
+        /* ===========================================
+           LAYOUT HELPERS
+           =========================================== */
+        .wrapw { max-width: min(96%, 1180px); margin: 0 auto; width: 100%; }
+        .stack { display: flex; flex-direction: column; gap: var(--element-gap); }
+        .stack-lg { display: flex; flex-direction: column; gap: var(--content-gap); }
+        .row { display: flex; align-items: center; gap: clamp(0.6rem, 1.4vw, 1.2rem); }
+        .wrap { display: flex; flex-wrap: wrap; gap: clamp(0.4rem, 0.9vw, 0.7rem); }
+        .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.4rem, 3vw, 3rem); align-items: center; height: 100%; }
+        .split-60 { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(1.4rem, 3vw, 2.6rem); align-items: center; height: 100%; }
+        .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .cards-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .center-col { display: flex; flex-direction: column; height: 100%; justify-content: center; }
+        .rule { height: 0; border-top: 2px solid var(--line); flex: 1; }
+
+        /* ===========================================
+           REEL — video gallery cards (duotone thumbs)
+           =========================================== */
+        .reel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+            gap: clamp(0.7rem, 1.5vw, 1.2rem);
+        }
+        .reel {
+            text-decoration: none; display: flex; flex-direction: column;
+            border: 1.5px solid var(--line); background: var(--bg-2);
+            transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+        }
+        .reel:hover { border-color: var(--lime); transform: translateY(-3px); }
+        .thumb { position: relative; aspect-ratio: 16/9; overflow: hidden; background: var(--bg-3); }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; display: block;
+            filter: grayscale(1) contrast(1.05) brightness(0.92); }
+        .thumb::after {
+            content: ""; position: absolute; inset: 0;
+            background: var(--violet); mix-blend-mode: color; opacity: 0.62;
+            transition: background 0.25s var(--ease), opacity 0.25s var(--ease);
+        }
+        .reel:hover .thumb::after { background: var(--lime); opacity: 0.5; }
+        .thumb .play {
+            position: absolute; inset: 0; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-size: 1.6rem; color: var(--ink);
+        }
+        .thumb .play::before {
+            content: "▶"; width: 2.6em; height: 2.6em; display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--ink); border-radius: 50%; font-size: 0.7em; padding-left: 0.15em;
+            background: rgba(10,10,11,0.35); backdrop-filter: blur(2px);
+            transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+        }
+        .reel:hover .thumb .play::before { background: var(--lime); color: #0a0a0b; border-color: var(--lime); }
+        .thumb.ph { display: flex; align-items: center; justify-content: center; }
+        .thumb.ph::after { opacity: 0.25; }
+        .thumb.ph .ig, .thumb.ph .novid {
+            position: relative; z-index: 2; font-family: var(--mono); font-weight: 700;
+            letter-spacing: 0.14em; color: var(--ink); font-size: var(--small-size);
+            border: 1.5px solid var(--line); padding: 0.4em 0.9em;
+        }
+        .reel-meta { padding: clamp(0.55rem,1.1vw,0.85rem) clamp(0.7rem,1.3vw,1rem); display: flex; flex-direction: column; gap: 0.25rem; }
+        .reel-meta .k { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+        .reel-meta h4 { font-family: var(--body); font-weight: 700; font-size: clamp(0.95rem,1.6vw,1.2rem); color: var(--ink); line-height: 1.15; letter-spacing: -0.01em; }
+
+        /* featured embed */
+        .video-frame {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            border: 1.5px solid var(--lime); background: #000; overflow: hidden;
+        }
+        .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+        a.link {
+            font-family: var(--mono); font-size: var(--small-size);
+            color: var(--lime); text-decoration: none;
+            border-bottom: 1.5px solid var(--lime);
+            word-break: break-all;
+        }
+        a.link::before { content: "↗ "; }
+
+        /* ===========================================
+           DIVIDER / TITLE / THANKS
+           =========================================== */
+        .slide.title h1 { font-size: clamp(3.4rem, 13vw, 11rem); line-height: 0.92; }
+
+        .slide.divider .slide-content { justify-content: center; }
+        .divider-num { font-family: var(--mono); font-size: clamp(0.85rem, 1.4vw, 1.15rem); letter-spacing: 0.24em; color: var(--lime); margin-bottom: 0.7rem; }
+        .slide.divider h1 { font-size: clamp(2.6rem, 9vw, 7rem); }
+        .slide.divider .bignum {
+            position: absolute; right: clamp(2rem,6vw,7rem); bottom: clamp(0rem,3vw,3rem);
+            font-family: var(--head); font-weight: 400; font-size: clamp(8rem, 30vw, 28rem);
+            color: transparent; -webkit-text-stroke: 2px var(--bg-3); line-height: 0.8; z-index: 0;
+        }
+        .slide.divider .dots {
+            position: absolute; left: clamp(1rem,5vw,5rem); bottom: clamp(1rem,5vw,4rem);
+            width: clamp(80px,12vw,170px); height: clamp(80px,12vw,170px); z-index: 0; opacity: 0.5;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, transparent 38%, var(--violet) 39%, var(--violet) 41%, transparent 42%),
+                radial-gradient(circle, transparent 58%, var(--violet) 59%, var(--violet) 61%, transparent 62%),
+                radial-gradient(circle, transparent 78%, var(--violet) 79%, var(--violet) 81%, transparent 82%);
+        }
+
+        .slide.thanks h1 { font-size: clamp(4rem, 16vw, 13rem); line-height: 0.88; }
+
+        /* ===========================================
+           INTERACTIVE — student intro
+           =========================================== */
+        .qblock { border: 1.5px solid var(--line); background: var(--bg-2); padding: clamp(1rem,2vw,1.6rem); display: flex; flex-direction: column; gap: clamp(0.7rem,1.4vw,1.1rem); }
+        .qblock .qk { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.16em; text-transform: uppercase; color: var(--violet-2); }
+        .qblock .qtitle { font-family: var(--body); font-weight: 800; font-size: clamp(1.1rem,2.2vw,1.6rem); letter-spacing: -0.02em; color: var(--ink); line-height: 1.2; }
+        .chips { display: flex; flex-wrap: wrap; gap: clamp(0.35rem,0.8vw,0.6rem); }
+        .chip {
+            font-family: var(--body); font-weight: 600; font-size: var(--small-size);
+            border: 1.5px solid var(--line); background: transparent; color: var(--ink-soft);
+            padding: 0.4em 0.85em; cursor: pointer; user-select: none;
+            transition: all 0.18s var(--ease); line-height: 1.2;
+        }
+        .chip:hover { border-color: var(--ink); color: var(--ink); }
+        .chip.on { background: var(--lime); border-color: var(--lime); color: #0a0a0b; }
+        .qfield {
+            width: 100%; min-height: clamp(54px, 8vh, 84px); resize: vertical;
+            font-family: var(--body); font-size: var(--small-size); line-height: 1.5;
+            background: var(--bg); color: var(--ink); border: 1.5px solid var(--line);
+            padding: 0.7em 0.85em;
+        }
+        .qfield:focus { outline: none; border-color: var(--violet-2); }
+        .qfield::placeholder { color: var(--ink-dim); }
+        .name-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .name-input {
+            font-family: var(--body); font-weight: 700; font-size: clamp(1rem,1.8vw,1.3rem);
+            background: transparent; border: none; border-bottom: 2px solid var(--lime); color: var(--ink);
+            padding: 0.2em 0.3em; min-width: 8ch; max-width: 18ch;
+        }
+        .name-input:focus { outline: none; }
+        .name-input::placeholder { color: var(--ink-dim); }
+        .save-state { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
+        .save-state.flash { color: var(--lime); }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+           =========================================== */
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.33s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.40s; }
+        .slide.visible .reveal:nth-child(7) { transition-delay: 0.47s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal { transition: none; opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 720px) {
+            .split, .split-60 { grid-template-columns: 1fr; gap: 1.2rem; }
+            .cards-3 { grid-template-columns: 1fr; }
+            .cards-2 { grid-template-columns: 1fr; }
+        }
+
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--lime); z-index: 1000; transition: width 0.2s ease; width: 0; }
+
+        /* ===========================================
+           LIGHTBOX — fullscreen video overlay
+           =========================================== */
+        .lightbox {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.94); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.35s var(--ease);
+        }
+        .lightbox.open { opacity: 1; pointer-events: auto; }
+        .lightbox .lb-inner {
+            width: min(92vw, 1400px); aspect-ratio: 16/9; position: relative;
+        }
+        .lightbox .lb-inner iframe {
+            width: 100%; height: 100%; border: 2px solid var(--lime); background: #000;
+        }
+        .lightbox .lb-close {
+            position: absolute; top: -2.6rem; right: 0;
+            font-family: var(--mono); font-size: var(--small-size);
+            color: var(--ink); background: none; border: 1.5px solid var(--line);
+            padding: 0.35em 0.9em; cursor: pointer; letter-spacing: 0.08em;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .lightbox .lb-close:hover { border-color: var(--lime); color: var(--lime); }
+        .lightbox .lb-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            font-family: var(--mono); font-size: 1.6rem; color: var(--ink);
+            background: rgba(10,10,11,0.55); border: 1.5px solid var(--line);
+            width: 3rem; height: 3rem; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; user-select: none;
+            transition: all 0.2s; backdrop-filter: blur(2px);
+        }
+        .lightbox .lb-nav:hover { border-color: var(--lime); background: rgba(10,10,11,0.8); }
+        .lightbox .lb-nav:active { transform: translateY(-50%) scale(0.93); }
+        .lightbox .lb-prev { left: -3.5rem; }
+        .lightbox .lb-next { right: -3.5rem; }
+        .lightbox .lb-title {
+            position: absolute; bottom: -2.2rem; left: 0;
+            font-family: var(--mono); font-size: var(--label-size);
+            color: var(--ink-dim); letter-spacing: 0.08em;
+        }
+        @media (max-width: 720px) {
+            .lightbox .lb-nav { width: 2.4rem; height: 2.4rem; font-size: 1.2rem; }
+            .lightbox .lb-prev { left: 0.4rem; }
+            .lightbox .lb-next { right: 0.4rem; }
+        }
+
+        /* ===========================================
+           EDIT MODE — press 'e' to edit text in-place
+           =========================================== */
+        .edit-mode .slide h1,
+        .edit-mode .slide h2,
+        .edit-mode .slide h3,
+        .edit-mode .slide h4,
+        .edit-mode .slide p,
+        .edit-mode .slide li,
+        .edit-mode .slide .lead,
+        .edit-mode .slide .caption,
+        .edit-mode .slide .eyebrow,
+        .edit-mode .slide .qtitle,
+        .edit-mode .slide .card .k,
+        .edit-mode .slide .card h4,
+        .edit-mode .slide .card p,
+        .edit-mode .slide .divider-num,
+        .edit-mode .slide .corner-tl,
+        .edit-mode .slide .corner-tr,
+        .edit-mode .slide .bottom-strip span,
+        .edit-mode .slide .num-list h4,
+        .edit-mode .slide .num-list p,
+        .edit-mode .slide .reel-meta h4,
+        .edit-mode .slide .reel-meta .k,
+        .edit-mode .slide .qblock .qk {
+            outline: 1px dashed rgba(204,255,0,0.22);
+            outline-offset: 4px;
+            cursor: text;
+            transition: outline-color 0.2s;
+        }
+        .edit-mode .slide h1:hover,
+        .edit-mode .slide h2:hover,
+        .edit-mode .slide h3:hover,
+        .edit-mode .slide h4:hover,
+        .edit-mode .slide p:hover,
+        .edit-mode .slide li:hover,
+        .edit-mode .slide .lead:hover,
+        .edit-mode .slide .caption:hover,
+        .edit-mode .slide .eyebrow:hover {
+            outline-color: var(--lime);
+        }
+        .edit-mode .slide [contenteditable]:focus {
+            outline: 2px solid var(--lime) !important;
+            outline-offset: 6px;
+        }
+        .edit-badge {
+            position: fixed; top: 1rem; right: 1rem; z-index: 9998;
+            font-family: var(--mono); font-size: var(--label-size);
+            letter-spacing: 0.12em; text-transform: uppercase;
+            background: var(--lime); color: #0a0a0b;
+            padding: 0.4em 1em; 
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .edit-mode .edit-badge { opacity: 1; }
+
+        /* ===========================================
+           HELP OVERLAY — press '?' to show shortcuts
+           =========================================== */
+        .help-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.88); backdrop-filter: blur(3px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s var(--ease);
+        }
+        .help-overlay.open { opacity: 1; pointer-events: auto; }
+        .help-panel {
+            background: var(--bg-2); border: 1.5px solid var(--lime);
+            padding: clamp(1.5rem,3vw,2.5rem); max-width: 520px; width: 90%;
+            display: flex; flex-direction: column; gap: clamp(0.7rem,1.2vw,1rem);
+        }
+        .help-panel h4 {
+            font-family: var(--body); font-weight: 800;
+            font-size: var(--h3-size); color: var(--lime); margin-bottom: 0.2rem;
+        }
+        .help-panel .kbd {
+            font-family: var(--mono); font-size: var(--small-size);
+            padding: 0.18em 0.5em; border: 1.5px solid var(--line);
+            color: var(--ink); display: inline-block; min-width: 1.6em;
+            text-align: center;
+        }
+        .help-row {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem;
+        }
+        .help-row span:last-child {
+            color: var(--ink-soft); font-size: var(--small-size); text-align: right;
+        }
+        .help-close {
+            font-family: var(--mono); font-size: var(--small-size);
+            color: var(--ink-dim); background: none; border: 1.5px solid var(--line);
+            padding: 0.3em 0.8em; cursor: pointer; align-self: flex-end;
+            letter-spacing: 0.08em; transition: border-color 0.2s;
+        }
+        .help-close:hover { border-color: var(--lime); color: var(--ink); }
+
+        /* ===========================================
+           CURSOR GLOW — subtle ambient follow
+           =========================================== */
+        .cursor-glow {
+            position: fixed; width: 140px; height: 140px; border-radius: 50%;
+            pointer-events: none; z-index: 9997;
+            background: radial-gradient(circle, rgba(204,255,0,0.045) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: opacity 0.4s;
+            opacity: 0;
+        }
+        .cursor-glow.active { opacity: 1; }
+
+        /* ===========================================
+           UI SCREENSHOT FIGURES — TouchDesigner 맛보기
+           =========================================== */
+        .shot-grid { display: grid; gap: clamp(0.7rem, 1.5vw, 1.2rem); width: 100%; }
+        .shot-grid.c3 { grid-template-columns: repeat(3, 1fr); }
+        .shot-grid.c2 { grid-template-columns: repeat(2, 1fr); }
+        .shot {
+            display: flex; flex-direction: column; text-decoration: none;
+            border: 1.5px solid var(--line); background: var(--bg-2);
+            transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+        }
+        .shot:hover { border-color: var(--lime); transform: translateY(-3px); }
+        .shot .pic {
+            background: #0d0d0f; border-bottom: 1.5px solid var(--line);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            height: clamp(120px, 26vh, 280px);
+        }
+        .shot.tall .pic { height: clamp(150px, 34vh, 360px); }
+        .shot .pic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .shot .cap { padding: clamp(0.5rem,1vw,0.85rem) clamp(0.6rem,1.2vw,1rem); display: flex; flex-direction: column; gap: 0.25rem; }
+        .shot .cap .k { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime); }
+        .shot .cap h4 { font-family: var(--body); font-weight: 800; font-size: clamp(0.95rem,1.6vw,1.3rem); letter-spacing: -0.02em; color: var(--ink); line-height: 1.15; }
+        .shot .cap p { font-size: var(--small-size); color: var(--ink-soft); line-height: 1.45; }
+
+        /* signal flow — Input / Process / Output */
+        .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: clamp(0.5rem,1.2vw,1rem); width: 100%; }
+        .flow .node { border: 1.5px solid var(--ink); background: var(--bg-2); padding: clamp(1rem,2.2vw,1.8rem); display: flex; flex-direction: column; gap: 0.4rem; justify-content: center; }
+        .flow .node.in { border-color: var(--lime); }
+        .flow .node.out { border-color: var(--violet-2); }
+        .flow .node .k { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
+        .flow .node h4 { font-family: var(--body); font-weight: 800; font-size: clamp(1.2rem,2.4vw,1.9rem); letter-spacing: -0.03em; color: var(--ink); }
+        .flow .node p { font-size: var(--small-size); color: var(--ink-soft); }
+        .flow .arr { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: clamp(1.1rem,2.2vw,1.9rem); color: var(--lime); }
+
+        @media (max-width: 720px) {
+            .shot-grid.c3, .shot-grid.c2 { grid-template-columns: 1fr; }
+            .flow { grid-template-columns: 1fr; }
+            .flow .arr { transform: rotate(90deg); }
+        }
+    
+        /* ===========================================
+           WEEK 02 — INTERACTIVE COMPONENTS
+           =========================================== */
+
+        /* ghost button shared */
+        .ghost-btn {
+            font-family: var(--mono); font-size: var(--small-size); letter-spacing: 0.04em;
+            background: transparent; color: var(--ink); border: 1.5px solid var(--line);
+            padding: 0.6em 1em; cursor: pointer; text-align: left;
+            transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background 0.2s var(--ease);
+        }
+        .ghost-btn:hover { border-color: var(--lime); color: var(--lime); }
+        .ghost-btn.on { background: var(--lime); border-color: var(--lime); color: #0a0a0b; }
+
+        .chl { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+
+        /* --- operator family explorer --- */
+        .fam-wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(0.8rem, 2vw, 1.6rem); width: 100%; align-items: stretch; }
+        .fam-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.5rem, 1vw, 0.8rem); }
+        .fam {
+            border: 1.5px solid var(--line); background: var(--bg-2); cursor: pointer;
+            padding: clamp(0.7rem, 1.4vw, 1.05rem); display: flex; flex-direction: column; gap: 0.4rem;
+            align-items: flex-start; text-align: left;
+            transition: transform 0.18s var(--ease), border-color 0.18s var(--ease);
+        }
+        .fam:hover { transform: translateY(-2px); border-color: var(--c); }
+        .fam.on { border-color: var(--c); box-shadow: inset 0 0 0 1.5px var(--c); }
+        .fam .dot { width: 0.85em; height: 0.85em; border-radius: 50%; flex: none; }
+        .fam .fn { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.08em; color: var(--ink-dim); }
+        .fam .ab { font-family: var(--head); font-weight: 400; font-size: clamp(1.3rem, 2.8vw, 2.1rem); letter-spacing: 0.02em; line-height: 1; color: var(--ink); }
+        .fam-detail {
+            border: 1.5px solid var(--line); background: var(--bg-2);
+            padding: clamp(1rem, 2vw, 1.6rem); display: flex; flex-direction: column; gap: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .fam-detail h3 { letter-spacing: -0.02em; }
+
+        /* --- non-destructive effect chain --- */
+        .fx { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(0.8rem, 2vw, 1.6rem); width: 100%; align-items: stretch; }
+        .fx-stage {
+            position: relative; aspect-ratio: 16 / 10; border: 1.5px solid var(--line);
+            background: #000; overflow: hidden;
+        }
+        .fx-stage .src, .fx-stage video {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+            transition: filter 0.25s var(--ease), transform 0.25s var(--ease);
+        }
+        .fx-stage .src {
+            background:
+                radial-gradient(circle at 30% 34%, #ccff00 0 13%, transparent 13.5%),
+                radial-gradient(circle at 70% 40%, #6e2bff 0 16%, transparent 16.5%),
+                radial-gradient(circle at 52% 76%, #ff3b6b 0 11%, transparent 11.5%),
+                radial-gradient(circle at 82% 78%, #2bd9ff 0 8%, transparent 8.5%),
+                repeating-linear-gradient(135deg, #131316 0 13px, #0d0d0f 13px 26px);
+        }
+        .fx-side { display: flex; flex-direction: column; gap: clamp(0.55rem, 1.2vw, 0.9rem); justify-content: center; }
+        .fx-controls { display: flex; flex-direction: column; gap: clamp(0.4rem, 0.9vw, 0.6rem); }
+        .fx-btn {
+            font-family: var(--body); font-weight: 700; font-size: var(--small-size);
+            background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line);
+            padding: 0.55em 0.9em; cursor: pointer; text-align: left; letter-spacing: -0.01em;
+            transition: all 0.18s var(--ease);
+        }
+        .fx-btn:hover { border-color: var(--ink); color: var(--ink); }
+        .fx-btn.on { background: var(--violet); border-color: var(--violet); color: var(--ink); }
+        .fx-chain {
+            font-family: var(--mono); font-size: var(--small-size); letter-spacing: 0.02em;
+            color: var(--ink-dim); line-height: 1.7; word-spacing: 0.1em;
+        }
+        .fx-chain b { color: var(--lime); font-weight: 700; }
+        .fx-chain .seg.on { color: var(--violet-2); }
+
+        /* --- CHOP three views (live) --- */
+        .chop-pad {
+            position: relative; border: 1.5px solid var(--line); background: var(--bg-2);
+            padding: clamp(1rem, 2.2vw, 1.8rem); cursor: crosshair;
+        }
+        .chop-pad .pad-hint {
+            position: absolute; top: 0.6rem; left: 50%; transform: translateX(-50%);
+            font-family: var(--mono); font-size: var(--label-size); color: var(--ink-dim);
+            letter-spacing: 0.06em; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+        }
+        .chop-pad.active .pad-hint { opacity: 0; }
+        .chop3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.7rem, 1.6vw, 1.3rem); margin-top: clamp(0.8rem, 1.6vw, 1.3rem); }
+        .chop-cell { border: 1.5px solid var(--line); background: var(--bg); padding: clamp(0.7rem, 1.4vw, 1.1rem); display: flex; flex-direction: column; gap: clamp(0.5rem, 1vw, 0.8rem); }
+        .chop-cell > .k { font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime); }
+        .chop-nums { display: flex; flex-direction: column; gap: 0.5rem; }
+        .chop-nums > div { display: flex; align-items: baseline; gap: 0.7rem; }
+        .chop-num { font-family: var(--head); font-weight: 400; font-size: clamp(1.6rem, 3.4vw, 2.6rem); color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
+        .bar-row { display: flex; align-items: center; gap: 0.6rem; }
+        .bar-track { flex: 1; height: clamp(14px, 2.2vw, 20px); background: var(--bg-3); border: 1px solid var(--line); position: relative; }
+        .bar-fill { position: absolute; left: 50%; top: 0; bottom: 0; width: 0; background: var(--lime); transition: none; }
+        canvas.wave { width: 100%; height: clamp(70px, 12vh, 120px); display: block; }
+
+        /* --- CHOP reference (live) --- */
+        .ref { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(0.8rem, 2vw, 1.6rem); width: 100%; align-items: stretch; }
+        .ref-stage {
+            position: relative; border: 1.5px solid var(--line); background: var(--bg);
+            display: flex; align-items: center; justify-content: center; cursor: crosshair;
+            min-height: clamp(180px, 34vh, 340px); overflow: hidden;
+        }
+        .ref-stage .ref-tag {
+            position: absolute; top: 0.6rem; left: 0.7rem;
+            font-family: var(--mono); font-size: var(--label-size); letter-spacing: 0.14em;
+            color: var(--violet-2); border: 1.5px solid var(--violet); padding: 0.18em 0.6em;
+        }
+        .ref-obj {
+            width: clamp(90px, 18vw, 160px); height: clamp(90px, 18vw, 160px);
+            background:
+                radial-gradient(circle at 30% 30%, #ccff00 0%, transparent 50%),
+                radial-gradient(circle at 72% 68%, #6e2bff 0%, transparent 55%),
+                linear-gradient(135deg, #1b1b1f, #0a0a0b);
+            border: 1.5px solid var(--line);
+            will-change: transform;
+        }
+        .ref-side { display: flex; flex-direction: column; gap: clamp(0.6rem, 1.2vw, 1rem); justify-content: center; }
+        .ref-expr { display: flex; flex-direction: column; gap: 0.5rem; }
+        .expr-line { display: flex; align-items: center; gap: 0.7rem; font-family: var(--mono); }
+        .expr-line .arrowx { color: var(--lime); }
+        .expr-line code {
+            font-family: var(--mono); font-size: var(--small-size); color: var(--ink);
+            background: var(--bg); border: 1px solid var(--line); padding: 0.3em 0.6em;
+            white-space: nowrap; overflow-x: auto;
+        }
+
+        @media (max-width: 720px) {
+            .fam-wrap, .fx, .ref { grid-template-columns: 1fr; }
+            .chop3 { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- ========================================================
+         SLIDE 01 — TITLE
+         ======================================================== -->
+    <section class="slide title">
+        <span class="corner-tl">포항 XR 교육 / 융합예술캠프</span>
+        <span class="corner-tr"><b>01</b> / 21</span>
+        <div class="slide-content" style="justify-content:center;">
+            <div class="wrapw">
+                <div class="eyebrow reveal" style="margin-bottom:clamp(1.1rem,2.4vw,1.9rem);">Pohang XR · Week 02 · 2026.07.02</div>
+                <h1 class="reveal">오퍼레이터,</h1>
+                <h1 class="reveal display outline lime" style="margin-top:0.1em; font-size:clamp(2rem,8vw,6.4rem);">신호를 잇는다</h1>
+                <div class="row reveal" style="margin-top:clamp(1.2rem,2.4vw,2rem); gap:1rem; flex-wrap:wrap;">
+                    <span class="sticker lime">TouchDesigner</span>
+                    <span class="tag violet">TOP</span>
+                    <span class="tag">CHOP</span>
+                    <span class="tag">Interactive</span>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-strip">
+            <span>유태양</span>
+            <span class="dline"></span>
+            <span>Operators · Signals</span>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 02 — 오늘 할 것
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">오늘 할 것</span>
+        <span class="corner-tr"><b>02</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.9rem,1.8vw,1.6rem);">
+                <div class="row reveal"><span class="eyebrow">Week 02 — 두 개의 오퍼레이터</span><span class="rule"></span><span class="barcode lime"></span></div>
+                <div class="cards-2 reveal">
+                    <div class="card accent">
+                        <span class="k" style="color:var(--violet-2);">01</span>
+                        <h4>TOP 활용해보기</h4>
+                        <p>Texture Operator. 이미지·영상을 픽셀 단위로 다루고, 효과를 비파괴적으로 쌓는다.</p>
+                    </div>
+                    <div class="card accent">
+                        <span class="k" style="color:var(--violet-2);">02</span>
+                        <h4>CHOP으로 인터랙티브</h4>
+                        <p>Channel Operator. 마우스·키보드·소리 같은 입력 데이터를 신호로 받아 화면을 움직인다.</p>
+                    </div>
+                </div>
+                <p class="caption reveal">TEXTURE OPERATOR · CHANNEL OPERATOR</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 03 — DIVIDER · 오퍼레이터
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>03</b> / 21</span>
+        <span class="bignum">01</span>
+        <span class="dots"></span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 01</div>
+                <h1 class="reveal">오퍼레이터</h1>
+                <p class="reveal" style="margin-top:clamp(0.8rem,1.6vw,1.4rem); max-width:50ch;">터치디자이너의 모든 도구는 오퍼레이터다. 하나하나가 기능을 담은 노드.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 04 — 오퍼레이터란 (img 01)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">오퍼레이터란</span>
+        <span class="corner-tr"><b>04</b> / 21</span>
+        <div class="slide-content">
+            <div class="split-60 wrapw">
+                <a class="shot tall reveal" href="../assets/td-w2/01-operators.png" target="_blank" rel="noopener">
+                    <div class="pic"><img loading="lazy" alt="터치디자이너 오퍼레이터들" src="../assets/td-w2/01-operators.png"></div>
+                    <div class="cap"><span class="k">Operators</span><h4>도구 하나하나</h4><p>화면 속 노드 하나가 오퍼레이터 하나.</p></div>
+                </a>
+                <div class="stack-lg reveal">
+                    <div class="row"><span class="eyebrow">What is an Operator</span></div>
+                    <h2 style="margin-bottom:0.2rem;">도구 하나하나가<br>오퍼레이터다</h2>
+                    <ul class="ticks" style="max-width:44ch;">
+                        <li>터치디자이너에서 보이는 <strong>도구 하나하나</strong>를 오퍼레이터라고 부른다.</li>
+                        <li>각 오퍼레이터는 <strong>고유한 기능</strong>을 담고 있다.</li>
+                        <li>어제 본 <strong>파라미터 창</strong>은 오퍼레이터를 클릭할 때마다 그 기능에 맞게 바뀐다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 05 — INTERACTIVE · 오퍼레이터 패밀리
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">오퍼레이터 패밀리 · 인터랙티브</span>
+        <span class="corner-tr"><b>05</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.7rem,1.4vw,1.2rem);">
+                <div class="row reveal"><span class="eyebrow">Operator Family — 각자 다른 나라</span><span class="rule"></span><span class="caption">클릭해서 살펴보기</span></div>
+                <div class="fam-wrap reveal">
+                    <div class="fam-grid" id="famGrid">
+                        <button class="fam on" data-fam="TOP" style="--c:#9a6bff;"><span class="row" style="gap:0.5em;"><span class="dot" style="background:#9a6bff;"></span><span class="fn">Texture</span></span><span class="ab">TOP</span></button>
+                        <button class="fam" data-fam="CHOP" style="--c:#5fd17a;"><span class="row" style="gap:0.5em;"><span class="dot" style="background:#5fd17a;"></span><span class="fn">Channel</span></span><span class="ab">CHOP</span></button>
+                        <button class="fam" data-fam="SOP" style="--c:#4a90e2;"><span class="row" style="gap:0.5em;"><span class="dot" style="background:#4a90e2;"></span><span class="fn">Surface</span></span><span class="ab">SOP</span></button>
+                        <button class="fam" data-fam="DAT" style="--c:#b6b14a;"><span class="row" style="gap:0.5em;"><span class="dot" style="background:#b6b14a;"></span><span class="fn">Data</span></span><span class="ab">DAT</span></button>
+                        <button class="fam" data-fam="MAT" style="--c:#c98b5a;"><span class="row" style="gap:0.5em;"><span class="dot" style="background:#c98b5a;"></span><span class="fn">Material</span></span><span class="ab">MAT</span></button>
+                        <button class="fam" data-fam="COMP" style="--c:#9aa0a6;"><span class="row" style="gap:0.5em;"><span class="dot" style="background:#9aa0a6;"></span><span class="fn">Component</span></span><span class="ab">COMP</span></button>
+                    </div>
+                    <div class="fam-detail" id="famDetail">
+                        <div class="row" style="gap:0.6em;"><span class="dot" id="famDot" style="width:0.9em;height:0.9em;border-radius:50%;background:#9a6bff;"></span><span class="fn mono" id="famFull" style="color:var(--ink-dim);letter-spacing:0.1em;">Texture Operator</span></div>
+                        <h3 id="famName" style="font-size:clamp(1.6rem,3.6vw,2.6rem);">TOP</h3>
+                        <p id="famDesc" style="color:var(--ink-soft);">GPU에서 모든 2D 이미지 연산을 처리한다. 영상·이미지·실시간 합성이 전부 여기서 일어난다.</p>
+                        <div class="wrap" id="famEx"><span class="tag">Movie File In</span><span class="tag">Edge</span><span class="tag">Blur</span><span class="tag">Composite</span></div>
+                    </div>
+                </div>
+                <p class="caption reveal">같은 색(같은 나라)끼리만 직접 연결된다 · 색이 다르면 변환 오퍼레이터를 거친다</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 06 — 연결 규칙 (img 02 · 03)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">연결 규칙</span>
+        <span class="corner-tr"><b>06</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.8rem,1.6vw,1.3rem);">
+                <div class="row reveal"><span class="eyebrow">Wiring — 같은 색끼리</span><span class="rule"></span><span class="caption">클릭하면 원본</span></div>
+                <div class="shot-grid c2 reveal">
+                    <a class="shot" href="../assets/td-w2/02-same-color-connected.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="같은 보라색 오퍼레이터끼리 연결" src="../assets/td-w2/02-same-color-connected.png"></div>
+                        <div class="cap"><span class="k">연결됨</span><h4>같은 보라색끼리</h4><p>TOP과 TOP은 선으로 바로 이어진다.</p></div>
+                    </a>
+                    <a class="shot" href="../assets/td-w2/03-dashed-link.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="점선으로 연결된 오퍼레이터" src="../assets/td-w2/03-dashed-link.png"></div>
+                        <div class="cap"><span class="k">점선</span><h4>실선이 아닌 점선</h4><p>직접 연결이 아니라 참조로 이어진 상태다.</p></div>
+                    </a>
+                </div>
+                <div class="row reveal" style="gap:0.8rem; flex-wrap:wrap;"><span class="sticker lime">같은 색 = 직접 연결</span><span class="caption">색(패밀리)이 다르면 변환 오퍼레이터를 한 번 거친다 — 다른 나라끼리는 번역기가 필요하다.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 07 — TAB 카탈로그 (img 04)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">오퍼레이터 카탈로그</span>
+        <span class="corner-tr"><b>07</b> / 21</span>
+        <div class="slide-content">
+            <div class="split-60 wrapw">
+                <a class="shot tall reveal" href="../assets/td-w2/04-tab-catalog.png" target="_blank" rel="noopener">
+                    <div class="pic"><img loading="lazy" alt="TAB 오퍼레이터 카탈로그" src="../assets/td-w2/04-tab-catalog.png"></div>
+                    <div class="cap"><span class="k">TAB</span><h4>오퍼레이터 카탈로그</h4><p>색색의 탭이 각각의 패밀리.</p></div>
+                </a>
+                <div class="stack-lg reveal">
+                    <div class="row"><span class="eyebrow">Catalog — 다른 나라들의 집단</span></div>
+                    <h2 style="margin-bottom:0.2rem;">TAB,<br>카탈로그를 연다</h2>
+                    <ul class="ticks" style="max-width:44ch;">
+                        <li><span class="mono">TAB</span> 키로 모든 오퍼레이터를 꺼내는 창을 연다.</li>
+                        <li>창 안의 <strong>색색의 탭</strong>이 곧 패밀리 — 나라가 다른 사람들이 모인 집단이다.</li>
+                        <li>같은 나라끼리는 직접 소통하고, <strong>다른 나라는 번역기</strong>를 한 번 거쳐 소통한다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 08 — 단축키 (img 05–08)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">알아두면 좋은 단축키</span>
+        <span class="corner-tr"><b>08</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="eyebrow">Shortcuts — 손에 익혀두기</span><span class="rule"></span><span class="caption">클릭하면 원본</span></div>
+                <div class="shot-grid c2 reveal">
+                    <a class="shot" href="../assets/td-w2/05-key-tab.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="TAB — 오퍼레이터 카탈로그" src="../assets/td-w2/05-key-tab.png"></div>
+                        <div class="cap"><span class="k">TAB</span><h4>오퍼레이터 카탈로그</h4><p>오퍼레이터를 꺼내는 창을 연다.</p></div>
+                    </a>
+                    <a class="shot" href="../assets/td-w2/06-key-c.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="C — 컬러 패널" src="../assets/td-w2/06-key-c.png"></div>
+                        <div class="cap"><span class="k">C</span><h4>컬러 패널</h4><p>좌측 하단에 컬러 패널을 띄운다.</p></div>
+                    </a>
+                    <a class="shot" href="../assets/td-w2/07-key-p.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="P — 파라미터 패널" src="../assets/td-w2/07-key-p.png"></div>
+                        <div class="cap"><span class="k">P</span><h4>파라미터 패널</h4><p>우측 파라미터 창을 껐다 켠다.</p></div>
+                    </a>
+                    <a class="shot" href="../assets/td-w2/08-key-d.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="D — Display" src="../assets/td-w2/08-key-d.png"></div>
+                        <div class="cap"><span class="k">D</span><h4>Display</h4><p>노드 뒤에서 실시간 결과를 바로 본다.</p></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 09 — 폴더 구조 (img 09 · 10)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">폴더 구조</span>
+        <span class="corner-tr"><b>09</b> / 21</span>
+        <div class="slide-content">
+            <div class="split wrapw">
+                <div class="shot-grid c2 reveal" style="grid-template-columns:1fr 1fr;">
+                    <a class="shot" href="../assets/td-w2/09-folder-desktop.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="바탕화면 폴더 정리" src="../assets/td-w2/09-folder-desktop.png"></div>
+                        <div class="cap"><span class="k">Organize</span><h4>폴더로 정리</h4></div>
+                    </a>
+                    <a class="shot" href="../assets/td-w2/10-project1-path.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="/project1 경로" src="../assets/td-w2/10-project1-path.png"></div>
+                        <div class="cap"><span class="k">Path</span><h4>/project1</h4></div>
+                    </a>
+                </div>
+                <div class="stack-lg reveal">
+                    <div class="row"><span class="eyebrow">Folders — 컴포넌트 구조</span></div>
+                    <h2 style="margin-bottom:0.2rem;">폴더 안에서<br>작업한다</h2>
+                    <ul class="ticks" style="max-width:42ch;">
+                        <li>터치디자이너는 <strong>폴더(컴포넌트) 구조</strong>를 가진다. 작업을 분류해 저장한다.</li>
+                        <li>기본 작업 경로는 <span class="mono">/project1</span>. 그 안에서 네트워크를 만든다.</li>
+                        <li><span class="mono">u</span> / <span class="mono">i</span> 키로 폴더의 <strong>밖(상위)</strong>과 <strong>안(하위)</strong>을 오간다.</li>
+                        <li>노드 몇 개로도 화면이 꽉 찬다 — 정리는 습관이다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 10 — DIVIDER · TOP
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>10</b> / 21</span>
+        <span class="bignum">02</span>
+        <span class="dots"></span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 02</div>
+                <h1 class="reveal">TOP</h1>
+                <p class="reveal" style="margin-top:clamp(0.8rem,1.6vw,1.4rem); max-width:48ch;">Texture Operator. 이미지·영상을 픽셀로 다룬다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 11 — TOP이란 (img 11)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">TOP이란</span>
+        <span class="corner-tr"><b>11</b> / 21</span>
+        <div class="slide-content">
+            <div class="split-60 wrapw">
+                <a class="shot tall reveal" href="../assets/td-w2/11-top-region.png" target="_blank" rel="noopener">
+                    <div class="pic"><img loading="lazy" alt="보라색 TOP 영역" src="../assets/td-w2/11-top-region.png"></div>
+                    <div class="cap"><span class="k">TOP</span><h4>보라색 영역 전체</h4><p>이미지·영상 처리 오퍼레이터.</p></div>
+                </a>
+                <div class="stack-lg reveal">
+                    <div class="row"><span class="eyebrow">Texture Operator</span></div>
+                    <h2 style="margin-bottom:0.2rem;">이미지를 다루는<br>픽셀 계산기</h2>
+                    <ul class="ticks" style="max-width:44ch;">
+                        <li>보라색 <strong>TOP</strong> 영역 전체가 이미지·영상 처리 오퍼레이터다.</li>
+                        <li>시각적으로는 <strong>이미지를 다루는 도구</strong>.</li>
+                        <li>데이터로 보면 <strong>픽셀 계산기의 모음</strong> — GPU에서 매 프레임 픽셀을 계산한다.</li>
+                    </ul>
+                    <span class="sticker lime" style="align-self:flex-start;">TOP = Texture Operator</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 12 — Edge / Mirror / Blur TOP (img 12–14)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">TOP 효과 셋</span>
+        <span class="corner-tr"><b>12</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.8rem,1.6vw,1.3rem);">
+                <div class="row reveal"><span class="eyebrow">TOP Effects — 골라 쓰는 픽셀 연산</span><span class="rule"></span><span class="caption">클릭하면 원본</span></div>
+                <div class="shot-grid c3 reveal">
+                    <a class="shot tall" href="../assets/td-w2/12-edge-top.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="Edge TOP" src="../assets/td-w2/12-edge-top.png"></div>
+                        <div class="cap"><span class="k">Edge TOP</span><h4>외곽선 추출</h4><p>이미지·영상의 경계선을 뽑아낸다.</p></div>
+                    </a>
+                    <a class="shot tall" href="../assets/td-w2/13-mirror-top.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="Mirror TOP" src="../assets/td-w2/13-mirror-top.png"></div>
+                        <div class="cap"><span class="k">Mirror TOP</span><h4>거울·대칭</h4><p>이미지를 거울처럼 반사·대칭시킨다.</p></div>
+                    </a>
+                    <a class="shot tall" href="../assets/td-w2/14-blur-top.png" target="_blank" rel="noopener">
+                        <div class="pic"><img loading="lazy" alt="Blur TOP" src="../assets/td-w2/14-blur-top.png"></div>
+                        <div class="cap"><span class="k">Blur TOP</span><h4>흐리게</h4><p>이미지에 블러를 준다.</p></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 13 — INTERACTIVE · 비파괴적 체인
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">비파괴적 연결 · 인터랙티브</span>
+        <span class="corner-tr"><b>13</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="eyebrow">Hands-on — 효과를 쌓아본다</span><span class="rule"></span><span class="caption">토글을 켜고 끄며 확인</span></div>
+                <div class="fx reveal">
+                    <div class="fx-stage" id="fxStage">
+                        <div class="src" id="fxSrc"></div>
+                        <svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true"><filter id="td-edge" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"/><feConvolveMatrix order="3" preserveAlpha="true" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"/></filter></svg>
+                        <video id="fxVideo" playsinline muted style="display:none;"></video>
+                    </div>
+                    <div class="fx-side">
+                        <div class="fx-controls" id="fxControls">
+                            <button class="fx-btn" data-fx="edge">Edge TOP</button>
+                            <button class="fx-btn" data-fx="mirror">Mirror TOP</button>
+                            <button class="fx-btn" data-fx="blur">Blur TOP</button>
+                        </div>
+                        <div class="fx-chain" id="fxChain"></div>
+                        <button class="ghost-btn" id="fxCam">▸ 웹캠 켜기 (Video Device In TOP)</button>
+                        <p class="caption" style="line-height:1.5;">오퍼레이터를 연결해도 이전 노드는 사라지지 않는다. 언제든 끄고 켜고 순서를 바꾼다 — <strong style="color:var(--ink);">비파괴 편집</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 14 — 웹캠 → Time Machine
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">웹캠 · 시간을 왜곡한다</span>
+        <span class="corner-tr"><b>14</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.9rem,1.8vw,1.5rem);">
+                <div class="row reveal"><span class="eyebrow">Webcam — 실시간 입력으로</span><span class="rule"></span><span class="barcode lime"></span></div>
+                <div class="flow reveal">
+                    <div class="node in"><span class="k">Input</span><h4>Video Device In</h4><p>웹캠 영상을 받아온다</p></div>
+                    <div class="arr">▶</div>
+                    <div class="node"><span class="k">Stack</span><h4>Texture 3D</h4><p>프레임을 시간순으로 쌓는다</p></div>
+                    <div class="arr">▶</div>
+                    <div class="node out"><span class="k">Warp</span><h4>Time Machine</h4><p>시간을 왜곡한다</p></div>
+                </div>
+                <div class="card accent reveal" style="gap:0.5rem;">
+                    <span class="k" style="color:var(--violet-2);">Time Machine TOP</span>
+                    <p>흑백 <strong>디스플레이스먼트 맵</strong>으로 픽셀마다 다른 시점을 고른다. 흰 픽셀은 <strong>가장 최근 프레임</strong>, 검은 픽셀은 <strong>가장 오래된 프레임</strong> — 한 화면 안에서 시간이 어긋난다.</p>
+                </div>
+                <p class="caption reveal">입력 데이터가 무엇이냐에 따라 효과는 천차만별 · 실시간 기기 데이터를 안정적으로 받아내는 것이 TD의 매력.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 15 — DIVIDER · CHOP
+         ======================================================== -->
+    <section class="slide divider">
+        <span class="corner-tr"><b>15</b> / 21</span>
+        <span class="bignum">03</span>
+        <span class="dots"></span>
+        <div class="slide-content">
+            <div class="wrapw">
+                <div class="divider-num reveal">SECTION 03</div>
+                <h1 class="reveal">CHOP</h1>
+                <p class="reveal" style="margin-top:clamp(0.8rem,1.6vw,1.4rem); max-width:48ch;">Channel Operator. 데이터를 신호로 다룬다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 16 — CHOP이란 (img 16)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">CHOP이란</span>
+        <span class="corner-tr"><b>16</b> / 21</span>
+        <div class="slide-content">
+            <div class="split-60 wrapw">
+                <a class="shot tall reveal" href="../assets/td-w2/16-chop.png" target="_blank" rel="noopener">
+                    <div class="pic"><img loading="lazy" alt="CHOP 오퍼레이터" src="../assets/td-w2/16-chop.png"></div>
+                    <div class="cap"><span class="k">CHOP</span><h4>채널 오퍼레이터</h4><p>숫자들의 흐름을 다룬다.</p></div>
+                </a>
+                <div class="stack-lg reveal">
+                    <div class="row"><span class="eyebrow">Channel Operator</span></div>
+                    <h2 style="margin-bottom:0.2rem;">데이터를<br>바라보는 방식</h2>
+                    <ul class="ticks" style="max-width:44ch;">
+                        <li><strong>CHOP</strong>은 모션·오디오·컨트롤 신호를 다룬다.</li>
+                        <li>같은 데이터를 <strong>숫자 · 채널 · 시각화</strong> 세 가지로 바라본다.</li>
+                        <li>마우스·키보드·마이크 — 이미 노트북에 있는 장치가 곧 입력이다.</li>
+                    </ul>
+                    <span class="sticker violet" style="align-self:flex-start;">CHOP = Channel Operator</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 17 — INTERACTIVE · CHOP 세 가지 시선
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">CHOP · 세 가지 시선 · 인터랙티브</span>
+        <span class="corner-tr"><b>17</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="eyebrow">Three Views — 같은 신호, 세 시선</span><span class="rule"></span><span class="caption">아래에서 마우스를 움직이세요</span></div>
+                <div class="chop-pad reveal" id="chopPad">
+                    <span class="pad-hint" id="chopHint">↑ 이 영역 위에서 마우스를 움직이면 신호가 반응한다 (Mouse In CHOP)</span>
+                    <div class="chop3">
+                        <div class="chop-cell">
+                            <span class="k">① 숫자</span>
+                            <div class="chop-nums">
+                                <div><span class="chl">tx</span><span class="chop-num" id="numTx">0.00</span></div>
+                                <div><span class="chl">ty</span><span class="chop-num" id="numTy">0.00</span></div>
+                            </div>
+                        </div>
+                        <div class="chop-cell">
+                            <span class="k">② 채널</span>
+                            <div class="bar-row"><span class="chl">tx</span><div class="bar-track"><div class="bar-fill" id="barTx"></div></div></div>
+                            <div class="bar-row"><span class="chl">ty</span><div class="bar-track"><div class="bar-fill" id="barTy"></div></div></div>
+                        </div>
+                        <div class="chop-cell">
+                            <span class="k">③ 시각화</span>
+                            <canvas class="wave" id="chopWave" width="320" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <p class="caption reveal">숫자도, 막대도, 파형도 전부 <strong style="color:var(--ink);">같은 신호</strong>다 — CHOP은 이 신호를 자유롭게 변형한다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 18 — CHOP In (img 17)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">CHOP In · 데이터 가져오기</span>
+        <span class="corner-tr"><b>18</b> / 21</span>
+        <div class="slide-content">
+            <div class="split-60 wrapw">
+                <a class="shot tall reveal" href="../assets/td-w2/17-chop-in.png" target="_blank" rel="noopener">
+                    <div class="pic"><img loading="lazy" alt="CHOP In 오퍼레이터" src="../assets/td-w2/17-chop-in.png"></div>
+                    <div class="cap"><span class="k">In</span><h4>장치 → 터치디자이너</h4><p>연결된 기기의 데이터를 가져온다.</p></div>
+                </a>
+                <div class="stack-lg reveal">
+                    <div class="row"><span class="eyebrow">Device In — 입력의 관문</span></div>
+                    <h2 style="margin-bottom:0.2rem;">In으로<br>가져온다</h2>
+                    <ul class="ticks" style="max-width:44ch;">
+                        <li>내 컴퓨터 장치의 데이터를 가져올 때는 <strong>In</strong>을 쓴다.</li>
+                        <li><strong>Mouse In CHOP</strong> — 마우스 위치·버튼.</li>
+                        <li><strong>Keyboard In CHOP</strong> — 키 입력 상태.</li>
+                        <li><strong>Audio Device In CHOP</strong> — 마이크 등 오디오 입력.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 19 — INTERACTIVE · CHOP Reference (img 18)
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">CHOP Reference · 인터랙티브</span>
+        <span class="corner-tr"><b>19</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.7rem,1.4vw,1.1rem);">
+                <div class="row reveal"><span class="eyebrow">CHOP Reference — 다른 나라로 신호 보내기</span><span class="rule"></span><span class="caption">마우스를 움직이면 TOP이 반응한다</span></div>
+                <div class="ref reveal" id="refPad">
+                    <div class="ref-stage">
+                        <span class="ref-tag">TOP</span>
+                        <div class="ref-obj" id="refObj"></div>
+                    </div>
+                    <div class="ref-side">
+                        <div class="ref-expr">
+                            <div class="expr-line"><span class="chl">Rotate</span><span class="arrowx">◂</span><code id="exprRot">op('mouse1')['tx']</code></div>
+                            <div class="expr-line"><span class="chl">Scale</span><span class="arrowx">◂</span><code id="exprScl">op('mouse1')['ty']</code></div>
+                        </div>
+                        <a class="shot" href="../assets/td-w2/18-chop-reference.png" target="_blank" rel="noopener" style="max-width:280px;">
+                            <div class="pic" style="height:clamp(90px,16vh,150px);"><img loading="lazy" alt="CHOP Reference" src="../assets/td-w2/18-chop-reference.png"></div>
+                            <div class="cap"><span class="k">CHOP Reference</span></div>
+                        </a>
+                        <p class="caption" style="line-height:1.5;">CHOP의 값을 <strong style="color:var(--ink);">다른 색 오퍼레이터의 파라미터</strong>로 보낸다. 선으로 잇던 규칙을 참조로 건너뛴다 — 첫 시간에 본 인터랙티브가 이렇게 만들어진다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 20 — 정리
+         ======================================================== -->
+    <section class="slide">
+        <span class="corner-tl">오늘 정리</span>
+        <span class="corner-tr"><b>20</b> / 21</span>
+        <div class="slide-content">
+            <div class="center-col wrapw" style="gap:clamp(0.9rem,1.8vw,1.5rem);">
+                <div class="row reveal"><span class="eyebrow">Recap</span><span class="rule"></span></div>
+                <ul class="num-list reveal">
+                    <li>
+                        <span class="n">01</span>
+                        <div>
+                            <h4>오퍼레이터</h4>
+                            <p>도구 하나하나가 오퍼레이터. 색은 패밀리이고, 같은 색끼리 직접 연결된다.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="n">02</span>
+                        <div>
+                            <h4>TOP</h4>
+                            <p>이미지·영상을 비파괴적으로 쌓는다. Edge · Mirror · Blur · Time Machine.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="n">03</span>
+                        <div>
+                            <h4>CHOP</h4>
+                            <p>입력을 신호로. 숫자·채널·시각화, In과 Reference로 인터랙티브를 만든다.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="n">↗</span>
+                        <div>
+                            <h4>다음</h4>
+                            <p>직접 만든 재료를 공간에 증강한다.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         SLIDE 21 — THANKS
+         ======================================================== -->
+    <section class="slide thanks">
+        <span class="corner-tl">제6의 섬 · Week 02</span>
+        <span class="corner-tr"><b>21</b> / 21</span>
+        <div class="slide-content" style="justify-content:center;">
+            <div class="wrapw">
+                <h1 class="reveal display"><span class="fill-lime">THANK</span> <span class="outline">YOU</span></h1>
+            </div>
+        </div>
+        <div class="bottom-strip">
+            <span>유태양</span>
+            <span class="dline"></span>
+            <span>Pohang XR · Week 02 — TOP &amp; CHOP</span>
+        </div>
+    </section>
+
+
+    <!-- ===========================================
+         LIGHTBOX — fullscreen video overlay
+         =========================================== -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-close" id="lbClose">CLOSE [ESC]</button>
+        <button class="lb-nav lb-prev" id="lbPrev" title="Previous video">◀</button>
+        <div class="lb-inner" id="lbInner"></div>
+        <button class="lb-nav lb-next" id="lbNext" title="Next video">▶</button>
+        <span class="lb-title" id="lbTitle"></span>
+    </div>
+
+    <!-- ===========================================
+         EDIT MODE BADGE
+         =========================================== -->
+    <div class="edit-badge" id="editBadge">✎ EDIT MODE [esc]</div>
+
+    <!-- ===========================================
+         HELP OVERLAY — press '?' to show shortcuts
+         =========================================== -->
+    <div class="help-overlay" id="helpOverlay">
+        <div class="help-panel">
+            <h4>⌨ KEYBOARD SHORTCUTS</h4>
+            <div class="help-row"><span><span class="kbd">→</span> <span class="kbd">↓</span> <span class="kbd">PgDn</span> <span class="kbd">Space</span></span><span>다음 슬라이드</span></div>
+            <div class="help-row"><span><span class="kbd">←</span> <span class="kbd">↑</span> <span class="kbd">PgUp</span></span><span>이전 슬라이드</span></div>
+            <div class="help-row"><span><span class="kbd">Home</span> / <span class="kbd">End</span></span><span>처음 / 마지막 슬라이드</span></div>
+            <div class="help-row"><span><span class="kbd">F</span></span><span>전체 화면 전환</span></div>
+            <div class="help-row"><span><span class="kbd">E</span></span><span>텍스트 편집 모드</span></div>
+            <div class="help-row"><span><span class="kbd">?</span></span><span>이 도움말</span></div>
+            <div class="help-row"><span><span class="kbd">Esc</span></span><span>닫기 / 편집 모드 종료</span></div>
+            <div class="help-row" style="margin-top:0.3rem;"><span>🖱 클릭</span><span>영상 썸네일 → 전체 화면 재생</span></div>
+            <button class="help-close" id="helpClose">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- ===========================================
+         CURSOR GLOW
+         =========================================== -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <script>
+    /* ---------- presentation nav ---------- */
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.current = 0;
+            this.bar = document.getElementById('progressBar');
+            this.observe();
+            this.keys();
+            this.touch();
+        }
+        observe() {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting && e.intersectionRatio > 0.5) {
+                        e.target.classList.add('visible');
+                        const i = Array.from(this.slides).indexOf(e.target);
+                        if (i !== -1) { this.current = i; this.progress(); }
+                    }
+                });
+            }, { threshold: [0.5] });
+            this.slides.forEach(s => io.observe(s));
+        }
+        progress() { this.bar.style.width = ((this.current + 1) / this.slides.length) * 100 + '%'; }
+        goTo(i) { i = Math.max(0, Math.min(this.slides.length - 1, i)); this.slides[i].scrollIntoView({ behavior: 'smooth' }); }
+        next() { this.goTo(this.current + 1); }
+        prev() { this.goTo(this.current - 1); }
+        keys() {
+            document.addEventListener('keydown', (e) => {
+                // typing inside a field — don't hijack keys
+                if (e.target.matches('input, textarea, [contenteditable="true"]')) return;
+                if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); this.next(); }
+                else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+                else if (e.key === 'Home') { e.preventDefault(); this.goTo(0); }
+                else if (e.key === 'End') { e.preventDefault(); this.goTo(this.slides.length - 1); }
+                else if (e.key === 'f' || e.key === 'F') {
+                    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                    else document.exitFullscreen();
+                }
+            });
+        }
+        touch() {
+            let y0 = 0, x0 = 0;
+            document.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; }, { passive: true });
+            document.addEventListener('touchend', (e) => {
+                if (e.target.closest('.qblock, .name-row')) return;
+                const dy = e.changedTouches[0].clientY - y0, dx = e.changedTouches[0].clientX - x0;
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) { dy < 0 ? this.next() : this.prev(); }
+            }, { passive: true });
+        }
+    }
+    new SlidePresentation();
+
+    /* ---------- video lightbox — click reel → fullscreen embed ---------- */
+    (function lightbox() {
+        const lb = document.getElementById('lightbox');
+        const inner = document.getElementById('lbInner');
+        const title = document.getElementById('lbTitle');
+        const prevBtn = document.getElementById('lbPrev');
+        const nextBtn = document.getElementById('lbNext');
+        const closeBtn = document.getElementById('lbClose');
+
+        let reels = [];
+        let currentIdx = -1;
+
+        function extractYouTubeID(url) {
+            const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+            return m ? m[1] : null;
+        }
+
+        function collectReels() {
+            reels = [];
+            document.querySelectorAll('.reel').forEach((r) => {
+                const href = r.getAttribute('href');
+                if (!href) return;
+                const vid = extractYouTubeID(href);
+                if (!vid) return;
+                const h4 = r.querySelector('h4')?.textContent || '';
+                const k = r.querySelector('.k')?.textContent || '';
+                reels.push({ el: r, vid, title: `${k} — ${h4}` });
+            });
+        }
+
+        function open(idx) {
+            if (idx < 0 || idx >= reels.length) return;
+            currentIdx = idx;
+            const r = reels[idx];
+            inner.innerHTML = `<iframe src="https://www.youtube.com/embed/${r.vid}?autoplay=1&rel=0" allow="autoplay; fullscreen" allowfullscreen loading="eager"></iframe>`;
+            title.textContent = r.title;
+            lb.classList.add('open');
+            document.getElementById('helpOverlay').classList.remove('open');
+        }
+
+        function closeLB() {
+            lb.classList.remove('open');
+            inner.innerHTML = '';
+            currentIdx = -1;
+        }
+
+        function prevVideo() { if (currentIdx > 0) open(currentIdx - 1); }
+        function nextVideo() { if (currentIdx < reels.length - 1) open(currentIdx + 1); }
+
+        // Click any reel to open its video in lightbox
+        document.addEventListener('click', (e) => {
+            const reel = e.target.closest('.reel');
+            if (!reel) return;
+            const match = reels.find(r => r.el === reel);
+            if (match) {
+                e.preventDefault();
+                e.stopPropagation();
+                open(reels.indexOf(match));
+            }
+        });
+
+        closeBtn.addEventListener('click', closeLB);
+        prevBtn.addEventListener('click', prevVideo);
+        nextBtn.addEventListener('click', nextVideo);
+        lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
+
+        // Keyboard: lightbox navigation
+        document.addEventListener('keydown', (e) => {
+            if (!lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLB(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevVideo(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); nextVideo(); }
+        });
+
+        collectReels();
+    })();
+
+    /* ---------- edit mode — press 'e' to make text editable in-place ---------- */
+    (function editMode() {
+        const EDITABLE = '.slide h1, .slide h2, .slide h3, .slide h4, .slide p, .slide li, .slide .lead, .slide .caption, .slide .eyebrow, .slide .qtitle, .slide .card .k, .slide .card h4, .slide .card p, .slide .divider-num, .slide .corner-tl, .slide .corner-tr, .slide .bottom-strip span, .slide .num-list h4, .slide .num-list p, .slide .reel-meta h4, .slide .reel-meta .k, .slide .qblock .qk';
+        const STORAGE_KEY = 'pohang-xr-w2-edits';
+        const badge = document.getElementById('editBadge');
+        const lb = document.getElementById('lightbox');
+        const help = document.getElementById('helpOverlay');
+        let enabled = false;
+
+        // ① Assign permanent keys to all editable elements (runs once on page load)
+        function initKeys() {
+            let idx = 0;
+            document.querySelectorAll(EDITABLE).forEach(el => {
+                if (!el.textContent.trim()) return;
+                const slide = el.closest('.slide');
+                const sIdx = slide ? Array.from(document.querySelectorAll('.slide')).indexOf(slide) : 0;
+                el.dataset.editKey = `s${sIdx}-e${idx++}`;
+            });
+        }
+
+        // ② Restore saved edits — keys already assigned by initKeys()
+        function loadEdits() {
+            let edits = {};
+            try { edits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (_) {}
+            Object.entries(edits).forEach(([key, text]) => {
+                const el = document.querySelector(`[data-edit-key="${key}"]`);
+                if (el) el.textContent = text;
+            });
+        }
+
+        // ③ Save changed edits to localStorage
+        function saveEdits() {
+            const edits = {};
+            document.querySelectorAll(EDITABLE).forEach(el => {
+                const key = el.dataset.editKey;
+                if (key && el.dataset.originalText !== undefined && el.textContent !== el.dataset.originalText) {
+                    edits[key] = el.textContent;
+                }
+            });
+            if (Object.keys(edits).length > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
+            }
+        }
+
+        function enable() {
+            if (enabled) return;
+            enabled = true;
+            document.body.classList.add('edit-mode');
+
+            document.querySelectorAll(EDITABLE).forEach(el => {
+                if (!el.textContent.trim()) return;
+                // Snapshot current text as original (may already include restored edits)
+                el.dataset.originalText = el.textContent;
+                el.contentEditable = 'true';
+                el.addEventListener('blur', onBlur);
+                el.addEventListener('keydown', onEditKeydown);
+            });
+        }
+
+        function disable() {
+            if (!enabled) return;
+            enabled = false;
+            document.body.classList.remove('edit-mode');
+
+            document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+                el.contentEditable = 'false';
+                el.removeEventListener('blur', onBlur);
+                el.removeEventListener('keydown', onEditKeydown);
+            });
+            saveEdits();
+        }
+
+        function onBlur(e) {
+            if (e.target.dataset.originalText !== e.target.textContent) {
+                saveEdits();
+            }
+        }
+
+        function onEditKeydown(e) {
+            // Escape while editing: blur this element only
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.target.blur();
+            }
+        }
+
+        function toggle() {
+            if (enabled) disable(); else enable();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.matches('input, textarea, [contenteditable="true"]')) return;
+            if (lb.classList.contains('open')) return;
+            if (help.classList.contains('open')) return;
+            if (e.key === 'e' || e.key === 'E') {
+                e.preventDefault();
+                toggle();
+            }
+            if (e.key === 'Escape' && enabled) {
+                e.preventDefault();
+                disable();
+            }
+        });
+
+        // ④ Init sequence: assign permanent keys → restore saved edits
+        initKeys();
+        loadEdits();
+    })();
+
+    /* ---------- help overlay — press '?' to show keyboard shortcuts ---------- */
+    (function helpOverlay() {
+        const overlay = document.getElementById('helpOverlay');
+        const closeBtn = document.getElementById('helpClose');
+
+        function open() { overlay.classList.add('open'); }
+        function close() { overlay.classList.remove('open'); }
+
+        closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.matches('input, textarea, [contenteditable="true"]')) return;
+            if (e.key === '?') { e.preventDefault(); open(); }
+            if (e.key === 'Escape' && overlay.classList.contains('open')) {
+                e.preventDefault(); close();
+            }
+        });
+    })();
+
+    /* ---------- cursor glow — subtle ambient mouse follow ---------- */
+    (function cursorGlow() {
+        const glow = document.getElementById('cursorGlow');
+        let ticking = false;
+        let visible = false;
+
+        function show() { if (!visible) { glow.classList.add('active'); visible = true; } }
+        function hide() { if (visible) { glow.classList.remove('active'); visible = false; } }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    glow.style.left = e.clientX + 'px';
+                    glow.style.top = e.clientY + 'px';
+                    show();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        document.addEventListener('mouseleave', hide);
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('.lightbox, .help-overlay, .reel, .chip, button, input, textarea, [contenteditable="true"]')) {
+                hide();
+            }
+        });
+    })();
+
+    /* ---------- A · operator family explorer ---------- */
+    (function familyExplorer() {
+        const grid = document.getElementById('famGrid');
+        if (!grid) return;
+        const DATA = {
+            TOP:  { full: 'Texture Operator',  color: '#9a6bff', desc: 'GPU에서 모든 2D 이미지 연산을 처리한다. 영상·이미지·실시간 합성이 전부 여기서 일어난다.', ex: ['Movie File In', 'Edge', 'Blur', 'Composite'] },
+            CHOP: { full: 'Channel Operator',  color: '#5fd17a', desc: '모션·오디오·애니메이션·컨트롤 신호를 다룬다. 시간에 따라 흐르는 숫자들(채널).', ex: ['Mouse In', 'Audio Device In', 'Noise', 'Math'] },
+            SOP:  { full: 'Surface Operator',  color: '#4a90e2', desc: '3D 점·폴리곤·프리미티브 같은 지오메트리를 다룬다. 형태를 만드는 곳.', ex: ['Sphere', 'Grid', 'Noise SOP', 'Line'] },
+            DAT:  { full: 'Data Operator',     color: '#b6b14a', desc: '텍스트·테이블·스크립트를 다룬다. 문자와 데이터, 그리고 파이썬 코드.', ex: ['Table', 'Text', 'Execute', 'Select'] },
+            MAT:  { full: 'Material Operator',  color: '#c98b5a', desc: '3D 렌더링에 입히는 재질과 셰이더를 다룬다.', ex: ['Phong', 'PBR', 'Constant', 'Wireframe'] },
+            COMP: { full: 'Component',          color: '#9aa0a6', desc: '다른 오퍼레이터를 담는 컨테이너. 3D 오브젝트와 UI 패널도 COMP다.', ex: ['Container', 'Geometry', 'Camera', 'Button'] }
+        };
+        const dot = document.getElementById('famDot');
+        const full = document.getElementById('famFull');
+        const name = document.getElementById('famName');
+        const desc = document.getElementById('famDesc');
+        const exWrap = document.getElementById('famEx');
+
+        function select(key, btn) {
+            const d = DATA[key];
+            if (!d) return;
+            grid.querySelectorAll('.fam').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            dot.style.background = d.color;
+            full.textContent = d.full;
+            name.textContent = key;
+            desc.textContent = d.desc;
+            exWrap.innerHTML = d.ex.map(e => `<span class="tag">${e}</span>`).join('');
+        }
+        grid.querySelectorAll('.fam').forEach(btn => {
+            btn.addEventListener('click', () => select(btn.dataset.fam, btn));
+        });
+    })();
+
+    /* ---------- B · non-destructive effect chain ---------- */
+    (function effectChain() {
+        const stage = document.getElementById('fxStage');
+        if (!stage) return;
+        const src = document.getElementById('fxSrc');
+        const video = document.getElementById('fxVideo');
+        const controls = document.getElementById('fxControls');
+        const chainEl = document.getElementById('fxChain');
+        const camBtn = document.getElementById('fxCam');
+        const ORDER = ['edge', 'mirror', 'blur'];
+        const LABEL = { edge: 'Edge', mirror: 'Mirror', blur: 'Blur' };
+        const active = {};
+
+        function apply() {
+            const on = ORDER.filter(k => active[k]);
+            const filters = [];
+            let transform = 'scale(1.02)'; // slight bleed to hide edges
+            on.forEach(k => {
+                if (k === 'edge') filters.push('url(#td-edge)');
+                if (k === 'blur') filters.push('blur(7px)');
+                if (k === 'mirror') transform += ' scaleX(-1)';
+            });
+            const f = filters.length ? filters.join(' ') : 'none';
+            src.style.filter = f; src.style.transform = transform;
+            video.style.filter = f; video.style.transform = transform;
+            // chain readout
+            const segs = ['<b>In</b>'];
+            on.forEach(k => segs.push(`<span class="seg on">${LABEL[k]}</span>`));
+            segs.push('<b>Out</b>');
+            chainEl.innerHTML = segs.join(' &nbsp;▸&nbsp; ');
+        }
+
+        controls.querySelectorAll('.fx-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const k = btn.dataset.fx;
+                active[k] = !active[k];
+                btn.classList.toggle('on', active[k]);
+                apply();
+            });
+        });
+
+        let stream = null;
+        camBtn.addEventListener('click', async () => {
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+                video.style.display = 'none'; src.style.display = 'block';
+                camBtn.classList.remove('on');
+                camBtn.textContent = '▸ 웹캠 켜기 (Video Device In TOP)';
+                return;
+            }
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = stream; await video.play();
+                src.style.display = 'none'; video.style.display = 'block';
+                camBtn.classList.add('on');
+                camBtn.textContent = '■ 웹캠 끄기';
+            } catch (err) {
+                camBtn.textContent = '웹캠을 열 수 없습니다 (권한 확인)';
+            }
+        });
+
+        apply();
+    })();
+
+    /* ---------- C · CHOP three live views ---------- */
+    (function chopLive() {
+        const pad = document.getElementById('chopPad');
+        if (!pad) return;
+        const numTx = document.getElementById('numTx');
+        const numTy = document.getElementById('numTy');
+        const barTx = document.getElementById('barTx');
+        const barTy = document.getElementById('barTy');
+        const canvas = document.getElementById('chopWave');
+        const ctx = canvas.getContext('2d');
+        let tx = 0, ty = 0;
+        const N = 120;
+        const hist = new Array(N).fill(0);
+
+        function setBar(el, v) { // v in [-1,1]
+            const half = Math.abs(v) * 50;
+            el.style.width = half + '%';
+            el.style.left = v >= 0 ? '50%' : (50 - half) + '%';
+        }
+        pad.addEventListener('pointermove', (e) => {
+            const r = pad.getBoundingClientRect();
+            tx = ((e.clientX - r.left) / r.width) * 2 - 1;
+            ty = ((e.clientY - r.top) / r.height) * 2 - 1;
+            tx = Math.max(-1, Math.min(1, tx));
+            ty = Math.max(-1, Math.min(1, ty));
+            pad.classList.add('active');
+        });
+
+        function frame() {
+            numTx.textContent = (tx >= 0 ? ' ' : '') + tx.toFixed(2);
+            numTy.textContent = (ty >= 0 ? ' ' : '') + ty.toFixed(2);
+            setBar(barTx, tx); setBar(barTy, ty);
+            hist.push(tx); if (hist.length > N) hist.shift();
+            // draw waveform
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(244,244,241,0.12)';
+            ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+            ctx.strokeStyle = '#ccff00'; ctx.lineWidth = 2; ctx.beginPath();
+            for (let i = 0; i < hist.length; i++) {
+                const x = (i / (N - 1)) * w;
+                const y = h / 2 - hist[i] * (h / 2 - 6);
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    })();
+
+    /* ---------- D · CHOP reference (live) ---------- */
+    (function chopReference() {
+        const pad = document.getElementById('refPad');
+        if (!pad) return;
+        const obj = document.getElementById('refObj');
+        const exprRot = document.getElementById('exprRot');
+        const exprScl = document.getElementById('exprScl');
+        const stage = pad.querySelector('.ref-stage');
+        let tx = 0, ty = 0;
+
+        function update(e) {
+            const r = stage.getBoundingClientRect();
+            tx = ((e.clientX - r.left) / r.width) * 2 - 1;
+            ty = ((e.clientY - r.top) / r.height) * 2 - 1;
+            tx = Math.max(-1, Math.min(1, tx));
+            ty = Math.max(-1, Math.min(1, ty));
+            const rot = (tx * 180).toFixed(0);
+            const scl = (1 + ty * 0.6).toFixed(2);
+            obj.style.transform = `rotate(${rot}deg) scale(${scl})`;
+            exprRot.textContent = `op('mouse1')['tx'] = ${tx.toFixed(2)}  →  ${rot}°`;
+            exprScl.textContent = `op('mouse1')['ty'] = ${ty.toFixed(2)}  →  ×${scl}`;
+        }
+        stage.addEventListener('pointermove', update);
+    })();
+
+    </script>
+</body>
+</html>

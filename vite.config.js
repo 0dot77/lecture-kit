@@ -57,6 +57,7 @@ export default defineConfig({
         "seongnam-pm-week01-slides": "courses/seongnam-projection-mapping/slides/week-01.html",
         "pohang-xr-index": "courses/pohang-xr/index.html",
         "pohang-xr-week01-slides": "courses/pohang-xr/slides/week-01.html",
+        "pohang-xr-week02-slides": "courses/pohang-xr/slides/week-02.html",
       },
     },
   },
